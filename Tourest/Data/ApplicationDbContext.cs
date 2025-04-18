@@ -125,8 +125,8 @@ namespace Tourest.Data
 				entity.Property(e => e.Description).IsRequired(false); // Default for NVARCHAR(MAX)
 				entity.Property(e => e.DurationDays).IsRequired();
 				entity.Property(e => e.DurationNights).IsRequired();
-				entity.Property(e => e.AdultPrice).IsRequired().HasColumnType("decimal(18, 2)");
-				entity.Property(e => e.ChildPrice).IsRequired().HasColumnType("decimal(18, 2)");
+				entity.Property(e => e.AdultPrice).IsRequired();
+				entity.Property(e => e.ChildPrice).IsRequired();
 				entity.Property(e => e.MinGroupSize).IsRequired(false);
 				entity.Property(e => e.MaxGroupSize).IsRequired(false);
 				entity.Property(e => e.DeparturePoints).HasMaxLength(500).IsRequired(false);
@@ -186,7 +186,7 @@ namespace Tourest.Data
 				entity.Property(e => e.DepartureDate).IsRequired().HasColumnType("DATE"); // Specify Date type
 				entity.Property(e => e.NumberOfAdults).IsRequired();
 				entity.Property(e => e.NumberOfChildren).IsRequired().HasDefaultValue(0);
-				entity.Property(e => e.TotalPrice).IsRequired().HasColumnType("decimal(18, 2)");
+				entity.Property(e => e.TotalPrice).IsRequired();
 				entity.Property(e => e.Status).IsRequired().HasMaxLength(50);
 				entity.Property(e => e.PickupPoint).HasMaxLength(200).IsRequired(false);
 				entity.Property(e => e.CustomerID).IsRequired();
@@ -194,7 +194,7 @@ namespace Tourest.Data
 				entity.Property(e => e.TourGroupID).IsRequired(false);
 				entity.Property(e => e.PaymentID).IsRequired(false);
 				entity.Property(e => e.CancellationDate).IsRequired(false);
-				entity.Property(e => e.RefundAmount).HasColumnType("decimal(18, 2)").IsRequired(false);
+				entity.Property(e => e.RefundAmount).IsRequired(false);
 
 				entity.HasOne(b => b.Customer)
 					  .WithMany(u => u.Bookings)
@@ -228,7 +228,7 @@ namespace Tourest.Data
 				entity.Property(e => e.BookingID).IsRequired();
 				entity.HasIndex(e => e.BookingID).IsUnique(); // Ensure 1 payment per booking
 
-				entity.Property(e => e.Amount).IsRequired().HasColumnType("decimal(18, 2)");
+				entity.Property(e => e.Amount).IsRequired();
 				entity.Property(e => e.PaymentDate).IsRequired();
 				entity.Property(e => e.PaymentMethod).IsRequired().HasMaxLength(50);
 				entity.Property(e => e.TransactionID).HasMaxLength(255).IsRequired(false);

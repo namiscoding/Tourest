@@ -4,7 +4,7 @@
 	{
 		public int PaymentID { get; set; }
 		public int BookingID { get; set; } // FK property
-		public decimal Amount { get; set; }
+		public int Amount { get; set; }
 		public DateTime PaymentDate { get; set; }
 		public string PaymentMethod { get; set; } = string.Empty;
 		public string? TransactionID { get; set; }

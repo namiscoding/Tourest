@@ -10,10 +10,10 @@
 		public int DurationNights { get; set; }
 
 		// [Column(TypeName = "decimal(18, 2)")]
-		public decimal AdultPrice { get; set; }
+		public int AdultPrice { get; set; }
 
 		// [Column(TypeName = "decimal(18, 2)")]
-		public decimal ChildPrice { get; set; }
+		public int ChildPrice { get; set; }
 
 		public int? MinGroupSize { get; set; }
 		public int? MaxGroupSize { get; set; }
