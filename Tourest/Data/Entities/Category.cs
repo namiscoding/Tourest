@@ -1,4 +1,4 @@
-﻿namespace Tourest.Models
+﻿namespace Tourest.Data.Entities
 {
 	public class Category
 	{

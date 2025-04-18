@@ -1,4 +1,4 @@
-﻿namespace Tourest.Models
+﻿namespace Tourest.Data.Entities
 {
 	public class ItineraryDay
 	{
@@ -8,7 +8,7 @@
 		public string Title { get; set; } = string.Empty;
 		public string? Description { get; set; }
 		public int Order { get; set; }
-						
+
 		// Navigation Property
 		public virtual Tour Tour { get; set; } = null!;
 	}

@@ -1,6 +1,6 @@
 ﻿using System.Security.Principal;
 
-namespace Tourest.Models
+namespace Tourest.Data.Entities
 {
 	public class User
 	{

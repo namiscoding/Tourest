@@ -1,4 +1,4 @@
-﻿namespace Tourest.Models
+﻿namespace Tourest.Data.Entities
 {
 	public class TourRating // Can inherit Rating if preferred, but TPT setup in DbContext works too
 	{

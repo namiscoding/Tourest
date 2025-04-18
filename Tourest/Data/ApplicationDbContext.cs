@@ -1,5 +1,5 @@
-﻿using Tourest.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Tourest.Data.Entities;
 
 namespace Tourest.Data
 {

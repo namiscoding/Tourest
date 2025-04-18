@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Tourest.Models;
+using Tourest.ViewModels;
 
 namespace Tourest.Controllers
 {
