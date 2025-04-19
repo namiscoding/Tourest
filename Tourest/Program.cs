@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tourest.Data;
+using Tourest.Data.Repositories;
+using Tourest.Services;
+
 
 namespace Tourest
 {
@@ -7,6 +10,7 @@ namespace Tourest
 	{
 		public static void Main(string[] args)
 		{
+
 			var builder = WebApplication.CreateBuilder(args);
 
 			// Lấy connection string từ appsettings.json
@@ -16,10 +20,13 @@ namespace Tourest
 			builder.Services.AddDbContext<ApplicationDbContext>(options =>
 				options.UseSqlServer(connectionString));
 
-			// Add services to the container.
-			builder.Services.AddControllersWithViews();
+            // Add services to the container.
+            builder.Services.AddScoped<ITourRepository, TourRepository>();
+            builder.Services.AddScoped<ITourService, TourService>();
 
-			var app = builder.Build();
+            builder.Services.AddControllersWithViews();
+            
+            var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
 			if (!app.Environment.IsDevelopment())
@@ -38,7 +45,7 @@ namespace Tourest
 
 			app.MapControllerRoute(
 				name: "default",
-				pattern: "{controller=Home}/{action=Index}/{id?}");
+				pattern: "{controller=Tours}/{action=Index}/{id?}");
 
 			app.Run();
 		}

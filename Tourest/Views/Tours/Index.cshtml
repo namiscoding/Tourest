@@ -1,0 +1,540 @@
+﻿@* File: Views/Tours/Index.cshtml *@
+@using System.Globalization
+@model IEnumerable<Tourest.ViewModels.Tour.TourListViewModel>
+@* Khai báo model mà View này sẽ nhận từ Controller *@
+@{
+    ViewData["Title"] = "Tourest - Danh Sách Tour Hiện Có";
+}
+
+<body class="custom-cursor">
+    <!-- Custom Cursor start -->
+    <div class="custom-cursor__cursor"></div>
+    <div class="custom-cursor__cursor-two"></div>
+    <!-- Custom Cursor end -->
+    <!-- Preloader start -->
+    <div id="preloader">
+        <div class="loading-container">
+            <div class="loading"></div>
+            <div id="loading-icon">
+                <img alt="logo-sm" src="~/assets/images/logo.svg" width="90" />
+            </div>
+        </div>
+    </div>
+    <!-- Preloader end -->
+    <!-- back to top button start-->
+    <a href="#" id="scroll-top" class="back-to-top-btn">
+        <i class="fa-solid fa-arrow-up"></i>
+    </a>
+    <!-- back to top button end-->
+    <!-- Mobile Menu side Bar Start  -->
+    <div class="offcanvas offcanvas-md offcanvas-start"
+         tabindex="-1"
+         id="offcanvasTop"
+         aria-labelledby="offcanvasTopLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasTopLabel">
+                <a href="index.html" class="logo">
+                    <img src="~/assets/images/logo.svg" alt="logo" />
+                </a>
+            </h5>
+            <button type="button"
+                    class="btn-close offcanvas-close-btn"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Close">
+                <i class="fa-regular fa-circle-xmark"></i>
+            </button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="mobile-menu"></div>
+        </div>
+    </div>
+    <!-- Mobile Menu side Bar End  -->
+    <!-- search modal start  -->
+    <div class="modal fade"
+         id="searchModal"
+         tabindex="-1"
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="exampleModalLabel">
+                        Search Your Trip
+                    </h2>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="search__area">
+                        <form action="index.html" class="search-form">
+                            <div class="input-group">
+                                <span>Destination</span>
+                                <div class="input-container">
+                                    <input type="text"
+                                           class="form-control"
+                                           id="destination"
+                                           placeholder="Where to go?"
+                                           autocomplete="off"
+                                           required />
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <span>Type</span>
+                                <div class="input-container">
+                                    <input type="text"
+                                           class="form-control"
+                                           id="type"
+                                           placeholder="Activity"
+                                           autocomplete="off"
+                                           required />
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <span>When</span>
+                                <div class="input-container">
+                                    <input type="date"
+                                           class="form-control"
+                                           id="daterange"
+                                           name="daterange" />
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <span>Guests</span>
+                                <div class="input-container">
+                                    <input type="number"
+                                           class="form-control"
+                                           id="guests"
+                                           placeholder="0"
+                                           autocomplete="off"
+                                           required />
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <button class="common-btn color-two">search</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="common-btn color-two"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- search modal end  -->
+
+    <
+
+    <main>
+        <!-- Breadcrumb__section start  -->
+        <section class="breadcrumb__section section-padding-top-bottom"
+                 style="
+          --bg-image: url('../images/breadcrumb-section/tour-breadcrumb-bg.png');
+        ">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="breadcrumb__content">
+                            <h1 class="breadcrumb-title">Tour Package</h1>
+                            <nav>
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a href="index.html">home</a>
+                                    </li>
+                                    <li class="breadcrumb-item active" aria-current="page">
+                                        Tour Package
+                                    </li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Breadcrumb__section end  -->
+        <!-- Search__section start  -->
+        <div class="search__section fade_bottom">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="search__area search__area--extend">
+                            <form action="index.html" class="search-form">
+                                <div class="input-group">
+                                    <span>Destination</span>
+                                    <div class="input-container">
+                                        <input type="text"
+                                               class="form-control"
+                                               id="destination2"
+                                               placeholder="Where to go?"
+                                               autocomplete="off"
+                                               required />
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <span>Type</span>
+                                    <div class="input-container">
+                                        <input type="text"
+                                               class="form-control"
+                                               id="type2"
+                                               placeholder="Activity"
+                                               autocomplete="off"
+                                               required />
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <span>When</span>
+                                    <div class="input-container">
+                                        <input type="date"
+                                               class="form-control"
+                                               id="daterange2"
+                                               name="daterange" />
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <span>Guests</span>
+                                    <div class="input-container">
+                                        <input type="number"
+                                               class="form-control"
+                                               id="guests2"
+                                               placeholder="0"
+                                               autocomplete="off"
+                                               required />
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <button class="common-btn color-two">search</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Search__section end  -->
+        <!-- Tour-package__section start  -->
+        <section class="tour-package__section section-padding-top-bottom">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4 col-xl-3">
+                        <div class="destination-dtls__sidebar sidebar">
+                            <div class="widget__item item-stagger search-widget">
+                                <h6 class="widget-title">Search</h6>
+                                <form action="index.html" class="search-widget__search-form">
+                                    <div class="input-group">
+                                        <input type="search"
+                                               name="filter-search"
+                                               id="filter-search"
+                                               placeholder="Type anything..." />
+                                        <button class="search-btn">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="widget__item item-stagger range-widget">
+                                <h6 class="widget-title">Filter By</h6>
+                                <div class="range-widget__content">
+                                    <form action="index.html" class="range-form">
+                                        <div id="slider-range"></div>
+                                        <div class="price-input">
+                                            <input type="text" id="amount" />
+                                            <input type="text" id="amount2" />
+                                        </div>
+
+                                        <button class="common-btn color-two">submit</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="widget__item item-stagger categories-widget">
+                                <h6 class="widget-title">Categories</h6>
+                                <div class="categories-widget__content">
+                                    <div class="widget__check-list">
+                                        <ul>
+                                            <li>
+                                                <input type="checkbox" id="category-1" />
+                                                <label for="category-1">Adventure</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="category-2" />
+                                                <label for="category-2">Beaches</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="category-3" />
+                                                <label for="category-3">Boat Tours</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="category-4" />
+                                                <label for="category-4">City Tours</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="category-5" />
+                                                <label for="category-5">Food</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="category-6" />
+                                                <label for="category-6">Hiking</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="category-7" />
+                                                <label for="category-7">Honeymoon</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="category-8" />
+                                                <label for="category-8">Museum Tours</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="widget__item item-stagger destinations-widget">
+                                <h6 class="widget-title">Destinations</h6>
+                                <div class="destinations-widget__content">
+                                    <div class="widget__check-list">
+                                        <h6 class="checklist-title">Africa</h6>
+                                        <ul>
+                                            <li>
+                                                <input type="checkbox" id="destinations-africa-1" />
+                                                <label for="destinations-africa-1">Morocco</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="destinations-africa-2" />
+                                                <label for="destinations-africa-2">Tanzania</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="widget__check-list">
+                                        <h6 class="checklist-title">Americas</h6>
+                                        <ul>
+                                            <li>
+                                                <input type="checkbox" id="destinations-americas-1" />
+                                                <label for="destinations-americas-1">Argentina</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="destinations-americas-2" />
+                                                <label for="destinations-americas-2">Canada</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="destinations-americas-3" />
+                                                <label for="destinations-americas-3">Colombia</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="destinations-americas-4" />
+                                                <label for="destinations-americas-4">Costa Rica</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="widget__check-list">
+                                        <h6 class="checklist-title">asia</h6>
+                                        <ul>
+                                            <li>
+                                                <input type="checkbox" id="destinations-asia-1" />
+                                                <label for="destinations-asia-1">Cambodia</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="destinations-asia-2" />
+                                                <label for="destinations-asia-2">japan</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="destinations-asia-3" />
+                                                <label for="destinations-asia-3">Nepal</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="destinations-asia-4" />
+                                                <label for="destinations-asia-4">Thailand</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="destinations-asia-5" />
+                                                <label for="destinations-asia-5">Viet Nam</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="widget__check-list">
+                                        <h6 class="checklist-title">eupore</h6>
+                                        <ul>
+                                            <li>
+                                                <input type="checkbox" id="destinations-eupore-1" />
+                                                <label for="destinations-eupore-1">France</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="destinations-eupore-2" />
+                                                <label for="destinations-eupore-2">Greece</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="widget__item item-stagger reviews-widget">
+                                <h6 class="widget-title">Reviews</h6>
+                                <div class="reviews-widget__content">
+                                    <div class="widget__check-list">
+                                        <ul>
+                                            <li>
+                                                <input type="checkbox" id="reviews-1" />
+                                                <label for="reviews-1">5 Stars</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="reviews-2" />
+                                                <label for="reviews-2">4 Stars & Up</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="reviews-3" />
+                                                <label for="reviews-3">3 Stars & Up</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="reviews-4" />
+                                                <label for="reviews-4">2 Stars & Up</label>
+                                            </li>
+                                            <li>
+                                                <input type="checkbox" id="reviews-5" />
+                                                <label for="reviews-5">1 Stars & Up</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8 col-xl-9">
+                        <div class="row g-4 align-items-center g-4">
+                            <div class="col-sm-8 col-md-8 col-xl-9 pe-sm-0">
+                                <div class="tour-package__filter d-flex justify-content-between">
+                                    <span class="filter-total-item">16 Tours</span>
+                                    <div class="filter-short-by">
+                                        Sort by
+                                        <i class="fa-solid fa-arrow-down-a-z active"></i>
+                                        <i class="fa-solid fa-arrow-up-a-z"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 col-md-4 col-xl-3">
+                                <div class="tour-package__filter">
+                                    <div class="filter-title">
+                                        <button class="dropdown-toggle"
+                                                type="button"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            Title
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a href="#">Title 1</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Title 2</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Title 3</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Title 4</a>
+                                            </li>
+                                            <li>
+                                                <a href="#">Title 5</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-4 pt-4">
+                            @if (!Model.Any())
+                            {
+                                <div class="col">
+                                     <p>Hiện tại chưa có tour nào đang hoạt động. Vui lòng quay lại sau!</p>
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var tour in Model)
+                                {
+                                <div class="col-md-6 col-xl-4">
+                                    <div class="featured-tours__slide item-stagger">
+                                        <figure class="slide-thumb">
+                                            <a href="#0" class="favorite">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </a>
+                                            <img src="./assets/images/featured-tours-section/tour-1.png"
+                                                 alt="tour" />
+                                        </figure>
+                                        <div class="slide-content">
+                                                <a class="tour-location d-flex">
+                                                    <i style="margin-right: 2px" class="fa-solid fa-map-location-dot"></i>
+                                                    <p class="tour-location">@tour.Destination</p>
+                                                </a>
+                                                
+                                            <h6 class="tour-title">
+                                                    <a href="tour-details.html" class="line-clamp-2">@tour.Name</a>
+                                            </h6>
+                                            <div class="featured-tours__meta">
+                                                <div class="revew">
+                                                    <span class="total-ratings bg-orange-red text-white">
+                                                        <i class="fa-solid fa-star"></i>
+                                                            @tour.AverageRating
+                                                    </span>
+                                                    <span class="total-review">15 reviews</span>
+                                                </div>
+                                                <div class="duration">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    @tour.DurationDays days
+                                                </div>
+                                            </div>
+                                            <div class="pricing">
+                                                <p>Starting From</p>
+                                                    <span class="price">@tour.ChildPrice.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) VND</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                }
+                            }
+                        </div>
+                        <div class="row section-mini-padding-top">
+                            <div class="col-12">
+                                <div class="tour-package__paginations">
+                                    <nav aria-label="Page navigation example">
+                                        <ul class="pagination">
+                                            <li class="page-item">
+                                                <a class="page-link" href="#" aria-label="Previous">
+                                                    <i class="fa-solid fa-chevron-left"></i>
+                                                </a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link active" href="#">1</a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="#">2</a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="#">3</a>
+                                            </li>
+                                            <li class="page-item">
+                                                <a class="page-link" href="#" aria-label="Next">
+                                                    <i class="fa-solid fa-chevron-right"></i>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Tour-package____section end  -->
+      
+        <!-- Footer__section end  -->
+    </main>
+
+   
+</body>
+</html>
+
+
