@@ -1,0 +1,37 @@
+﻿@model List<Tourest.ViewModels.Tour.TourGuideListViewModel>
+
+<h2>Tour Guide List</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Fullname</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Active</th>
+            <th>Experience</th>
+            <th>Actions</th>
+            <th>View Feedback</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.TourGuideUserID</td>
+                <td>@item.Fullname</td>
+                <td>@item.Email</td>
+                <td>@item.PhoneNumber</td>
+                <td>@item.ActiveStatus</td>
+                <td>@item.ExperienceLevel</td>
+                <td>
+                    <a asp-controller="TourManager" asp-action="TourGuideDetail" asp-route-id="@item.TourGuideUserID">View Detail</a>
+                </td>
+                <td>
+                    <a asp-controller="TourManager" asp-action="TourGuideFeedback" asp-route-id="@item.TourGuideUserID">View Feedback</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

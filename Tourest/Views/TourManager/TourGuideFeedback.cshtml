@@ -1,0 +1,25 @@
+﻿@model List<Tourest.ViewModels.Tour.TourGuideFeedbackViewModel>
+
+<h2>Feedbacks for Tour Guide</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Rating</th>
+            <th>Date</th>
+            <th>Comment</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var feedback in Model)
+        {
+            <tr>
+                <td>@feedback.CustomerName</td>
+                <td>@feedback.RatingValue</td>
+                <td>@feedback.RatingDate.ToShortDateString()</td>
+                <td>@feedback.Comment</td>
+            </tr>
+        }
+    </tbody>
+</table>
