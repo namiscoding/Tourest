@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="TourGuide\Views\" />
     <Folder Include="ViewModels\Booking\" />
     <Folder Include="wwwroot\assets\images\icons\" />
   </ItemGroup>

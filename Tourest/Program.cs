@@ -2,6 +2,8 @@
 using Tourest.Data;
 using Tourest.Data.Repositories;
 using Tourest.Services;
+using Tourest.TourGuide.Repositories;
+using Tourest.TourGuide.Services;
 
 
 namespace Tourest
@@ -23,7 +25,8 @@ namespace Tourest
             // Add services to the container.
             builder.Services.AddScoped<ITourRepository, TourRepository>();
             builder.Services.AddScoped<ITourService, TourService>();
-
+            builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
+            builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
             builder.Services.AddControllersWithViews();
             
             var app = builder.Build();
