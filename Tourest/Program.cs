@@ -1,4 +1,4 @@
-﻿    using Microsoft.AspNetCore.Identity;
+ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Tourest.Data;
 using Tourest.Data.Repositories;
@@ -8,10 +8,16 @@ using Tourest.TourGuide.Repositories;
 using Tourest.TourGuide.Services;
 
 
+
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 
+
+
+using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Tourest
 {
@@ -82,14 +88,30 @@ namespace Tourest
             });
             // Add Repository
             builder.Services.AddScoped<ITourRepository, TourRepository>();
-            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
-            // Add services to the container.
             builder.Services.AddScoped<ITourService, TourService>();
 
             builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
             builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
+
+
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); 
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ITourGuideService, TourGuideService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
+
+            // Add services to the container.
+            builder.Services.AddScoped<ITourService, TourService>();
+
+
+            builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
+            builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
+
+
 
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
