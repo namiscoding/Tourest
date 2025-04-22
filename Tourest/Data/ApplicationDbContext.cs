@@ -4,7 +4,7 @@ using Tourest.Data.Entities;
 namespace Tourest.Data
 {
 	public class ApplicationDbContext : DbContext
-	{
+    {
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 		: base(options)
 		{

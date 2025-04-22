@@ -1,0 +1,362 @@
+﻿@* File: Views/Authentication/Login.cshtml *@
+@using System.Globalization
+@model Tourest.ViewModels.Account.AuthenticationViewModel
+@* Khai báo model mà View này sẽ nhận từ Controller *@
+@{
+    ViewData["Title"] = "Tourest -đăng nhập cho tao";
+}
+<body class="custom-cursor">
+    <!-- Custom Cursor start -->
+      <div class="custom-cursor__cursor"></div>
+    <div class="custom-cursor__cursor-two"></div>
+    <!-- Custom Cursor end -->
+    <!-- Preloader start -->
+    <div id="preloader">
+        <div class="loading-container">
+            <div class="loading"></div>
+            <div id="loading-icon">
+                <img alt="logo-sm" src="~/assets/images/logo.svg" width="90" />
+            </div>
+        </div>
+    </div>
+    <!-- Preloader end -->
+    <!-- back to top button start-->
+    <a href="#" id="scroll-top" class="back-to-top-btn">
+        <i class="fa-solid fa-arrow-up"></i>
+    </a>
+    <!-- back to top button end-->
+    <!-- Mobile Menu side Bar Start  -->
+    <div class="offcanvas offcanvas-md offcanvas-start"
+         tabindex="-1"
+         id="offcanvasTop"
+         aria-labelledby="offcanvasTopLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasTopLabel">
+                <a href="index.html" class="logo">
+                    <img src="~/assets/images/logo.svg" alt="logo" />
+                </a>
+            </h5>
+            <button type="button"
+                    class="btn-close offcanvas-close-btn"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Close"> 
+                <i class="fa-regular fa-circle-xmark"></i>
+            </button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="mobile-menu"></div>
+        </div>
+    </div>
+    <!-- Mobile Menu side Bar End  -->
+    <!-- search modal start  -->
+     <div class="modal fade"
+         id="searchModal"
+         tabindex="-1"
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="exampleModalLabel">
+                        Search Your Trip
+                    </h2>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="search__area">
+                        <form action="index.html" class="search-form">
+                            <div class="input-group">
+                                <span>Destination</span>
+                                <div class="input-container">
+                                    <input type="text"
+                                           class="form-control"
+                                           id="destination"
+                                           placeholder="Where to go?"
+                                           autocomplete="off"
+                                           required />
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <span>Type</span>
+                                <div class="input-container">
+                                    <input type="text"
+                                           class="form-control"
+                                           id="type"
+                                           placeholder="Activity"
+                                           autocomplete="off"
+                                           required />
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <span>When</span>
+                                <div class="input-container">
+                                    <input type="date"
+                                           class="form-control"
+                                           id="daterange"
+                                           name="daterange" />
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <span>Guests</span>
+                                <div class="input-container">
+                                    <input type="number"
+                                           class="form-control"
+                                           id="guests"
+                                           placeholder="0"
+                                           autocomplete="off"
+                                           required />
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <button class="common-btn color-two">search</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="common-btn color-two"
+                            data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- search modal end  -->
+
+
+
+    <main>
+        <!-- Breadcrumb__section start  -->
+        <section class="breadcrumb__section section-padding-top-bottom"
+                 style="
+          --bg-image: url('../images/breadcrumb-section/authentication-breadcrumb-bg.png');">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="breadcrumb__content">
+                            <h1 class="breadcrumb-title">Authentication</h1>
+                            <nav>
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item">
+                                        <a href="index.html">home</a>
+                                    </li>
+                                    <li class="breadcrumb-item active" aria-current="page">
+                                        Authentication
+                                    </li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Breadcrumb__section end  -->
+        <!-- authentication__section start  -->
+        <div class="authentication__section section-padding-top-bottom">
+            <div class="container">
+                <div class="row g-4 justify-content-center">
+                    <div class="col-md-10 col-lg-7">
+                        <div class="authentication__form-area">
+                            <!-- Tabs -->
+                            <ul class="nav nav-tabs authentication__tabs section-mini-margin-bottom"
+                                id="authTabs"
+                                role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active"
+                                            id="signup-tab"
+                                            data-bs-toggle="tab"
+                                            data-bs-target="#signup"
+                                            type="button"
+                                            role="tab"
+                                            aria-controls="signup"
+                                            aria-selected="true">
+                                        Sign Up
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link"
+                                            id="signin-tab"
+                                            data-bs-toggle="tab"
+                                            data-bs-target="#signin"
+                                            type="button"
+                                            role="tab"
+                                            aria-controls="signin"
+                                            aria-selected="false">
+                                        Sign In
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="authTabsContent">
+                                <!-- Sign Up Tab -->
+                                <div class="tab-pane fade authentication__signup show active"
+                                     id="signup"
+                                     role="tabpanel"
+                                     aria-labelledby="signup-tab">
+                                    <form id="signupForm" asp-action="Register" asp-controller="Authentication" method="post" class="authentication__signup-form"
+                                          autocomplete="off">
+                                        @if (TempData["Message"] != null)
+                                        {
+                                            <div class="alert alert-warning text-center">
+                                                @TempData["Message"]
+                                            </div>
+                                        }
+                                        <div class="input-group">
+                                            <label for="signupPhone" class="form-label">FullName</label>
+                                            <input asp-for="Register.Fullname" type="text"
+                                                   class="form-control"
+                                                   id="signupPhone"
+                                                   placeholder="Enter your Fullname" />
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="signupEmail" class="form-label">Email address</label>
+                                            <input asp-for="Register.Email" type="email"
+                                                   class="form-control"
+                                                   id="signupEmail"
+                                                   placeholder="Enter your email" />
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="signupPhone" class="form-label">Phone Number</label>
+                                            <input asp-for="Register.PhoneNumber" type="tel"
+                                                   class="form-control"
+                                                   id="signupPhone"
+                                                   placeholder="Enter your phone number" />
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="signupPassword" class="form-label">Password</label>
+                                            <input asp-for="Register.PasswordHash" type="password"
+                                                   class="form-control"
+                                                   id="signupPassword"
+                                                   placeholder="Enter your password" />
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="signupConfirmPassword" class="form-label">Confirm Password</label>
+                                            <input asp-for="Register.PasswordHashConfirm" type="password"
+                                                   class="form-control"
+                                                   id="signupConfirmPassword"
+                                                   placeholder="Confirm your password" />
+                                        </div>
+                                        <button type="submit" class="common-btn color-two w-100">
+                                            Sign Up
+                                        </button>
+                                    </form>
+
+                                    <div class="social-login text-center">
+                                        <p>Or sign up with:</p>
+                                        <div class="btn-group justify-content-center flex-wrap gap-2">
+                                            <button class="common-btn color-two">
+                                                <i class="fab fa-google"></i> Google
+                                            </button>
+                                            <button class="common-btn color-two">
+                                                <i class="fab fa-facebook"></i> Facebook
+                                            </button>
+                                            <button class="common-btn color-two">
+                                                <i class="fab fa-twitter"></i> Twitter
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sign In Tab -->
+                                <div  class="tab-pane fade authentication__signin"
+                                     id="signin"
+                                     role="tabpanel"
+                                     aria-labelledby="signin-tab">
+                                    <form asp-action="Login" asp-controller="Authentication" method="post" class="authentication__signin-form"
+                                          autocomplete="off">
+                                        @if (TempData["Message"] != null)
+                                        {
+                                            <div class="alert alert-warning text-center">
+                                                @TempData["Message"]
+                                            </div>
+                                        }
+                                        <div class="input-group">
+                                            <label for="signinEmail" class="form-label">Email address</label>
+                                            <input asp-for="Login.Email" type="email"
+                                                   class="form-control"
+                                                   id="signinEmail"
+                                                   placeholder="Enter your email" />
+                                            <span asp-validation-for="Login.Email"></span>
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="signinPassword" class="form-label">Password</label>
+                                            <input asp-for="Login.PasswordHash" type="password"
+                                                   class="form-control"
+                                                   id="signinPassword"
+                                                   placeholder="Enter your password" />
+                                            <span asp-validation-for="Login.PasswordHash"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="checkbox">
+                                                <label asp-for="Login.RememberMe">
+                                                    <input asp-for="Login.RememberMe" />
+                                                    @Html.DisplayNameFor(m => m.Login.RememberMe)
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="common-btn color-two w-100">
+                                            Sign In
+                                        </button>
+                                    </form>
+                                    <div class="social-login text-center">
+                                        <p>Or sign in with:</p>
+                                        <div class="btn-group justify-content-center flex-wrap gap-2">
+                                            <button class="common-btn color-two">
+                                                <i class="fab fa-google"></i> Google
+                                            </button>
+                                            <button class="common-btn color-two">
+                                                <i class="fab fa-facebook"></i> Facebook
+                                            </button>
+                                            <button class="common-btn color-two">
+                                                <i class="fab fa-twitter"></i> Twitter
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- authentication__section end  -->
+        <!-- Footer__section end  -->
+    </main>
+</body>
+
+<script>
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+        const password = document.getElementById("signupPassword").value;
+        const confirmPassword = document.getElementById("signupConfirmPassword").value;
+
+        // Xóa thông báo lỗi cũ
+        const existingError = document.getElementById("passwordMismatchError");
+        if (existingError) {
+            existingError.remove();
+        }
+
+        if (password !== confirmPassword) {
+            e.preventDefault(); // Ngăn form gửi
+            const errorSpan = document.createElement("span");
+            errorSpan.id = "passwordMismatchError";
+            errorSpan.className = "text-danger";
+            errorSpan.innerText = "Passwords do not match.";
+            document.getElementById("signupConfirmPassword").parentNode.appendChild(errorSpan);
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const activeTab = "@TempData["ActiveTab"]";
+
+        if (activeTab === "signin") {
+            document.querySelector('#signin-tab').click();
+        } else if (activeTab === "signup") {
+            document.querySelector('#signup-tab').click();
+        }
+    });
+</script>
