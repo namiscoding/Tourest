@@ -13,6 +13,7 @@ namespace Tourest.Data.Repositories
         Task<(bool Success, User? CreatedUser)> AddUserAndAccountAsync(User user, Account account); // Trả về User đã tạo
         Task<bool> UpdateUserAsync(User user);
         Task<bool> UpdateAccountAsync(Account account);
+        Task<User?> GetGuideByIdAsync(int userId);
 
     }
 }

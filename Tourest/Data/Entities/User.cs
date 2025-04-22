@@ -1,10 +1,13 @@
-﻿using System.Security.Principal;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Principal;
 
 namespace Tourest.Data.Entities
 {
 	public class User
 	{
-		public int UserID { get; set; }
+      
+        public int UserID { get; set; }
 		public string FullName { get; set; } = string.Empty;
 		public string Email { get; set; } = string.Empty;
 		public string? PhoneNumber { get; set; }
@@ -26,5 +29,10 @@ namespace Tourest.Data.Entities
 		public virtual ICollection<TourAuditLog> TourAuditLogsPerformed { get; set; } = new List<TourAuditLog>();
 		public virtual ICollection<Notification> NotificationsReceived { get; set; } = new List<Notification>();
 		public virtual ICollection<Notification> NotificationsSent { get; set; } = new List<Notification>();
-	}
+        public override string ToString()
+        {
+            return $"UserID: {UserID}, FullName: {FullName}, Email: {Email}, Phone: {PhoneNumber}, Address: {Address}, Active: {IsActive}, Registered: {RegistrationDate:yyyy-MM-dd}";
+        }
+
+    }
 }

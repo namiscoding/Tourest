@@ -148,6 +148,17 @@ namespace Tourest.Data.Repositories
             }
         }
 
-        // Bỏ qua Delete cứng, ưu tiên Update IsActive
+        public async Task<User?> GetGuideByIdAsync(int userId)
+        {
+            return await _context.Users
+                .Where(u => u.UserID == userId && u.TourGuide != null) 
+                .Include(u => u.TourGuide) 
+                .Include(u => u.TourGuideRatingsReceived) 
+                    .ThenInclude(tgr => tgr.Rating)
+                        .ThenInclude(r => r.Customer) 
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+        }
+
     }
 }
