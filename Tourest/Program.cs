@@ -4,6 +4,8 @@ using Tourest.Data;
 using Tourest.Data.Repositories;
 using Tourest.Services;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Tourest
 {
@@ -43,6 +45,19 @@ namespace Tourest
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = false;
             });
+
+            builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+
+
+            builder.Services.AddAuthentication()
+    .AddCookie(options => {
+        options.Events.OnValidatePrincipal = context => {
+            var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            context.Principal.AddIdentity(new ClaimsIdentity(new[] { new Claim("userId", userId) }));
+            return Task.CompletedTask;
+        };
+    });
+            builder.Services.AddAuthorization();
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 // Cookie settings
@@ -62,10 +77,12 @@ namespace Tourest
             // Add Repository
             builder.Services.AddScoped<ITourRepository, TourRepository>();
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
             // Add services to the container.
             builder.Services.AddScoped<ITourService, TourService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddControllersWithViews();
             
             var app = builder.Build();
@@ -77,14 +94,15 @@ namespace Tourest
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
 			}
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.MapIdentityApi<IdentityUser>();
             app.UseHttpsRedirection();
 			app.UseStaticFiles();
-
-			app.UseRouting();
+            app.UseRouting();
             app.UseSession();
-            app.UseAuthentication();
-            app.UseAuthorization();
+         
+            //app.MapHub<NotificationHub>("/notificationHub");
 
             app.MapControllerRoute(
 				name: "default",

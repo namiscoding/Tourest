@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Tourest.Data.Entities;
 using Tourest.Services;
 using Tourest.Util;
@@ -59,6 +62,16 @@ namespace Tourest.Controllers
             {
                 HttpContext.Session.SetObject("CurrentAccount", CurrentAccount);
 
+                var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, CurrentAccount.UserID.ToString()), // RẤT QUAN TRỌNG
+        new Claim(ClaimTypes.Name, CurrentAccount.FullName),
+         new Claim(ClaimTypes.Role, CurrentAccount.Account.Role) // Thêm dòng này
+    };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             }
             return RedirectToAction("Index", "Tours"); }
     
@@ -88,6 +101,16 @@ namespace Tourest.Controllers
             {
                 HttpContext.Session.SetObject("CurrentAccount", CurrentAccount);
 
+                var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, CurrentAccount.UserID.ToString()), // RẤT QUAN TRỌNG
+        new Claim(ClaimTypes.Name, CurrentAccount.FullName),
+                 new Claim(ClaimTypes.Role, CurrentAccount.Account.Role) // Thêm dòng này
+    };
+
+                var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var principal = new ClaimsPrincipal(identity);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             }
             return RedirectToAction("Index","Tours"); }
 
