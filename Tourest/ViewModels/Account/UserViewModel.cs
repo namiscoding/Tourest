@@ -16,7 +16,7 @@ namespace Tourest.ViewModels.Account
 
         // Navigation Properties
         public virtual AccountViewModel? Account { get; set; }
-        public virtual TourGuide? TourGuide { get; set; }
+        public virtual Tourest.Data.Entities.TourGuide? TourGuide { get; set; }
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
         public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
         public virtual ICollection<SupportRequest> SubmittedSupportRequests { get; set; } = new List<SupportRequest>();

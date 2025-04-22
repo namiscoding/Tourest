@@ -1,0 +1,70 @@
+﻿@model List<Tourest.ViewModels.Tour.TourGuideFeedbackViewModel>
+
+@section Style {
+    <style>
+        .container-centered {
+            max-width: 1000px;
+            margin: 2rem auto;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #343a40;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+    </style>
+}
+
+<h2 class="text-center">Feedbacks for Tour Guide</h2>
+
+<div class="container-centered">
+    <table>
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Rating</th>
+                <th>Date</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var feedback in Model)
+            {
+                <tr>
+                    <td>@feedback.CustomerName</td>
+                    <td>@feedback.RatingValue</td>
+                    <td>@feedback.RatingDate.ToShortDateString()</td>
+                    <td>@feedback.Comment</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
