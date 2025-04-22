@@ -23,6 +23,10 @@ namespace Tourest
             // Add services to the container.
             builder.Services.AddScoped<ITourRepository, TourRepository>();
             builder.Services.AddScoped<ITourService, TourService>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); 
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ITourGuideService, TourGuideService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             builder.Services.AddControllersWithViews();
             
