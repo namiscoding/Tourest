@@ -76,34 +76,32 @@ namespace Tourest
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-            // Add Repository
+          
             builder.Services.AddScoped<ITourRepository, TourRepository>();
-
             builder.Services.AddScoped<ITourService, TourService>();
+
             builder.Services.AddScoped<ITourManagerRepository, TourManagerRepository>();
             builder.Services.AddScoped<ITourManagerService, TourManagerService>();
             builder.Services.AddScoped<TourManagerRepository>();
 
-
-
             builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
             builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
 
-
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); 
             builder.Services.AddScoped<ICategoryService, CategoryService>();
+      
             builder.Services.AddScoped<ITourGuideService, TourGuideService>();
+      
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-
-
-            // Add services to the container.
-            builder.Services.AddScoped<ITourService, TourService>();
             builder.Services.AddScoped<IAccountService, AccountService>();
+      
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
 
+      
             builder.Services.AddControllersWithViews();
             
             var app = builder.Build();
