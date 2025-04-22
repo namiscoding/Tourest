@@ -1,9 +1,43 @@
-﻿`@* File: Views/Tours/Index.cshtml *@
+
 @using System.Globalization
-@model IEnumerable<Tourest.ViewModels.Tour.TourListViewModel>
-@* Khai báo model mà View này sẽ nhận từ Controller *@
+@using Tourest.ViewModels
+@model Tourest.ViewModels.TourIndexViewModel
+@using System.Text.RegularExpressions 
+@using System.Text
 @{
     ViewData["Title"] = "Tourest - Danh Sách Tour Hiện Có";
+    // Hàm trợ giúp tạo ID an toàn từ chuỗi
+    Func<string, string> CreateSafeId = (input) =>
+    {
+        if (string.IsNullOrWhiteSpace(input)) return $"id_{Guid.NewGuid()}"; // Xử lý input rỗng
+
+        // 1. Loại bỏ dấu tiếng Việt
+        string decomposedString = input.Normalize(NormalizationForm.FormD);
+        var chars = decomposedString
+            .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+            .ToArray();
+        // Đảm bảo không tạo chuỗi rỗng nếu input chỉ có dấu
+        string noAccents = new string(chars).Length > 0 ? new string(chars).Normalize(NormalizationForm.FormC) : input;
+
+        // 2. Thay thế ký tự không hợp lệ và khoảng trắng bằng '_' và chuyển thành chữ thường
+        string safeString = Regex.Replace(noAccents, @"[^a-zA-Z0-9_]", "_", RegexOptions.Compiled).ToLowerInvariant();
+
+        // 3. Đảm bảo ID bắt đầu bằng chữ cái hoặc '_'
+        if (!string.IsNullOrEmpty(safeString) && !char.IsLetter(safeString[0]) && safeString[0] != '_')
+        {
+            safeString = "_" + safeString;
+        }
+
+        // 4. Xử lý trường hợp chuỗi trở thành rỗng sau khi thay thế (ít xảy ra)
+        if (string.IsNullOrEmpty(safeString))
+        {
+            return $"id_{Guid.NewGuid()}";
+        }
+
+        // 5. Thêm mã hash để đảm bảo tính duy nhất tuyệt đối (an toàn hơn)
+        int hashCode = Math.Abs(input.GetHashCode());
+        return $"dest_{safeString}_{hashCode}"; // Kết hợp tiền tố + chuỗi an toàn + hash
+    };
 }
 
 <body class="custom-cursor">
@@ -251,200 +285,162 @@
                                     </form>
                                 </div>
                             </div>
+                            <form id="filterForm" asp-controller="Tours" asp-action="Index" method="get">
                             <div class="widget__item item-stagger categories-widget">
                                 <h6 class="widget-title">Categories</h6>
                                 <div class="categories-widget__content">
                                     <div class="widget__check-list">
                                         <ul>
-                                            <li>
-                                                <input type="checkbox" id="category-1" />
-                                                <label for="category-1">Adventure</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="category-2" />
-                                                <label for="category-2">Beaches</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="category-3" />
-                                                <label for="category-3">Boat Tours</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="category-4" />
-                                                <label for="category-4">City Tours</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="category-5" />
-                                                <label for="category-5">Food</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="category-6" />
-                                                <label for="category-6">Hiking</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="category-7" />
-                                                <label for="category-7">Honeymoon</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="category-8" />
-                                                <label for="category-8">Museum Tours</label>
-                                            </li>
+                                                @foreach (var category in Model.Categories)
+                                                {
+                                                    <li>
+                                                        <input type="checkbox"
+                                                               class="filter-checkbox category-filter-checkbox" @* QUAN TRỌNG: Phải có 'filter-checkbox' *@
+                                                               name="categoryIds"
+                                                               value="@category.CategoryId"
+                                                               id="category-@category.CategoryId"
+                                                        @(Model.SelectedCategoryIds != null && Model.SelectedCategoryIds.Contains(category.CategoryId) ? "checked" : "") />
+                                                        <label for="category-@category.CategoryId">@category.Name</label>
+                                                    </li>
+                                                }
+                                            
                                         </ul>
                                     </div>
                                 </div>
                             </div>
+                            
                             <div class="widget__item item-stagger destinations-widget">
                                 <h6 class="widget-title">Destinations</h6>
                                 <div class="destinations-widget__content">
                                     <div class="widget__check-list">
-                                        <h6 class="checklist-title">Africa</h6>
                                         <ul>
-                                            <li>
-                                                <input type="checkbox" id="destinations-africa-1" />
-                                                <label for="destinations-africa-1">Morocco</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="destinations-africa-2" />
-                                                <label for="destinations-africa-2">Tanzania</label>
-                                            </li>
+                                                @foreach (var destination in Model.AvailableDestinations)
+                                                {
+                                                    var safeDestId = CreateSafeId(destination);
+                                                    <li>
+                                                        <input type="checkbox"
+                                                               class="filter-checkbox destination-filter-checkbox" @* QUAN TRỌNG: Phải có 'filter-checkbox' *@
+                                                               name="destinations"
+                                                               value="@destination"
+                                                               id="@safeDestId"
+                                                        @(Model.SelectedDestinations != null && Model.SelectedDestinations.Contains(destination) ? "checked" : "") />
+                                                        <label for="@safeDestId">@destination</label>
+                                                    </li>
+                                                }
                                         </ul>
                                     </div>
-                                    <div class="widget__check-list">
-                                        <h6 class="checklist-title">Americas</h6>
-                                        <ul>
-                                            <li>
-                                                <input type="checkbox" id="destinations-americas-1" />
-                                                <label for="destinations-americas-1">Argentina</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="destinations-americas-2" />
-                                                <label for="destinations-americas-2">Canada</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="destinations-americas-3" />
-                                                <label for="destinations-americas-3">Colombia</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="destinations-americas-4" />
-                                                <label for="destinations-americas-4">Costa Rica</label>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="widget__check-list">
-                                        <h6 class="checklist-title">asia</h6>
-                                        <ul>
-                                            <li>
-                                                <input type="checkbox" id="destinations-asia-1" />
-                                                <label for="destinations-asia-1">Cambodia</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="destinations-asia-2" />
-                                                <label for="destinations-asia-2">japan</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="destinations-asia-3" />
-                                                <label for="destinations-asia-3">Nepal</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="destinations-asia-4" />
-                                                <label for="destinations-asia-4">Thailand</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="destinations-asia-5" />
-                                                <label for="destinations-asia-5">Viet Nam</label>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="widget__check-list">
-                                        <h6 class="checklist-title">eupore</h6>
-                                        <ul>
-                                            <li>
-                                                <input type="checkbox" id="destinations-eupore-1" />
-                                                <label for="destinations-eupore-1">France</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="destinations-eupore-2" />
-                                                <label for="destinations-eupore-2">Greece</label>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                   
                                 </div>
                             </div>
-                            <div class="widget__item item-stagger reviews-widget">
-                                <h6 class="widget-title">Reviews</h6>
-                                <div class="reviews-widget__content">
-                                    <div class="widget__check-list">
-                                        <ul>
-                                            <li>
-                                                <input type="checkbox" id="reviews-1" />
-                                                <label for="reviews-1">5 Stars</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="reviews-2" />
-                                                <label for="reviews-2">4 Stars & Up</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="reviews-3" />
-                                                <label for="reviews-3">3 Stars & Up</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="reviews-4" />
-                                                <label for="reviews-4">2 Stars & Up</label>
-                                            </li>
-                                            <li>
-                                                <input type="checkbox" id="reviews-5" />
-                                                <label for="reviews-5">1 Stars & Up</label>
-                                            </li>
-                                        </ul>
+
+                                <div class="widget__item item-stagger reviews-widget">
+                                    <h6 class="widget-title">Minimum Rating</h6> @* Đổi tiêu đề cho rõ nghĩa hơn *@
+                                    <div class="reviews-widget__content">
+                                        <div class="widget__check-list">
+                                            <ul>
+                                                <li>
+                                                    <input type="checkbox"
+                                                           id="reviews-1" @* Giữ nguyên ID tĩnh *@
+                                                           name="ratings" @* THÊM: name khớp tham số Controller *@
+                                                           value="5" @* THÊM: value là số sao *@
+                                                           class="filter-checkbox rating-filter-checkbox" @* THÊM: class cho JS *@
+                                                    @(Model.SelectedRatings != null && Model.SelectedRatings.Contains(5) ? "checked" : "") /> @* THÊM: kiểm tra checked *@
+                                                    <label for="reviews-1">
+                                                        @* Hiển thị sao động *@
+                                                        <i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i>
+                                                        
+                                                    </label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox"
+                                                           id="reviews-2"
+                                                           name="ratings"
+                                                           value="4" @* THÊM: value=4 *@
+                                                           class="filter-checkbox rating-filter-checkbox"
+                                                    @(Model.SelectedRatings != null && Model.SelectedRatings.Contains(4) ? "checked" : "") />
+                                                    <label for="reviews-2">
+                                                        @* Hiển thị sao động *@
+                                                        <i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i>
+                                                        
+                                                    </label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox"
+                                                           id="reviews-3"
+                                                           name="ratings"
+                                                           value="3" @* THÊM: value=3 *@
+                                                           class="filter-checkbox rating-filter-checkbox"
+                                                    @(Model.SelectedRatings != null && Model.SelectedRatings.Contains(3) ? "checked" : "") />
+                                                    <label for="reviews-3">
+                                                        @* Hiển thị sao động *@
+                                                        <i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i>
+                                                        
+                                                    </label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox"
+                                                           id="reviews-4"
+                                                           name="ratings"
+                                                           value="2" @* THÊM: value=2 *@
+                                                           class="filter-checkbox rating-filter-checkbox"
+                                                    @(Model.SelectedRatings != null && Model.SelectedRatings.Contains(2) ? "checked" : "") />
+                                                    <label for="reviews-4">
+                                                        @* Hiển thị sao động *@
+                                                        <i class="fa-solid fa-star text-warning"></i><i class="fa-solid fa-star text-warning"></i>
+                                                        
+                                                    </label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox"
+                                                           id="reviews-5"
+                                                           name="ratings"
+                                                           value="1" @* THÊM: value=1 *@
+                                                           class="filter-checkbox rating-filter-checkbox"
+                                                    @(Model.SelectedRatings != null && Model.SelectedRatings.Contains(1) ? "checked" : "") />
+                                                    <label for="reviews-5">
+                                                        @* Hiển thị sao động *@
+                                                        <i class="fa-solid fa-star text-warning"></i>
+                                                        
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+
+                            </form>
                         </div>
                     </div>
                     <div class="col-lg-8 col-xl-9">
-                        <div class="row g-4 align-items-center g-4">
-                            <div class="col-sm-8 col-md-8 col-xl-9 pe-sm-0">
-                                <div class="tour-package__filter d-flex justify-content-between">
-                                    <span class="filter-total-item">16 Tours</span>
-                                    <div class="filter-short-by">
-                                        Sort by
-                                        <i class="fa-solid fa-arrow-down-a-z active"></i>
-                                        <i class="fa-solid fa-arrow-up-a-z"></i>
-                                    </div>
+                        <div class="row g-4 align-items-center g-4 mb-3">
+                            <div class="col-md-8 pe-md-0">
+                                <div class="tour-package__filter d-flex justify-content-start">
+                                    @* Hiển thị số lượng tour đã lọc *@
+                                    <span class="filter-total-item me-3">@Model.Tours.Count() Tours Found</span>
                                 </div>
                             </div>
-                            <div class="col-sm-4 col-md-4 col-xl-3">
-                                <div class="tour-package__filter">
-                                    <div class="filter-title">
-                                        <button class="dropdown-toggle"
-                                                type="button"
-                                                data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                            Title
-                                            <i class="fa-solid fa-chevron-down"></i>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li>
-                                                <a href="#">Title 1</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Title 2</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Title 3</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Title 4</a>
-                                            </li>
-                                            <li>
-                                                <a href="#">Title 5</a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                            <div class="col-md-4">
+                                <div class="filter-short-by d-flex justify-content-end">
+                                    @{
+                                        var currentSort = ViewBag.CurrentSortBy as string;
+                                    }
+                                    @* Sử dụng lại thẻ SELECT đã hoạt động, cập nhật options *@
+                                    <select class="form-select form-select-sm" name="sortBy" onchange="document.getElementById('filterForm').submit();" style="max-width: 200px;">
+                                        @* Tăng width nếu cần *@
+                                        <option value="" selected="@(string.IsNullOrEmpty(currentSort))">Sắp xếp mặc định</option>
+                                        <option value="price_asc" selected="@(currentSort == "price_asc")">Giá: Thấp đến Cao</option>
+                                        <option value="price_desc" selected="@(currentSort == "price_desc")">Giá: Cao đến Thấp</option>
+                                        <option value="name_asc" selected="@(currentSort == "name_asc")">Tên: A-Z</option>
+                                        <option value="name_desc" selected="@(currentSort == "name_desc")">Tên: Z-A</option>
+                                        <option value="rating_desc" selected="@(currentSort == "rating_desc")">Đánh giá: Cao nhất</option>
+                                        <option value="duration_asc" selected="@(currentSort == "duration_asc")">Thời lượng: Ngắn nhất</option>
+                                        @* Thêm/bỏ các tùy chọn khác nếu muốn *@
+                                    </select>
                                 </div>
                             </div>
                         </div>
                         <div class="row g-4 pt-4">
-                            @if (!Model.Any())
+                            @if (!Model.Tours.Any())
                             {
                                 <div class="col">
                                      <p>Hiện tại chưa có tour nào đang hoạt động. Vui lòng quay lại sau!</p>
@@ -452,7 +448,7 @@
                             }
                             else
                             {
-                                @foreach (var tour in Model)
+                                @foreach (var tour in Model.Tours)
                                 {
                                 <div class="col-md-6 col-xl-4">
                                     <div class="featured-tours__slide item-stagger">
@@ -468,18 +464,28 @@
                                                     <i style="margin-right: 2px" class="fa-solid fa-map-location-dot"></i>
                                                     <p class="tour-location">@tour.Destination</p>
                                                 </a>
-                                                
-                                            <h6 class="tour-title">
-                                                    <a href="tour-details.html" class="line-clamp-2">@tour.Name</a>
-                                            </h6>
+
+                                                <h6 class="tour-title">
+                                                    <a asp-controller="Tours" asp-action="Details" asp-route-id="@tour.TourId" class="line-clamp-2">@tour.Name</a>
+                                                </h6>
                                             <div class="featured-tours__meta">
-                                                <div class="revew">
-                                                    <span class="total-ratings bg-orange-red text-white">
-                                                        <i class="fa-solid fa-star"></i>
-                                                            @tour.AverageRating
-                                                    </span>
-                                                    <span class="total-review">15 reviews</span>
-                                                </div>
+                                                    <div class="revew">
+                                                        @if (tour.AverageRating.HasValue && tour.AverageRating > 0)
+                                                        {
+                                                            <span class="total-ratings bg-warning text-dark px-2 py-1 rounded-pill small" title="@tour.AverageRating.Value.ToString("0.0") out of 5 stars">
+                                                                <i class="fa-solid fa-star"></i> @tour.AverageRating.Value.ToString("0.0")
+                                                            </span>
+                                                            @* THÊM hiển thị số lượng đánh giá *@
+                                                            @if (tour.SumRating.HasValue && tour.SumRating > 0)
+                                                            {
+                                                                <span class="total-review text-muted small ms-1">(@tour.SumRating reviews)</span>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="total-ratings text-muted small">No rating</span>
+                                                        }
+                                                    </div>
                                                 <div class="duration">
                                                     <i class="fa-regular fa-clock"></i>
                                                     @tour.DurationDays days
@@ -535,6 +541,43 @@
 
    
 </body>
-</html>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterForm = document.getElementById('filterForm');
+            if (!filterForm) {
+                console.error('Filter form with id "filterForm" not found!');
+                return; // Dừng nếu không tìm thấy form
+            }
+
+            const filterCheckboxes = filterForm.querySelectorAll('.filter-checkbox');
+            if (filterCheckboxes.length === 0) {
+                console.warn('No elements with class "filter-checkbox" found inside the form.');
+            } else {
+                // console.log(`Found ${filterCheckboxes.length} filter checkboxes.`); // Kiểm tra số lượng tìm thấy
+            }
 
 
+            filterCheckboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    // Ghi log ra console để xem sự kiện có được kích hoạt không và bởi checkbox nào
+                    console.log(`Checkbox changed: ID=${this.id}, Value=${this.value}, Checked=${this.checked}`);
+                    // Submit form ngay lập tức
+                    console.log('Submitting form...');
+                    filterForm.submit();
+                });
+            });
+
+            // Listener cho sort dropdown (nếu có)
+            const sortBySelect = filterForm.querySelector('select[name="sortBy"]');
+            if (sortBySelect) {
+                sortBySelect.addEventListener('change', function () {
+                    console.log(`Sort dropdown changed: Value=${this.value}`);
+                    console.log('Submitting form...');
+                    filterForm.submit();
+                });
+            }
+        });
+    </script>
+}

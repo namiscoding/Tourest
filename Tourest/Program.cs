@@ -80,11 +80,19 @@ namespace Tourest
             builder.Services.AddScoped<ITourRepository, TourRepository>();
 
             builder.Services.AddScoped<ITourService, TourService>();
+
             builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
             builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
 
+
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); 
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ITourGuideService, TourGuideService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
 
             // Add services to the container.
             builder.Services.AddScoped<ITourService, TourService>();
