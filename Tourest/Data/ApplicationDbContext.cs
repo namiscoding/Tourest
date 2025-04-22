@@ -13,7 +13,7 @@ namespace Tourest.Data
 		// DbSets
 		public DbSet<User> Users { get; set; } = null!; // Use `= null!` to suppress nullable warnings if needed
 		public DbSet<Account> Accounts { get; set; } = null!;
-		public DbSet<TourGuide> TourGuides { get; set; } = null!;
+		public DbSet<Tourest.Data.Entities.TourGuide> TourGuides { get; set; } = null!;
 		public DbSet<Category> Categories { get; set; } = null!;
 		public DbSet<Tour> Tours { get; set; } = null!;
 		public DbSet<TourCategory> TourCategories { get; set; } = null!;
@@ -84,7 +84,7 @@ namespace Tourest.Data
 			});
 
 			// TourGuide Configuration (TPT Inheritance)
-			modelBuilder.Entity<TourGuide>(entity =>
+			modelBuilder.Entity<Tourest.Data.Entities.TourGuide>(entity =>
 			{
 				entity.ToTable("TourGuides"); // Explicitly map to its own table
 				entity.HasKey(e => e.TourGuideUserID); // PK is the FK to User
@@ -98,7 +98,7 @@ namespace Tourest.Data
 				// Define 1-1 relationship (Subtype to Base)
 				entity.HasOne(tg => tg.User)
 					  .WithOne(u => u.TourGuide) // Assuming User has 'TourGuide' navigation property
-					  .HasForeignKey<TourGuide>(tg => tg.TourGuideUserID)
+					  .HasForeignKey<Tourest.Data.Entities.TourGuide>(tg => tg.TourGuideUserID)
 					  .OnDelete(DeleteBehavior.Cascade); // Delete TourGuide profile if User is deleted
 			});
 
