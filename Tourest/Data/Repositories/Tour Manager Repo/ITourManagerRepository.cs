@@ -8,6 +8,8 @@ namespace Tourest.Data.Repositories
         List<TourGuideListViewModel> GetAllTourGuidesWithUserInfo();
         TourGuideDetailViewModel GetTourGuideDetailById(int id);
         Task<List<TourGuideFeedbackViewModel>> GetFeedbacksByTourGuideIdAsync(int tourGuideUserId);
+        Task<List<TourCustomerViewModel>> GetCustomersByTourIdAsync(int tourId);
+        IEnumerable<TourListAllViewModel> GetAllTours();
 
     }
 }

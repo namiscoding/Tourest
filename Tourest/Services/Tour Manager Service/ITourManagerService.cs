@@ -7,5 +7,8 @@ namespace Tourest.Services
         List<TourGuideListViewModel> GetAllTourGuides();
         TourGuideDetailViewModel GetDetail(int id);
         Task<List<TourGuideFeedbackViewModel>> GetFeedbacksByTourGuideIdAsync(int tourGuideUserId);
+        Task<List<TourCustomerViewModel>> GetCustomersForTourAsync(int tourId);
+        IEnumerable<TourListAllViewModel> GetAllTours();
+
     }
 }

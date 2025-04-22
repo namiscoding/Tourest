@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Tourest.Services;
+using Tourest.ViewModels.Tour;
 
 namespace Tourest.Controllers
 {

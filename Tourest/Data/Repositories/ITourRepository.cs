@@ -1,4 +1,5 @@
 ﻿using Tourest.Data.Entities;
+using Tourest.ViewModels.Tour;
 
 namespace Tourest.Data.Repositories
 {
@@ -6,5 +7,6 @@ namespace Tourest.Data.Repositories
     {
         Task<IEnumerable<Tour>> GetActiveToursAsync();
         Task<Tour?> GetByIdAsync(int id);
+        
     }
 }

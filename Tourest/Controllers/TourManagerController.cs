@@ -44,14 +44,24 @@ namespace Tourest.Controllers
         }
         public async Task<IActionResult> TourGuideFeedback(int id)
         {
-            var feedbacks = await _tourManagerService.GetFeedbacksByTourGuideIdAsync(id);  // Sử dụng await
+            var feedbacks = await _tourManagerService.GetFeedbacksByTourGuideIdAsync(id);   
 
             if (feedbacks == null || !feedbacks.Any())
             {
-                return NotFound();  // Nếu không có feedbacks, trả về 404
+                return NotFound();   
             }
 
-            return View(feedbacks);  // Trả về feedbacks cho view
+            return View(feedbacks);   
+        }
+        public async Task<IActionResult> ViewCustomers(int tourId)
+        {
+            var customers = await _tourManagerService.GetCustomersForTourAsync(tourId);
+            return View(customers);  
+        }
+        public IActionResult ListTour()
+        {
+            var tours = _tourManagerService.GetAllTours();
+            return View(tours);
         }
     }
 }

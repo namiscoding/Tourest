@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tourest.Data.Entities;
+using Tourest.ViewModels.Tour;
 
 namespace Tourest.Data.Repositories
 {
@@ -21,7 +22,6 @@ namespace Tourest.Data.Repositories
                                  .AsNoTracking()                 // Tùy chọn: Tăng hiệu năng nếu chỉ đọc
                                  .ToListAsync();
         }
-
         public Task<Tour?> GetByIdAsync(int id)
         {
             throw new NotImplementedException();

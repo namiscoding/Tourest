@@ -18,6 +18,11 @@ namespace Tourest.Services
             return tourManagerRepository.GetAllTourGuidesWithUserInfo();
         }
 
+        public Task<List<TourCustomerViewModel>> GetCustomersForTourAsync(int tourId)
+        {
+            return tourManagerRepository.GetCustomersByTourIdAsync(tourId);
+        }
+
         public TourGuideDetailViewModel GetDetail(int id)
         {
             return tourManagerRepository.GetTourGuideDetailById(id);
@@ -27,6 +32,10 @@ namespace Tourest.Services
         {
             // Gọi bất đồng bộ từ repository
             return await tourManagerRepository.GetFeedbacksByTourGuideIdAsync(tourGuideUserId);
+        }
+        public IEnumerable<TourListAllViewModel> GetAllTours()
+        {
+            return tourManagerRepository.GetAllTours();
         }
     }
 }

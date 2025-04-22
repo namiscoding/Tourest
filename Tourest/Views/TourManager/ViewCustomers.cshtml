@@ -1,4 +1,8 @@
-﻿@model List<Tourest.ViewModels.Tour.TourGuideFeedbackViewModel>
+﻿@model IEnumerable<Tourest.ViewModels.Tour.TourCustomerViewModel>
+
+@{
+    ViewData["Title"] = "Customers in Tour";
+}
 
 @section Style {
     <style>
@@ -43,26 +47,32 @@
     </style>
 }
 
-<h2 class="text-center">Feedbacks for Tour Guide</h2>
+<h2 class="text-center">Customers in Tour</h2>
 
 <div class="container-centered">
     <table>
         <thead>
             <tr>
-                <th>Customer</th>
-                <th>Rating</th>
-                <th>Date</th>
-                <th>Comment</th>
+                <th>UserID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Is Active</th>
+                <th>Registered At</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var feedback in Model)
+            @foreach (var customer in Model)
             {
                 <tr>
-                    <td>@feedback.CustomerName</td>
-                    <td>@feedback.RatingValue</td>
-                    <td>@feedback.RatingDate.ToShortDateString()</td>
-                    <td>@feedback.Comment</td>
+                    <td>@customer.UserID</td>
+                    <td>@customer.FullName</td>
+                    <td>@customer.Email</td>
+                    <td>@customer.PhoneNumber</td>
+                    <td>@customer.Address</td>
+                    <td>@(customer.IsActive ? "✔" : "✘")</td>
+                    <td>@customer.RegistrationDate.ToShortDateString()</td>
                 </tr>
             }
         </tbody>

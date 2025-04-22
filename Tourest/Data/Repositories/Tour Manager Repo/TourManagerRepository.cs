@@ -62,5 +62,39 @@ namespace Tourest.Data.Repositories
                               RatingDate = r.RatingDate
                           }).ToListAsync();
         }
+
+        public async Task<List<TourCustomerViewModel>> GetCustomersByTourIdAsync(int tourId)
+        {
+            var query = from t in _context.Tours
+                        join b in _context.Bookings on t.TourID equals b.TourID
+                        join u in _context.Users on b.CustomerID equals u.UserID
+                        where b.TourID == tourId
+                        select new TourCustomerViewModel
+                        {
+                            UserID = u.UserID,
+                            FullName = u.FullName,
+                            Email = u.Email,
+                            PhoneNumber = u.PhoneNumber,
+                            IsActive = u.IsActive,
+                            ProfilePictureUrl = u.ProfilePictureUrl,
+                            RegistrationDate = u.RegistrationDate,
+                            Address = u.Address
+                            // Thêm các thuộc tính khác nếu cần
+                        };
+
+            return await query.ToListAsync();
+        }
+        public IEnumerable<TourListAllViewModel> GetAllTours()
+        {
+            return _context.Tours
+    .Select(t => new TourListAllViewModel
+    {
+        TourID = t.TourID,
+        Name = t.Name,
+        // Bỏ comment các dòng nếu cần thêm dữ liệu khác từ Tour entity
+    })
+    .ToList();
+
+        }
     }
 }
