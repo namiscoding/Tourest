@@ -6,9 +6,19 @@ using Tourest.Services;
 
 using Tourest.TourGuide.Repositories;
 using Tourest.TourGuide.Services;
+
+
+
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
+
+
+
+using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
+using Microsoft.AspNetCore.SignalR;
+
 namespace Tourest
 {
 	public class Program
@@ -96,6 +106,20 @@ namespace Tourest
             builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
+
+            // Add services to the container.
+            builder.Services.AddScoped<ITourService, TourService>();
+
+
+            builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
+            builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
+
+
+
+
             builder.Services.AddScoped<IAccountService, AccountService>();
       
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
