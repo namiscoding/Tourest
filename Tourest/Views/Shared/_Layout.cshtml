@@ -4,7 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Tourest</title>
-    
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+    @using Newtonsoft.Json
+    @using Tourest.ViewModels.Account;
     <link rel="stylesheet" href="~/assets/css/style.css" />
     <link rel="stylesheet" href="~/assets/css/plugins.css" />
     <link rel="stylesheet" href="~/assets/plugins/all.min.css" />
@@ -16,61 +18,29 @@
     <link rel="stylesheet" href="~/assets/plugins/nice-select.css" />
     <link rel="stylesheet" href="~/assets/plugins/odometer.css" />
     <link rel="stylesheet" href="~/assets/plugins/swiper-bundle.min.css" />
-    
-    <link rel="icon" href="~/assets/images/favicon.png" type="image/x-icon" asp-append-version="true" />
+    <link rel="icon" href="assets/images/favicon.png" type="image/x-icon" />
 </head>
+@{
+    var session = HttpContextAccessor.HttpContext.Session;
+    var accountJson = session.GetString("CurrentAccount");
+    var currentAccount = accountJson == null ? null : JsonConvert.DeserializeObject<UserViewModel>(accountJson);
+}
 <body>
-    
+
     <header class="header__section">
-    <div class="header__top">
-        <div class="container container--max-width">
-            <div class="row g-2 align-items-center">
-                <div class="col-sm-6">
-                    <div class="header__top-left">
-                        <ul>
-                            <li>
-                                <a href="tel:+000999898999">(000)999-898-999</a>
-                            </li>
-                            <li>
-                                <a href="mailto:info@Touest.com">info@Touest.com</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="header__top-right">
-                        <div class="social-links">
+        <div class="header__top">
+            <div class="container container--max-width">
+                <div class="row g-2 align-items-center">
+                    <div class="col-sm-6">
+                        <div class="header__top-left">
                             <ul>
                                 <li>
-                                    <a href="#">
-                                        <i class="fa-brands fa-facebook-f"></i>
-                                    </a>
+                                    <a href="tel:+000999898999">(000)999-898-999</a>
                                 </li>
                                 <li>
-                                    <a href="#">
-                                        <i class="fa-brands fa-x-twitter"></i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i class="fa-brands fa-linkedin-in"></i>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        <i class="fa-brands fa-pinterest-p"></i>
-                                    </a>
+                                    <a href="mailto:info@Touest.com">info@Touest.com</a>
                                 </li>
                             </ul>
-                        </div>
-                        <div class="language-dropdown">
-                            <select>
-                                <option data-display="EUR">EUR</option>
-                                <option value="1">BDT</option>
-                                <option value="2">USD</option>
-                                <option value="3">INR</option>
-                                <option value="4">PLN</option>
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -88,75 +58,130 @@
                         <div class="header__main-menu">
                             <nav class="header__navigation">
                                 <ul>
-                                    <li class="has-child-menu">
-                                        <a href="javascript:void(0)">Home</a>
-                                        <ul>
-                                            <li><a href="index.html">Home - 1</a></li>
-                                            <li><a href="index-2.html">Home - 2</a></li>
-                                        </ul>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa-brands fa-facebook-f"></i>
+                                        </a>
                                     </li>
-                                    <li><a href="about-us.html">About Us</a></li>
-                                    <li class="has-child-menu">
-                                        <a href="javascript:void(0)">Blog</a>
-                                        <ul>
-                                            <li><a href="blog.html">Blog Style 1</a></li>
-                                            <li><a href="blog-2.html">Blog Style 2</a></li>
-                                            <li><a href="blog-3.html">Blog Style 3</a></li>
-                                            <li><a href="blog-details.html">Blog Details</a></li>
-                                        </ul>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa-brands fa-x-twitter"></i>
+                                        </a>
                                     </li>
-                                    <li class="has-child-menu">
-                                        <a href="javascript:void(0)">Pages</a>
-                                        <ul>
-                                            <li class="has-child-menu">
-                                                <a href="javascript:void(0)">Destination</a>
-                                                <ul>
-                                                    <li>
-                                                        <a href="destination.html">Destination</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="destination-details.html">Destination Details</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li class="has-child-menu">
-                                                <a href="javascript:void(0)">Tour</a>
-                                                <ul>
-                                                    <li><a href="tour.html">Tour</a></li>
-                                                    <li>
-                                                        <a href="tour-details.html">Tour Details</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li>
-                                                <a href="authentication.html">Authentication</a>
-                                            </li>
-                                            <li><a href="faq.html">FAQ</a></li>
-                                            <li><a href="404.html">Error 404</a></li>
-                                        </ul>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa-brands fa-linkedin-in"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa-brands fa-pinterest-p"></i>
+                                        </a>
                                     </li>
                                     <li><a href="contact.html">Contact</a></li>
                                     <li><a href="TourManager">Tour Manager</a></li>
                                 </ul>
-                            </nav>
+                            </div>
+                            <div class="language-dropdown">
+                                <select>
+                                    <option data-display="EUR">EUR</option>
+                                    <option value="1">BDT</option>
+                                    <option value="2">USD</option>
+                                    <option value="3">INR</option>
+                                    <option value="4">PLN</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-6 col-md-3 col-xl-4">
-                    <div class="header__main-right d-flex justify-content-end">
-                        <ul>
-                            <li>
-                                <button class="search-btn"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#searchModal">
-                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                </button>
-                            </li>
-                            <li>
-                                <a href="authentication.html" class="signin-signup d-flex">
-                                    <i class="fa-regular fa-user"></i>
-                                    <p>login / signup</p>
-                                </a>
+            </div>
+        </div>
+        <div class="header__main">
+            <div class="container container--max-width">
+                <div class="row align-content-center">
+                    <div class="col-6 col-md-9 col-xl-8">
+                        <div class="header__main-left">
+                            <a href="index.html" class="logo">
+                                <img src="~/assets/images/logo.svg" alt="logo" />
+                            </a>
+                            <div class="header__main-menu">
+                                <nav class="header__navigation">
+                                    <ul>
+                                        <li class="has-child-menu">
+                                            <a href="javascript:void(0)">Home</a>
+                                            <ul>
+                                                <li><a href="index.html">Home - 1</a></li>
+                                                <li><a href="index-2.html">Home - 2</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="about-us.html">About Us</a></li>
+                                        <li class="has-child-menu">
+                                            <a href="javascript:void(0)">Blog</a>
+                                            <ul>
+                                                <li><a href="blog.html">Blog Style 1</a></li>
+                                                <li><a href="blog-2.html">Blog Style 2</a></li>
+                                                <li><a href="blog-3.html">Blog Style 3</a></li>
+                                                <li><a href="blog-details.html">Blog Details</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="has-child-menu">
+                                            <a href="javascript:void(0)">Pages</a>
+                                            <ul>
+                                                <li class="has-child-menu">
+                                                    <a href="javascript:void(0)">Destination</a>
+                                                    <ul>
+                                                        <li>
+                                                            <a href="destination.html">Destination</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="destination-details.html">Destination Details</a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="has-child-menu">
+                                                    <a href="javascript:void(0)">Tour</a>
+                                                    <ul>
+                                                        <li><a href="tour.html">Tour</a></li>
+                                                        <li>
+                                                            <a href="tour-details.html">Tour Details</a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li>
+                                                    <a href="authentication.html">Authentication</a>
+                                                </li>
+                                                <li><a href="faq.html">FAQ</a></li>
+                                                <li><a href="404.html">Error 404</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="contact.html">Contact</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 col-xl-4">
+                        <div class="header__main-right d-flex justify-content-end">
+                            <ul>
+                                <li>
+                                    <button class="search-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#searchModal">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </button>
+                                </li>
+                                <li>
+                                    <a href="authentication.html" class="signin-signup d-flex">
+                                        <i class="fa-regular fa-user"></i>
+                                        @if (currentAccount != null)
+                                        {
+                                            <a href="#">Hello, @currentAccount.FullName!</a>
+                                        } 
+                                        else
+                                        {
+                                            <a asp-controller="Authentication" asp-action="Login">Login/Signup </a>
+                                        }
+                                    </a>
                             </li>
                             <li class="d-md-none">
                                 <button class="offcanvas-hamburger btn-link p-1 lh-1"

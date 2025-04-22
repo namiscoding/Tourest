@@ -1,0 +1,190 @@
+﻿@using System.Globalization
+@model Tourest.ViewModels.TourGuide.TourGuideDetailsViewModel
+
+@{
+    ViewData["Title"] = $"Tour Guide: {Model.FullName}";
+    var profilePic = Model.ProfilePictureUrl ?? Url.Content("~/assets/images/default-avatar.png");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css" @* Thay version nếu cần *@
+          rel="stylesheet" />
+
+    <style>
+        /* Có thể thêm CSS tùy chỉnh của bạn ở đây nếu cần */
+    </style>
+</head>
+<body>
+    <section style="background-color: #eee;">
+        <div class="container py-5">
+ 
+
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-body text-center">
+                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
+                                 class="rounded-circle img-fluid" style="width: 150px;">
+                            <h5 class="my-3">@Model.FullName</h5>
+                            <p class="text-muted mb-1">Tour Guide</p>
+                            
+                            <div class="mb-3">
+                                @if (Model.AverageRating.HasValue)
+                                {
+                                    <span class="ms-1">@Model.AverageRating.Value.ToString("0.0") </span>
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="fa-solid fa-star @(i <= Math.Round(Model.AverageRating.Value) ? "text-warning" : "text-light")"></i>
+                                    }
+                                    
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Chưa có đánh giá</span>
+                                }
+                            </div>
+                            <div class="d-flex justify-content-center mb-2">
+                                <button type="button" data-mdb-button-init data-mdb-ripple-init class="btn" style="background: #039e9d">Contact</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Full Name</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="text-muted mb-0">@Model.FullName</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Experiences</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    @if (!string.IsNullOrEmpty(Model.ExperienceLevel))
+                                    {
+                                        <p class="text-muted mb-4">@Model.ExperienceLevel</p>
+                                    }
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Langue</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    @if (Model.LanguagesSpokenList != null && Model.LanguagesSpokenList.Any())
+                                    {
+                                        <p class="text-muted mb-0">@string.Join(", ", Model.LanguagesSpokenList)</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted mb-0">Chưa cập nhật</p> @* Hoặc thông báo khác *@
+                                    }
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Major</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    @if (Model.SpecializationsList != null && Model.SpecializationsList.Any())
+                                    {
+                                        <p class="text-muted mb-0">@string.Join(", ", Model.SpecializationsList)</p>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-muted mb-0">Chưa cập nhật</p> @* Hoặc thông báo khác *@
+                                    }
+                                    
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Phone</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                                    {
+                                        <p class="text-muted mb-0">@Model.PhoneNumber</p>
+                                    }
+                                </div>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card mb-6 mb-md-0">
+                                <div class="card-body">
+                                    <h4 class="mt-4 mb-3">Đánh giá từ khách hàng (@Model.RatingCount)</h4>
+                                    @if (!Model.CustomerRatings.Any())
+                                    {
+                                        <p>Chưa có đánh giá nào.</p>
+                                    }
+                                    else
+                                    {
+                                        <div class="list-group">
+                                            @foreach (var rating in Model.CustomerRatings)
+                                            {
+                                                <div class="list-group-item list-group-item-action flex-column align-items-start mb-2 border rounded">
+                                                    <div class="d-flex w-100 justify-content-between">
+                                                        <h6 class="mb-1">
+                                                            @* <img src="@(rating.Customer?.ProfilePictureUrl ?? Url.Content("~/assets/images/default-avatar.png"))" alt="" width="25" height="25" class="rounded-circle me-1" /> *@
+                                                            @(rating.Customer?.FullName ?? "Khách hàng")
+                                                        </h6>
+                                                        <small class="text-muted">@rating.RatingDate.ToString("dd/MM/yyyy")</small>
+                                                    </div>
+                                                    <div class="mb-1 rating-stars">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            <i class="fa-solid fa-star small @(i <= rating.RatingValue ? "text-warning" : "text-light")"></i>
+                                                        }
+                                                        <span class="ms-1 fw-bold small">(@rating.RatingValue.ToString("0.0"))</span>
+                                                    </div>
+                                                    @if (!string.IsNullOrWhiteSpace(rating.Comment))
+                                                    {
+                                                        <p class="mb-1">@rating.Comment</p>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.umd.min.js" @* Thay version nếu cần *@></script>
+
+    <script>
+        // Có thể thêm JavaScript tùy chỉnh của bạn ở đây nếu cần
+    </script>
+</body>
+</html>
