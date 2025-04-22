@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tourest.Data.Entities;
+using Tourest.ViewModels.Tour;
 
 namespace Tourest.Data.Repositories
 {

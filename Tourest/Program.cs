@@ -1,4 +1,4 @@
- using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Tourest.Data;
 using Tourest.Data.Repositories;
@@ -80,6 +80,11 @@ namespace Tourest
             builder.Services.AddScoped<ITourRepository, TourRepository>();
 
             builder.Services.AddScoped<ITourService, TourService>();
+            builder.Services.AddScoped<ITourManagerRepository, TourManagerRepository>();
+            builder.Services.AddScoped<ITourManagerService, TourManagerService>();
+            builder.Services.AddScoped<TourManagerRepository>();
+
+
 
             builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
             builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();

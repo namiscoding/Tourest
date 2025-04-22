@@ -18,7 +18,6 @@
     <link rel="stylesheet" href="~/assets/plugins/nice-select.css" />
     <link rel="stylesheet" href="~/assets/plugins/odometer.css" />
     <link rel="stylesheet" href="~/assets/plugins/swiper-bundle.min.css" />
-
     <link rel="icon" href="assets/images/favicon.png" type="image/x-icon" />
 </head>
 @{
@@ -44,9 +43,20 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="header__top-right">
-                            <div class="social-links">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header__main">
+        <div class="container container--max-width">
+            <div class="row align-content-center">
+                <div class="col-6 col-md-9 col-xl-8">
+                    <div class="header__main-left">
+                        <a href="index.html" class="logo">
+                                <img src="~/assets/images/logo.svg" alt="logo" asp-append-version="true" />
+                        </a>
+                        <div class="header__main-menu">
+                            <nav class="header__navigation">
                                 <ul>
                                     <li>
                                         <a href="#">
@@ -68,6 +78,8 @@
                                             <i class="fa-brands fa-pinterest-p"></i>
                                         </a>
                                     </li>
+                                    <li><a href="contact.html">Contact</a></li>
+                                    <li><a href="TourManager">Tour Manager</a></li>
                                 </ul>
                             </div>
                             <div class="language-dropdown">
@@ -316,5 +328,7 @@
     <!-- Main JavaScript File -->
     <script src="assets/js/main.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    @RenderSection("Style", required: false)
+
 </body>
 </html>

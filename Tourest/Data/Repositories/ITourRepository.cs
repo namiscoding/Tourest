@@ -1,4 +1,5 @@
 ﻿using Tourest.Data.Entities;
+using Tourest.ViewModels.Tour;
 
 namespace Tourest.Data.Repositories
 {
@@ -14,7 +15,6 @@ namespace Tourest.Data.Repositories
             int? minPrice = null, // THÊM
             int? maxPrice = null);
         Task<Tour?> GetByIdAsync(int id);
-
         Task<IEnumerable<string>> GetDistinctActiveDestinationsAsync();
     }
 }

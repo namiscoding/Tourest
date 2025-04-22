@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "Tour Manager";
+}
+
+<style>
+    .dashboard {
+        max-width: 600px;
+        margin: 2rem auto;
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        text-align: center;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+        color: #343a40;
+    }
+
+    .dashboard-links {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+        .dashboard-links a {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+            .dashboard-links a:hover {
+                background-color: #0056b3;
+            }
+</style>
+
+<div class="dashboard">
+    <h2>🛠️ Tour Manager Dashboard</h2>
+
+    <div class="dashboard-links">
+        <a asp-controller="TourManager" asp-action="TourGuide">📋 View Tour Guides List</a>
+        <a asp-controller="TourManager" asp-action="ListTour">🗺️ View Tour List</a>
+    </div>
+</div>
