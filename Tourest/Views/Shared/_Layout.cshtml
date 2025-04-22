@@ -3,47 +3,323 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>@ViewData["Title"] - Tourest</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Tourest.styles.css" asp-append-version="true" />
+    @inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+    @using Newtonsoft.Json
+    @using Tourest.ViewModels.Account;
+    <link rel="stylesheet" href="~/assets/css/style.css" />
+    <link rel="stylesheet" href="~/assets/css/plugins.css" />
+    <link rel="icon" href="assets/images/favicon.png" type="image/x-icon" />
 </head>
+@{
+    var session = HttpContextAccessor.HttpContext.Session;
+    var accountJson = session.GetString("CurrentAccount");
+    var currentAccount = accountJson == null ? null : JsonConvert.DeserializeObject<UserViewModel>(accountJson);
+}
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Tourest</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <header class="header__section">
+        <div class="header__top">
+            <div class="container container--max-width">
+                <div class="row g-2 align-items-center">
+                    <div class="col-sm-6">
+                        <div class="header__top-left">
+                            <ul>
+                                <li>
+                                    <a href="tel:+000999898999">(000)999-898-999</a>
+                                </li>
+                                <li>
+                                    <a href="mailto:info@Touest.com">info@Touest.com</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="header__top-right">
+                            <div class="social-links">
+                                <ul>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa-brands fa-facebook-f"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa-brands fa-x-twitter"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa-brands fa-linkedin-in"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa-brands fa-pinterest-p"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="language-dropdown">
+                                <select>
+                                    <option data-display="EUR">EUR</option>
+                                    <option value="1">BDT</option>
+                                    <option value="2">USD</option>
+                                    <option value="3">INR</option>
+                                    <option value="4">PLN</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </nav>
+        </div>
+        <div class="header__main">
+            <div class="container container--max-width">
+                <div class="row align-content-center">
+                    <div class="col-6 col-md-9 col-xl-8">
+                        <div class="header__main-left">
+                            <a href="index.html" class="logo">
+                                <img src="~/assets/images/logo.svg" alt="logo" />
+                            </a>
+                            <div class="header__main-menu">
+                                <nav class="header__navigation">
+                                    <ul>
+                                        <li class="has-child-menu">
+                                            <a href="javascript:void(0)">Home</a>
+                                            <ul>
+                                                <li><a href="index.html">Home - 1</a></li>
+                                                <li><a href="index-2.html">Home - 2</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="about-us.html">About Us</a></li>
+                                        <li class="has-child-menu">
+                                            <a href="javascript:void(0)">Blog</a>
+                                            <ul>
+                                                <li><a href="blog.html">Blog Style 1</a></li>
+                                                <li><a href="blog-2.html">Blog Style 2</a></li>
+                                                <li><a href="blog-3.html">Blog Style 3</a></li>
+                                                <li><a href="blog-details.html">Blog Details</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="has-child-menu">
+                                            <a href="javascript:void(0)">Pages</a>
+                                            <ul>
+                                                <li class="has-child-menu">
+                                                    <a href="javascript:void(0)">Destination</a>
+                                                    <ul>
+                                                        <li>
+                                                            <a href="destination.html">Destination</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="destination-details.html">Destination Details</a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="has-child-menu">
+                                                    <a href="javascript:void(0)">Tour</a>
+                                                    <ul>
+                                                        <li><a href="tour.html">Tour</a></li>
+                                                        <li>
+                                                            <a href="tour-details.html">Tour Details</a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li>
+                                                    <a href="authentication.html">Authentication</a>
+                                                </li>
+                                                <li><a href="faq.html">FAQ</a></li>
+                                                <li><a href="404.html">Error 404</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="contact.html">Contact</a></li>
+                                        <li><a href="TourManager">Tour Manager</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3 col-xl-4">
+                        <div class="header__main-right d-flex justify-content-end">
+                            <ul>
+                                <li>
+                                    <button class="search-btn"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#searchModal">
+                                        <i class="fa-solid fa-magnifying-glass"></i>
+                                    </button>
+                                </li>
+                                <li>
+                                    <a href="authentication.html" class="signin-signup d-flex">
+                                        <i class="fa-regular fa-user"></i>
+                                        @if (currentAccount != null)
+                                        {
+                                            <a href="#">Hello, @currentAccount.FullName!</a>
+                                        } 
+                                        else
+                                        {
+                                            <a asp-controller="Authentication" asp-action="Login">Login/Signup </a>
+                                        }
+                                    </a>
+                            </li>
+                            <li class="d-md-none">
+                                <button class="offcanvas-hamburger btn-link p-1 lh-1"
+                                        type="button"
+                                        data-bs-toggle="offcanvas"
+                                        data-bs-target="#offcanvasTop"
+                                        aria-controls="offcanvasTop">
+                                    <i class="fa-solid fa-bars"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div>
+        <main role="main">
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
+    <!-- Footer__section start  -->
+    <footer class="footer__section footer__section--extend section-padding-top-bottom">
         <div class="container">
-            &copy; 2025 - Tourest - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row g-4 g-xxl-5 justify-content-between">
+                <div class="col-12 col-sm-6 col-lg-3 order-1 order-lg-0">
+                    <div class="footer-widgets footer__leftContent fade_bottom">
+                        <a href="index.html" class="logo">
+                            <img src="~/assets/images/logo-3.svg" alt="logo" />
+                        </a>
+                        <div class="help-info">
+                            <span>Need any help?</span>
+                            <h6 class="text-white">
+                                Call Us:
+                                <a href="tel:+88812345678" class="text-orange-red">(888)1234 5678</a>
+                            </h6>
+                        </div>
+                        <div class="contact-addresses">
+                            <p>Love Street, Muscat, Oman</p>
+                            <a href="mailto:exaample@Touest.com">exaample@Touest.com</a>
+                        </div>
+                        <div class="social-share">
+                            <ul>
+                                <li>
+                                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                                </li>
+                                <li>
+                                    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+                                </li>
+                                <li>
+                                    <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-12 col-lg-6 order-0 order-lg-1">
+                    <div class="footer-widgets footer__links-wrapper">
+                        <div class="footer-links item-stagger footer-links--extend">
+                            <h6 class="footer-link-title">Company</h6>
+                            <ul>
+                                <li><a href="about-us.html">About Us</a></li>
+                                <li><a href="contact.html">Contact Us</a></li>
+                                <li><a href="#">Travel Guides</a></li>
+                                <li><a href="#">Data Policy</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-links item-stagger footer-links--extend">
+                            <h6 class="footer-link-title">Top Destination</h6>
+                            <ul>
+                                <li><a href="destination-details.html">Las Vegas</a></li>
+                                <li>
+                                    <a href="destination-details.html">New York City</a>
+                                </li>
+                                <li>
+                                    <a href="destination-details.html">San Francisco</a>
+                                </li>
+                                <li><a href="destination-details.html">Hawaii</a></li>
+                            </ul>
+                        </div>
+                        <div class="footer-links item-stagger footer-links--extend">
+                            <h6 class="footer-link-title">&nbsp;</h6>
+                            <ul>
+                                <li><a href="destination-details.html">Tokyo</a></li>
+                                <li><a href="destination-details.html">Sydney</a></li>
+                                <li><a href="destination-details.html">Melbourne</a></li>
+                                <li><a href="destination-details.html">Dubai</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-3 order-2 order-lg-2">
+                    <div class="footer-widgets footer__rightContent fade_bottom">
+                        <div class="news-letter">
+                            <h6>Sign up Newsletter</h6>
+                            <form action="index.html" class="mt-3">
+                                <div class="input-group">
+                                    <input type="email"
+                                           name="email"
+                                           id="email"
+                                           placeholder="Enter email..."
+                                           required
+                                           autocomplete="off" />
+                                </div>
+                                <button type="submit" class="common-btn color-two">
+                                    Submit
+                                </button>
+                            </form>
+                            <p class="copyright">© 2025 Touest All Right Reserved</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- JS Files -->
+    <!-- jQuery MeanMe -->
+    <script src="~/assets/js/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="~/assets/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery MeanMenu Plugin -->
+    <script src="~/assets/js/jquery.meanmenu.js"></script>
+    <!-- Swiper slider Plugin -->
+    <script src="~/assets/js/swiper-bundle.min.js"></script>
+    <!-- Magnific-Popup Plugin -->
+    <script src="~/assets/js/jquery.magnific-popup.min.js"></script>
+    <!-- Nice Select Plugin -->
+    <script src="~/assets/js/jquery.nice-select.min.js"></script>
+    <!-- Moment Plugin -->
+    <script src="~/assets/js/moment.min.js"></script>
+    <!-- Daterangepicker Plugin -->
+    <script src="~/assets/js/daterangepicker.js"></script>
+    <!-- Odometer JS -->
+    <script src="~/assets/js/odometer.min.js"></script>
+    <script src="~/assets/js/viewport.jquery.js"></script>
+    <!-- BackToTop Plugin -->
+    <!-- <script src="assets/js/backToTop.js"></script> -->
+    <!-- GSAP -->
+    <script src="~/assets/js/gsap.min.js"></script>
+    <script src="~/assets/js/ScrollTrigger.min.js"></script>
+    <script src="~/assets/js/ScrollToPlugin.min.js"></script>
+    <script src="~/assets/js/ScrollSmoother.min.js"></script>
+    <script src="~/assets/js/SplitText.min.js"></script>
+
+    <!-- Main JavaScript File -->
+    <script src="~/assets/js/main.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    @RenderSection("Style", required: false)
+
 </body>
 </html>

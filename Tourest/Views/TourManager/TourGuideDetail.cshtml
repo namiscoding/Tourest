@@ -1,0 +1,77 @@
+﻿@model Tourest.ViewModels.Tour.TourGuideDetailViewModel
+
+@section Style {
+    <style>
+        .container-centered {
+            max-width: 1000px;
+            margin: 2rem auto;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #343a40;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+    </style>
+}
+
+<h2>Tour Guide Detail</h2>
+
+<div class="container-centered">
+    <table>
+        <tr>
+            <th>Experience</th>
+            <td>@Model.Experience</td>
+        </tr>
+        <tr>
+            <th>Languages</th>
+            <td>@Model.Languages</td>
+        </tr>
+        <tr>
+            <th>Specializations</th>
+            <td>@Model.Specializations</td>
+        </tr>
+        <tr>
+            <th>Max Group Size</th>
+            <td>@Model.MaxGroupSizeCapacity</td>
+        </tr>
+        <tr>
+            <th>Rating</th>
+            <td>@Model.Rating</td>
+        </tr>
+        <tr>
+            <th>Profile Picture</th>
+            <td>
+                <img src="@Model.ProfilePictureUri" alt="Profile Picture" />
+            </td>
+        </tr>
+    </table>
+</div>

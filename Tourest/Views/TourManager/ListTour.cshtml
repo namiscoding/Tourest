@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Tourest.ViewModels.Tour.TourListAllViewModel>
+
+@{
+    ViewData["Title"] = "Tour List";
+}
+
+<style>
+    .container-centered {
+        max-width: 800px;
+        margin: 2rem auto;
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 1.5rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    th, td {
+        padding: 12px 15px;
+        border: 1px solid #dee2e6;
+        text-align: left;
+    }
+
+    th {
+        background-color: #007bff;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+</style>
+
+<div class="container-centered">
+    <h2>@ViewData["Title"]</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tour</th>
+                <th>View Customers</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tour in Model)
+            {
+                <tr>
+                    <td>@tour.TourID</td>
+                    <td>@tour.Name</td>
+                    <td>
+                        <a asp-controller="TourManager" asp-action="ViewCustomers" asp-route-tourId="@tour.TourID">View</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

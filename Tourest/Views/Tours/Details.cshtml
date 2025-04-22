@@ -1,0 +1,1453 @@
+﻿@* File: Views/Tours/Details.cshtml *@
+@using System.Globalization
+@model Tourest.ViewModels.Tour.TourDetailsViewModel
+@using System.Net
+@{
+    ViewData["Title"] = Model.Name;
+    var firstImage = Model.ImageUrlList?.FirstOrDefault() ?? Url.Content("~/assets/images/placeholder-image.png");
+
+    // Sửa lại: Thêm kiểm tra null và định dạng cho MinAge
+    //var minAgeDisplay = Model.MinAge.HasValue ? $"{Model.MinAge.Value}+" : "N/A"; // Sử dụng biến này ở dưới
+
+    // Sửa lại: Thêm kiểm tra null cho MaxGroupSize
+    var maxPeopleDisplay = Model.MaxGroupSize.HasValue ? Model.MaxGroupSize.Value.ToString() : "N/A"; // Sử dụng biến này ở dưới
+
+    // Sửa lại: Tạo chuỗi category và kiểm tra null/empty
+    var categoriesDisplay = (Model.Categories != null && Model.Categories.Any())
+                            ? string.Join(", ", Model.Categories.Select(c => c.Name))
+                            : "N/A"; // Sử dụng biến này ở dưới
+
+    // Hàm helper tạo ID an toàn từ chuỗi (Thêm implementation cơ bản)
+    // Func<string, string> CreateSafeId = (input) => {
+    //     if (string.IsNullOrWhiteSpace(input)) return $"id-{Guid.NewGuid()}"; Return unique ID if input is bad
+    //     Remove accents
+    //     string normalizedString = input.Normalize(NormalizationForm.FormD);
+    //     var sb = new StringBuilder();
+    //     foreach (char c in normalizedString) {
+    //         if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark) {
+    //             sb.Append(c);
+    //         }
+    //     }
+    //     string deaccented = sb.ToString().Normalize(NormalizationForm.FormC);
+    //     Replace invalid chars, keep hyphens and underscores
+    //     string safe = Regex.Replace(deaccented, @"[^a-zA-Z0-9_-]+", "-", RegexOptions.Compiled).Trim('-');
+    //     Remove leading/trailing hyphens/underscores multiple times
+    //     safe = Regex.Replace(safe, @"^-+|-+$", "");
+    //     Ensure it doesn't start with a number if it's the only character
+    //     if (safe.Length > 0 && !char.IsLetter(safe[0]) && safe[0] != '_') {
+    //          safe = "_" + safe;
+    //     }
+    //     If after cleaning it's empty, generate a unique one
+    //     return string.IsNullOrWhiteSpace(safe) ? $"id-{Guid.NewGuid()}" : safe.ToLowerInvariant();
+    // };
+}
+    <main>
+        <!-- Tour-Details__section start  -->
+        <section class="tour-dtls__section section-mini-padding-top">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-7 col-xl-8">
+                        <article class="tour-dtls__article">
+                            <figure class="tour-thumb">
+                                <img src="./assets/images/tour-details-section/tour-details-thumb.png"
+                                     alt="tour-details-thumb"
+                                     class="w-100" />
+                                <div class="tour-thumb__caption">
+                                    <button>video <i class="fa-solid fa-video"></i></button>
+                                    <button>gallery <i class="fa-regular fa-image"></i></button>
+                                </div>
+                            </figure>
+                            <div class="tour-dtls__content">
+                                <div class="tour-meta">
+                                    <div class="meta-location">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    @Model.Destination
+                                    <a href="https://www.google.com/maps/search/?api=1&query=@System.Net.WebUtility.UrlEncode(Model.Destination)"
+                                       target="_blank"
+                                       class="text-orange-red ms-2">
+                                        View on map
+                                    </a>
+                                    </div>
+                                    <div class="meta-share">
+                                        <a href="#">
+                                            <i class="fa-solid fa-share-nodes"></i>
+                                        </a>
+                                        <a href="#">
+                                            <i class="fa-regular fa-heart"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <h3 class="title">
+                                <a href="tour-details.html">@Model.Name</a>
+                                </h3>
+                                <span class="divider"></span>
+                                <div class="tour-features">
+                                    <div class="feature">
+                                        <span class="features-title">From</span>
+                                    <span class="features-info text-orange-red">
+                                        @Model.ChildPrice.ToString("N0", CultureInfo.GetCultureInfo("vi-VN"))
+                                        - @Model.AdultPrice.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) VND</span>
+                                    </div>
+                                    <div class="feature">
+                                        <span class="features-title">Duration</span>
+                                        <span class="features-info">@Model.DurationDays days</span>
+                                    </div>
+                                    <div class="feature">
+                                        <span class="features-title">Max People</span>
+                                        <span class="features-info">@Model.MaxGroupSize</span>
+                                    </div>
+                                    <div class="feature">
+                                        <span class="features-title">Tour Type</span>
+                                        <span class="features-info">
+                                            @if (Model.Categories != null && Model.Categories.Any())
+                                            {
+                                                @string.Join(", ", Model.Categories.Select(c => c.Name))
+                                            }
+                                            else
+                                            {
+                                                <text>N/A</text> @* Hoặc để trống nếu không có category *@
+                                            }
+                                        </span>
+                                    </div>
+                                    <div class="feature">
+                                        <span class="features-title">Reviews</span>
+                                        <span class="features-info review">
+                                        @if (Model.AverageRating.HasValue)
+                                        {
+                                            @Model.AverageRating.Value.ToString("0.0")
+                                            <span>(@Model.SumRating reviews)</span>
+                                        }
+                                        else
+                                        {
+                                            <text>N/A</text>
+                                            <span>(0 reviews)</span>
+                                        }
+                                        </span>
+                                    </div>
+                                </div>
+                            <div class="tour-included-exclude tour-overview">
+                                <h5 class="overview-title">Pickup Points</h5>
+                                @if (Model.DeparturePointsList != null && Model.DeparturePointsList.Any())
+                                {
+                                    <ul class="include">
+                                        @foreach (var service in Model.DeparturePointsList)
+                                        {
+                                            <li>
+                                                <i style="color:#039e9d" class="fa-solid fa-location-dot"></i>
+                                                @service
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                                <div class="tour-overview">
+                                    <h5 class="overview-title">Overview</h5>
+                                    <p>
+                                        @Model.Description
+                                    </p>
+                                    
+                                </div>
+                            <div class="tour-overview">
+                                <h5 class="overview-title">Điều khoản & Điều kiện</h5>
+                                <p>
+                                    @Model.CancellationPolicyDescription
+                                </p>
+
+                            </div>
+                                <div class="tour-included-exclude">
+                                    <h5 class="included-exclude-title">Included / Exclude</h5>
+                                    <div class="included-exclude">
+                                        @if (Model.IncludedServicesList != null && Model.IncludedServicesList.Any())
+                                        {
+                                        <ul class="include">
+                                            @foreach (var service in Model.IncludedServicesList)
+                                            {
+                                            <li>
+                                                <i class="fa-solid fa-check"></i>
+                                                    @service
+                                            </li>
+                                            }
+                                        </ul>
+                                        }
+                                        @if (Model.ExcludedServicesList != null && Model.ExcludedServicesList.Any())
+                                    {
+                                        <ul class="exclude">
+                                            @foreach (var service in Model.ExcludedServicesList)
+                                            {
+                                                <li>
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                    @service
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                                </div>
+                            <div class="tour-Plan">
+                                <h5 class="plan-title">Tour Plan</h5>
+                                @if (Model.ItineraryDays != null && Model.ItineraryDays.Any())
+                                {
+                                    <div class="faq__accordion accordion accordion-reset" id="itineraryAccordion">
+
+                                        @foreach (var day in Model.ItineraryDays)
+                                        {
+                                            var collapseId = $"collapseItinerary{day.DayNumber}";
+                                            var headingId = $"headingItinerary{day.DayNumber}";
+                                            <div class="accordion-item">
+                                                <h6 class="accordion-header" id="@headingId">
+                                                    <button class="accordion-button tour-faq-number @(day.DayNumber == 1 ? "" : "collapsed")"
+                                                            type="button"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#@collapseId" 
+                                                            aria-expanded="@(day.DayNumber == 1 ? "true" : "false")"
+                                                            aria-controls="@collapseId">
+                                                        Day @day.DayNumber: @day.Title
+                                                    </button>
+                                                </h6>
+                                                <div id="@collapseId"
+                                                     class="accordion-collapse collapse @(day.DayNumber == 1 ? "show" : "")"
+                                                     aria-labelledby="@headingId"
+                                                     data-bs-parent="#itineraryAccordion">
+                                                    <div class="accordion-body">
+                                                        <div class="tour-plan-list">
+                                                            <ul>
+                                                                <li>
+                                                                    <i class="fa-solid fa-circle"></i>
+                                                                    @Html.Raw(day.Description?.Replace("\n", "<br />"))
+                                                                </li>
+                                                                @* Các mục tĩnh này bạn có thể thay bằng dữ liệu động nếu có trong ViewModel *@
+                                                                @*
+                                                        <li>
+                                                        <i class="fa-solid fa-circle"></i>
+                                                        Awesome Breakfast
+                                                        </li>
+                                                        <li>
+                                                        <i class="fa-solid fa-circle"></i>
+                                                        5 Star Accommodation
+                                                        </li>
+                                                        *@
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p>No itinerary details available.</p> @* Thêm thông báo nếu không có lịch trình *@
+                                }
+                            </div>
+                            <div class="tour-map">
+                                <h5 class="map-title">Map</h5>
+                                @if (!string.IsNullOrEmpty(Model.Destination))
+                                {
+                                    var encodedDestination = System.Net.WebUtility.UrlEncode(Model.Destination);
+                                    var mapSrc = $"https://maps.google.com/maps?q={encodedDestination}&t=&z=13&ie=UTF8&iwloc=&output=embed";
+
+                                    <iframe src="@mapSrc" @* <--- SRC động dựa trên Model.Destination *@
+                                            width="100%" @* Nên dùng width 100% để responsive tốt hơn *@
+                                            height="412"
+                                            style="border:0;"
+                                            allowfullscreen=""
+                                            loading="lazy"
+                                            referrerpolicy="no-referrer-when-downgrade"
+                                            class="tour-iframe">
+                                    </iframe>
+                                }
+                                else
+                                {
+                                    <p>Map location not available.</p> @* Hiển thị thông báo nếu không có Destination *@
+                                }
+                            </div>
+                            <div class="tour-reviews">
+                                <h5 class="reviews-title">Average Reviews</h5>
+                                <div class="reviews-container">
+                                    <div class="review-item d-flex align-items-center">
+                                        @* Sử dụng flexbox *@
+                                        @if (Model.AverageRating.HasValue)
+                                        {
+                                            <h2 class="total-point me-3">@Model.AverageRating.Value.ToString("0.0")</h2>
+                                            <p class="review-catagory mb-0">
+                                                @* Thêm mb-0 *@
+                                                @if (Model.AverageRating.Value >= 4.5m)
+                                                {
+                                                    <span class="ms-2">Excellent</span> @* Thêm class ms-2 để tạo khoảng cách *@
+                                                }
+                                                else if (Model.AverageRating.Value >= 3.5m)
+                                                {
+                                                    <span class="ms-2">Good</span>
+                                                }
+                                                else if (Model.AverageRating.Value >= 2.5m)
+                                                {
+                                                    <span class="ms-2">Average</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="ms-2">Below Average</span>
+                                                }
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <h2 class="total-point me-3">N/A</h2>
+                                            <p class="review-catagory mb-0 text-muted">No Reviews Yet</p>
+                                        }
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="showing-review">
+                                <h5 class="reviews-title">Showing @Model.Ratings.Count() review@(Model.Ratings.Count() != 1 ? "s" : "")</h5>
+                                @if (!Model.Ratings.Any())
+                                {
+                                    <p>There are no reviews for this tour yet.</p>
+                                }
+                                else
+                                {
+                                    <div class="review-container">
+                                        @foreach (var rating in Model.Ratings)
+                                        {
+                                            <div class="review-item d-flex mb-4">
+                                                @* mb-4 để tạo khoảng cách *@
+                                                <figure class="review-avatar me-3">
+                                                    @* Thêm me-3 *@
+                                                    <img src="@(rating.Customer?.ProfilePictureUrl ?? Url.Content("~/assets/images/default-avatar.png"))" @* Cần ảnh default *@
+                                                         alt="reviewer-avatar" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" />
+                                                </figure>
+                                                <div class="review-content">
+                                                    <span class="review-date text-muted"><small>@rating.RatingDate.ToString("dd MMM, yyyy")</small></span>
+                                                    <h6 class="review-title mt-1 mb-1">@(rating.Customer?.FullName ?? "Anonymous")</h6>
+                                                    <div class="reviews mb-2">
+                                                        @* Thêm mb-2 *@
+                                                        <span class="review-stars">
+                                                            @for (int i = 1; i <= 5; i++)
+                                                            {
+                                                                <i class="fa-solid fa-star @(i <= rating.RatingValue ? "text-warning" : "text-light")"></i>
+                                                            }
+                                                        </span>
+                                                        @* <span class="review-total">15 reviews</span> -- Không cần thiết ở đây *@
+                                                    </div>
+                                                    @if (!string.IsNullOrWhiteSpace(rating.Comment))
+                                                    {
+                                                        <p class="revew-description">@rating.Comment</p>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                                <div class="add-review">
+                                    <h5 class="reviews-title">Add a review</h5>
+                                    <div class="review-ratings">
+                                        <div class="rating">
+                                            <span class="rating-title">Services</span>
+                                            <div class="rating-stars">
+                                                <ul>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="rating">
+                                            <span class="rating-title">Locations</span>
+                                            <div class="rating-stars">
+                                                <ul>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="rating">
+                                            <span class="rating-title">Amenities</span>
+                                            <div class="rating-stars">
+                                                <ul>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="rating">
+                                            <span class="rating-title">Prices</span>
+                                            <div class="rating-stars">
+                                                <ul>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="rating">
+                                            <span class="rating-title">Room comfort and quality</span>
+                                            <div class="rating-stars">
+                                                <ul>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="#">
+                                                            <i class="fa-solid fa-star"></i>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <form action="index-2.html"
+                                          class="revew-form"
+                                          autocomplete="off">
+                                        <div class="row g-3">
+                                            <div class="col-sm-6">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           id="replyer-name"
+                                                           placeholder="Your name"
+                                                           required />
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="input-group">
+                                                    <input type="text"
+                                                           class="form-control"
+                                                           id="replyer-email"
+                                                           placeholder="Email address"
+                                                           required />
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="input-group">
+                                                    <textarea class="form-control"
+                                                              id="replyer-message"
+                                                              placeholder="Write your comment"
+                                                              rows="5"
+                                                              required></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="input-group">
+                                                    <button type="submit" class="common-btn color-two">
+                                                        Submit review
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="col-lg-5 col-xl-4">
+                        <div class="tour-dtls__sidebar sidebar">
+                             <div class="widget__item pricing-widget p-3 border rounded shadow-sm"> @* Thêm padding, border,... *@
+                                 <p class="fs-6"><strong>Giá người lớn:</strong> <span class="float-end">@Model.AdultPrice.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) VND</span></p>
+                                 <p class="fs-6 mb-3"><strong>Giá trẻ em:</strong> <span class="float-end">@Model.ChildPrice.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) VND</span></p>
+                            @* --- Form Đặt Tour --- *@
+                                 <form asp-action="Create" asp-controller="Booking" method="post" class="pricing-form needs-validation" novalidate>
+                                     <input type="hidden" name="TourId" value="@Model.TourId"/>
+                                     <input type="hidden" id="adultPriceHidden" value="@Model.AdultPrice" />
+                                     <input type="hidden" id="childPriceHidden" value="@Model.ChildPrice" />
+
+                                     <div class="input-group-wrapper">
+                                    @* --- Phần Chọn Ngày --- *@
+                                         <div class="mb-3">
+                                             <label for="datePickerInput" class="form-label fw-bold">Chọn ngày tham quan:</label>
+                                             <div class="input-group input-group-sm mb-2">
+                                                 <input type="text" id="datePickerInput" class="form-control datepicker-trigger" placeholder="dd/mm/yyyy" readonly style="background-color: white; cursor: pointer;">
+                                                 <span class="input-group-text"><i class="fa-regular fa-calendar-alt"></i></span>
+                                             </div>
+                                        @* Input ẩn cho flatpickr nếu dùng altInput *@
+                                        @* <input type="text" id="flatpickrHiddenInput" style="display: none;" /> *@
+
+                                             <div class="quick-dates-wrapper position-relative mb-2">
+                                                <button type="button" class="btn btn-sm btn-light quick-scroll-btn prev" id="quickDatePrevBtn" aria-label="Previous dates" style="position: absolute; left: -10px; top: 50%; transform: translateY(-50%); z-index: 2; padding: 0.1rem 0.4rem;">&lt;</button>
+                                                <div id="quickDateButtons" class="d-flex overflow-hidden pb-1" style="scroll-behavior: smooth;">
+                                                     <span class="text-muted small p-2">Đang tải ngày...</span>
+                                                </div>
+                                                 <button type="button" class="btn btn-sm btn-light quick-scroll-btn next" id="quickDateNextBtn" aria-label="Next dates" style="position: absolute; right: -10px; top: 50%; transform: translateY(-50%); z-index: 2; padding: 0.1rem 0.4rem;">&gt;</button>
+                                            </div>
+
+                                             <div id="selectedDateDisplay" class="alert alert-info py-1 px-2 small" role="alert" style="display: none;">
+                                                 Ngày tham quan đã chọn: <strong id="selectedDateText"></strong>
+                                             </div>
+
+                                             <input type="hidden" name="SelectedDate" id="selectedDateHidden" required/>
+                                             <div class="invalid-feedback">Vui lòng chọn ngày tham quan.</div>
+                                         </div>
+                                    @* --- Kết thúc Phần Chọn Ngày --- *@
+                                    @* --- Phần chọn điểm đón*@
+                                    @if (Model.DeparturePointsList != null && Model.DeparturePointsList.Any())
+                                    {
+                                        <div class="input-group mb-3">
+                                            <label for="pickupPointSelect" class="form-label fw-bold">Chọn điểm đón:</label>
+                                            <select class="form-select form-select-sm" id="pickupPointSelect" name="SelectedPickupPoint" required>
+                                                @* Đặt name để gửi đi *@
+                                                <option value="" selected disabled>-- Vui lòng chọn --</option>
+                                                @foreach (var point in Model.DeparturePointsList)
+                                                {
+                                                    <option value="@point">@point</option>
+                                                }
+                                            </select>
+                                            <div class="invalid-feedback">Vui lòng chọn điểm đón.</div> @* Validation message *@
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        @* Tùy chọn: Hiển thị thông báo nếu không có điểm đón *@
+                                        @* <p><small class="text-muted">Không có thông tin điểm đón cụ thể cho tour này.</small></p> *@
+                                        @* Hoặc thêm input ẩn với giá trị mặc định nếu cần *@
+                                        @* <input type="hidden" name="SelectedPickupPoint" value="Default Location" /> *@
+                                    }
+                                    @* --- Kết thúc Phần chọn điểm đón*@
+                                    <div class="alert alert-danger alert-dismissible fade" role="alert" id="maxGroupAlert" style="display: none;">
+                                                <h5 class="alert-heading">Thông báo</h5>
+                                                Đã đạt số lượng người tối đa cho tour này. Không thể tăng thêm.
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                    @* --- Bộ đếm Người lớn --- *@
+                                         <div class="input-group has-btn mb-3">
+                                             <label for="adults-input" class="form-label--extend">Người lớn <small class="text-muted">(từ tuổi)</small></label> @* Use MinAge *@
+                                             <div class="btn-group">
+                                                 <button class="btn btn-outline-secondary counter-btn" data-input="adults-input" data-action="decrement" type="button">
+                                                     <i class="fa-solid fa-minus"></i>
+                                                 </button>
+                                                 <input type="number" class="form-control text-center counter-input" id="adults-input" name="NumberOfAdults" value="1" min="1" readonly/>
+                                                 <button class="btn btn-outline-secondary counter-btn" data-input="adults-input" data-action="increment" type="button">
+                                                     <i class="fa-solid fa-plus"></i>
+                                                 </button>
+                                             </div>
+                                         </div>
+
+                                    @* --- Bộ đếm Trẻ em --- *@
+                                          <div class="input-group has-btn mb-3">
+                                              <label for="children-input" class="form-label--extend">Trẻ em <small class="text-muted">(dưới  0) tuổi)</small></label> @* Use MinAge *@
+                                              <div class="btn-group">
+                                                  <button class="btn btn-outline-secondary counter-btn" data-input="children-input" data-action="decrement" type="button">
+                                                      <i class="fa-solid fa-minus"></i>
+                                                  </button>
+                                                  <input type="number" class="form-control text-center counter-input" id="children-input" name="NumberOfChildren" value="0" min="0" readonly/>
+                                                  <button class="btn btn-outline-secondary counter-btn" data-input="children-input" data-action="increment" type="button">
+                                                      <i class="fa-solid fa-plus"></i>
+                                                  </button>
+                                              </div>
+                                          </div>
+
+                                    @* --- Tổng giá tiền --- *@
+                                         <div class="input-group pricing flex-row justify-content-between align-items-center mb-3 pt-2 border-top">
+                                             <label class="form-label--extend fw-bold">Tổng giá tiền</label>
+                                             <span class="total-price fw-bold fs-5 text-danger" id="totalPriceDisplay"></span>
+                                         </div>
+                                         
+                                    @* --- Nút Đặt Ngay --- *@
+                                         <button type="submit" class="common-btn color-two w-100" id="book-now-button">
+                                             Đặt ngay
+                                         </button>
+                                     </div>
+                                 </form>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Tour-Details__section end  -->
+        <!-- featured-tours__section start  -->
+        <section class="featured-tours__section position-relative bg-white section-padding-top-bottom">
+            <figure class="featured-tours__shap-icon-1">
+                <img src="./assets/images/featured-tours-section/icon-wave-1.png"
+                     alt="icon" />
+            </figure>
+            <figure class="featured-tours__shap-icon-2">
+                <img src="./assets/images/featured-tours-section/icon-wave-2.png"
+                     alt="icon" />
+            </figure>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="section__header">
+                            <h2 class="section__title char-animation mt-0">
+                                You may also like...
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="row section-mini-padding-top">
+                    <div class="col-12">
+                        <div class="swiper featured-tours__slider">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <div class="featured-tours__slide">
+                                        <figure class="slide-thumb">
+                                            <a href="#0" class="favorite">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </a>
+                                            <img src="./assets/images/featured-tours-section/tour-1.png"
+                                                 alt="tour" />
+                                        </figure>
+                                        <div class="slide-content">
+                                            <p class="tour-location">Budapest, Hungary</p>
+                                            <h6 class="tour-title">
+                                                <a href="tour-details.html" class="line-clamp-2">Wonders of the West Coast & Kimberley</a>
+                                            </h6>
+                                            <div class="featured-tours__meta">
+                                                <div class="revew">
+                                                    <span class="total-ratings bg-orange-red text-white">
+                                                        <i class="fa-solid fa-star"></i>
+                                                        4.8
+                                                    </span>
+                                                    <span class="total-review">15 reviews</span>
+                                                </div>
+                                                <div class="duration">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    7 days
+                                                </div>
+                                            </div>
+                                            <div class="pricing">
+                                                <p>Starting From</p>
+                                                <span class="price">$520</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="featured-tours__slide">
+                                        <figure class="slide-thumb">
+                                            <a href="#0" class="favorite">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </a>
+                                            <img src="./assets/images/featured-tours-section/tour-2.png"
+                                                 alt="tour" />
+                                        </figure>
+                                        <div class="slide-content">
+                                            <p class="tour-location">Greater London, UK</p>
+                                            <h6 class="tour-title">
+                                                <a href="tour-details.html" class="line-clamp-2">Windsor Castle, and Bath from London</a>
+                                            </h6>
+                                            <div class="featured-tours__meta">
+                                                <div class="revew">
+                                                    <span class="total-ratings bg-orange-red text-white">
+                                                        <i class="fa-solid fa-star"></i>
+                                                        4.8
+                                                    </span>
+                                                    <span class="total-review">15 reviews</span>
+                                                </div>
+                                                <div class="duration">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    7 days
+                                                </div>
+                                            </div>
+                                            <div class="pricing">
+                                                <p>Starting From</p>
+                                                <span class="price">$350</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="featured-tours__slide">
+                                        <figure class="slide-thumb">
+                                            <a href="#0" class="favorite">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </a>
+                                            <img src="./assets/images/featured-tours-section/tour-3.png"
+                                                 alt="tour" />
+                                        </figure>
+                                        <div class="slide-content">
+                                            <p class="tour-location">Australia</p>
+                                            <h6 class="tour-title">
+                                                <a href="tour-details.html" class="line-clamp-2">
+                                                    Enchanting Great Barrier Reef, Aquatic
+                                                    Wonderland
+                                                </a>
+                                            </h6>
+                                            <div class="featured-tours__meta">
+                                                <div class="revew">
+                                                    <span class="total-ratings bg-orange-red text-white">
+                                                        <i class="fa-solid fa-star"></i>
+                                                        4.8
+                                                    </span>
+                                                    <span class="total-review">15 reviews</span>
+                                                </div>
+                                                <div class="duration">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    7 days
+                                                </div>
+                                            </div>
+                                            <div class="pricing">
+                                                <p>Starting From</p>
+                                                <span class="price">$450</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="featured-tours__slide">
+                                        <figure class="slide-thumb">
+                                            <a href="#0" class="favorite">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </a>
+                                            <img src="./assets/images/featured-tours-section/tour-4.png"
+                                                 alt="tour" />
+                                        </figure>
+                                        <div class="slide-content">
+                                            <p class="tour-location">Oman</p>
+                                            <h6 class="tour-title">
+                                                <a href="tour-details.html" class="line-clamp-2">Ancient Heritage and Desert Adventures</a>
+                                            </h6>
+                                            <div class="featured-tours__meta">
+                                                <div class="revew">
+                                                    <span class="total-ratings bg-orange-red text-white">
+                                                        <i class="fa-solid fa-star"></i>
+                                                        4.8
+                                                    </span>
+                                                    <span class="total-review">15 reviews</span>
+                                                </div>
+                                                <div class="duration">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    7 days
+                                                </div>
+                                            </div>
+                                            <div class="pricing">
+                                                <p>Starting From</p>
+                                                <span class="price">$599</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="featured-tours__slide">
+                                        <figure class="slide-thumb">
+                                            <a href="#0" class="favorite">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </a>
+                                            <img src="./assets/images/featured-tours-section/tour-1.png"
+                                                 alt="tour" />
+                                        </figure>
+                                        <div class="slide-content">
+                                            <p class="tour-location">Budapest, Hungary</p>
+                                            <h6 class="tour-title">
+                                                <a href="tour-details.html" class="line-clamp-2">Wonders of the West Coast & Kimberley</a>
+                                            </h6>
+                                            <div class="featured-tours__meta">
+                                                <div class="revew">
+                                                    <span class="total-ratings bg-orange-red text-white">
+                                                        <i class="fa-solid fa-star"></i>
+                                                        4.8
+                                                    </span>
+                                                    <span class="total-review">15 reviews</span>
+                                                </div>
+                                                <div class="duration">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    7 days
+                                                </div>
+                                            </div>
+                                            <div class="pricing">
+                                                <p>Starting From</p>
+                                                <span class="price">$520</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="featured-tours__slide">
+                                        <figure class="slide-thumb">
+                                            <a href="#0" class="favorite">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </a>
+                                            <img src="./assets/images/featured-tours-section/tour-2.png"
+                                                 alt="tour" />
+                                        </figure>
+                                        <div class="slide-content">
+                                            <p class="tour-location">Greater London, UK</p>
+                                            <h6 class="tour-title">
+                                                <a href="tour-details.html" class="line-clamp-2">Windsor Castle, and Bath from London</a>
+                                            </h6>
+                                            <div class="featured-tours__meta">
+                                                <div class="revew">
+                                                    <span class="total-ratings bg-orange-red text-white">
+                                                        <i class="fa-solid fa-star"></i>
+                                                        4.8
+                                                    </span>
+                                                    <span class="total-review">15 reviews</span>
+                                                </div>
+                                                <div class="duration">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    7 days
+                                                </div>
+                                            </div>
+                                            <div class="pricing">
+                                                <p>Starting From</p>
+                                                <span class="price">$350</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="featured-tours__slide">
+                                        <figure class="slide-thumb">
+                                            <a href="#0" class="favorite">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </a>
+                                            <img src="./assets/images/featured-tours-section/tour-3.png"
+                                                 alt="tour" />
+                                        </figure>
+                                        <div class="slide-content">
+                                            <p class="tour-location">Australia</p>
+                                            <h6 class="tour-title">
+                                                <a href="tour-details.html" class="line-clamp-2">
+                                                    Enchanting Great Barrier Reef, Aquatic
+                                                    Wonderland
+                                                </a>
+                                            </h6>
+                                            <div class="featured-tours__meta">
+                                                <div class="revew">
+                                                    <span class="total-ratings bg-orange-red text-white">
+                                                        <i class="fa-solid fa-star"></i>
+                                                        4.8
+                                                    </span>
+                                                    <span class="total-review">15 reviews</span>
+                                                </div>
+                                                <div class="duration">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    7 days
+                                                </div>
+                                            </div>
+                                            <div class="pricing">
+                                                <p>Starting From</p>
+                                                <span class="price">$450</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="featured-tours__slide">
+                                        <figure class="slide-thumb">
+                                            <a href="#0" class="favorite">
+                                                <i class="fa-regular fa-heart"></i>
+                                            </a>
+                                            <img src="./assets/images/featured-tours-section/tour-4.png"
+                                                 alt="tour" />
+                                        </figure>
+                                        <div class="slide-content">
+                                            <p class="tour-location">Oman</p>
+                                            <h6 class="tour-title">
+                                                <a href="tour-details.html" class="line-clamp-2">Ancient Heritage and Desert Adventures</a>
+                                            </h6>
+                                            <div class="featured-tours__meta">
+                                                <div class="revew">
+                                                    <span class="total-ratings bg-orange-red text-white">
+                                                        <i class="fa-solid fa-star"></i>
+                                                        4.8
+                                                    </span>
+                                                    <span class="total-review">15 reviews</span>
+                                                </div>
+                                                <div class="duration">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    7 days
+                                                </div>
+                                            </div>
+                                            <div class="pricing">
+                                                <p>Starting From</p>
+                                                <span class="price">$599</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Pagination -->
+                            <div class="featured-tours__pagination pagination-orange-red section-mini-margin-top"></div>
+                            <!-- Navigation -->
+                            <div class="featured-tours__button-next"></div>
+                            <div class="featured-tours__button-prev"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+      
+    </main>
+
+   
+@section Scripts {
+    @* Đảm bảo Flatpickr CSS/JS và locale 'vn' đã được thêm vào _Layout.cshtml *@
+    @* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"> *@
+    @* <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> *@
+    @* <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script> *@
+    @* Đảm bảo Swiper CSS/JS đã được thêm vào _Layout.cshtml *@
+    @* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/> *@
+    @* <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script> *@
+
+            <script>
+                 document.addEventListener('DOMContentLoaded', function () {
+                     // --- Elements ---
+                     const adultsInput = document.getElementById('adults-input');
+                     const childrenInput = document.getElementById('children-input');
+                     const adultPriceHidden = document.getElementById('adultPriceHidden');
+                     const childPriceHidden = document.getElementById('childPriceHidden');
+                     const totalPriceDisplay = document.getElementById('totalPriceDisplay');
+                     const counterButtons = document.querySelectorAll('.counter-btn');
+                     const quickDateContainer = document.getElementById('quickDateButtons');
+                     const nextDatesBtn = document.getElementById('quickDateNextBtn'); // Sửa ID cho đúng
+                     const prevDatesBtn = document.getElementById('quickDatePrevBtn');
+                     const selectedDateHidden = document.getElementById('selectedDateHidden');
+                     const selectedDateDisplay = document.getElementById('selectedDateDisplay');
+                     const selectedDateText = document.getElementById('selectedDateText');
+                     const datePickerInput = document.getElementById('datePickerInput');
+                     const calendarIcon = datePickerInput?.nextElementSibling; // Icon lịch
+                     const weekdays_vi = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']; // Fix weekday names
+                     const bookingForm = document.querySelector('.pricing-form'); // Get form for validation later
+                     const addRatingStarsContainer = document.querySelector('.add-rating-stars'); // Container for adding stars
+                     const maxGroupAlert = document.getElementById('maxGroupAlert'); // Lấy element alert bằng ID
+
+                    // Lấy maxGroupSize từ Model
+                    const maxGroupSize = @(Model.MaxGroupSize.HasValue ? Model.MaxGroupSize.Value : 9999);
+                     // --- Helper Functions ---
+                     const formatPrice = (value) => {
+                         const numberValue = Number(value) || 0;
+                         return numberValue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+                     };
+
+                     const formatDateForDisplay = (date) => {
+                         // Format: Thứ N, ngày DD tháng MM năm YYYY
+                         const options = { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' };
+                         let formatted = date.toLocaleDateString('vi-VN', options);
+                         // Optional: Manual format if toLocaleDateString isn't perfect
+                         // const dayOfWeek = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"][date.getDay()];
+                         // const day = date.getDate();
+                         // const month = date.getMonth() + 1;
+                         // const year = date.getFullYear();
+                         // formatted = `${dayOfWeek}, ngày ${day} tháng ${month} năm ${year}`;
+                         return formatted;
+                     };
+
+                     const formatDateForValue = (date) => {
+                         // Format YYYY-MM-DD
+                         const yyyy = date.getFullYear();
+                         const mm = String(date.getMonth() + 1).padStart(2, '0');
+                         const dd = String(date.getDate()).padStart(2, '0');
+                         return `${yyyy}-${mm}-${dd}`;
+                     };
+
+                     // --- Price Calculation ---
+                     function updateTotalPrice() {
+                         if (!adultsInput || !childrenInput || !adultPriceHidden || !childPriceHidden || !totalPriceDisplay) return;
+                         try {
+                             const adults = parseInt(adultsInput.value, 10) || 0;
+                             const children = parseInt(childrenInput.value, 10) || 0;
+                             const adultPrice = parseFloat(adultPriceHidden.value) || 0;
+                             const childPrice = parseFloat(childPriceHidden.value) || 0;
+                             const total = (adults * adultPrice) + (children * childPrice);
+                             totalPriceDisplay.textContent = formatPrice(total);
+                         } catch (e) {
+                             console.error("Error calculating price:", e);
+                             totalPriceDisplay.textContent = formatPrice(0);
+                         }
+                     }
+
+                     // --- Counter Buttons Logic ---
+                         counterButtons.forEach(button => {
+                     button.addEventListener('click', function () {
+                         const action = this.dataset.action;
+                         const inputId = this.dataset.input;
+                         const inputElement = document.getElementById(inputId);
+
+                         if (inputElement) {
+                             let currentValue = parseInt(inputElement.value, 10);
+                             const minValue = parseInt(inputElement.min, 10);
+
+                             const adultsCount = parseInt(adultsInput.value, 10) || 0;
+                             const childrenCount = parseInt(childrenInput.value, 10) || 0;
+                             const currentTotal = adultsCount + childrenCount;
+
+                             if (action === 'increment') {
+                                 // Kiểm tra giới hạn *trước khi* tăng
+                                 if (currentTotal < maxGroupSize) {
+                                     // --- Có thể tăng ---
+                                     // Ẩn alert nếu nó đang hiển thị
+                                     if (maxGroupAlert && maxGroupAlert.style.display !== 'none') {
+                                         maxGroupAlert.classList.remove('show');
+                                         // Dùng display none thay vì chỉ remove show để đảm bảo ẩn
+                                         maxGroupAlert.style.display = 'none';
+                                     }
+                                     currentValue++; // Thực hiện tăng
+                                 } else {
+                                     // --- Đã đạt giới hạn ---
+                                     // Hiển thị Bootstrap alert
+                                     if (maxGroupAlert) {
+                                         maxGroupAlert.style.display = 'block'; // Đảm bảo nó hiện ra
+                                         // Thêm class 'show' sau một khoảng trễ nhỏ để kích hoạt hiệu ứng fade (nếu muốn)
+                                         setTimeout(() => {
+                                             if (maxGroupAlert) maxGroupAlert.classList.add('show');
+                                         }, 10);
+                                     }
+                                     console.warn(`Maximum group size (${maxGroupSize}) reached. Current total: ${currentTotal}.`); // Giữ lại cảnh báo console
+                                     return; // QUAN TRỌNG: Ngăn không cho tăng giá trị currentValue
+                                 }
+                             } else if (action === 'decrement' && currentValue > minValue) {
+                                 // --- Giảm thành công ---
+                                  // Ẩn alert nếu nó đang hiển thị
+                                 if (maxGroupAlert && maxGroupAlert.style.display !== 'none') {
+                                     maxGroupAlert.classList.remove('show');
+                                     maxGroupAlert.style.display = 'none';
+                                 }
+                                 currentValue--; // Thực hiện giảm
+                             }
+
+                             // Cập nhật giá trị input và tổng giá tiền
+                             inputElement.value = currentValue;
+                             updateTotalPrice();
+                         }
+                     });
+                 });
+
+
+                     // --- Date Selection Logic ---
+                     let currentStartDateForQuickButtons = new Date(); // Use let to potentially change it later
+
+                     function generateQuickDateButtons(startDate, daysToShow = 14) {
+                         if (!quickDateContainer) return;
+                         quickDateContainer.innerHTML = ''; // Clear old buttons
+                         let currentDate = new Date(startDate);
+                         const today = new Date();
+                         today.setHours(0,0,0,0); // Normalize today's date
+
+                         for (let i = 0; i < daysToShow; i++) {
+                             // Ensure we only show dates from today onwards
+                             if (currentDate < today) {
+                                 currentDate.setDate(currentDate.getDate() + 1);
+                                 continue; // Skip past dates
+                             }
+
+                             const button = document.createElement('button');
+                             button.type = 'button';
+                             button.className = 'btn btn-outline-secondary btn-sm me-2 quick-date-btn flex-shrink-0';
+                             const dateValue = formatDateForValue(currentDate);
+                             button.dataset.date = dateValue;
+
+                             // Format "T#, DD/M"
+                             const dayOfWeek = weekdays_vi[currentDate.getDay()];
+                             const dayOfMonth = currentDate.getDate();
+                             const month = currentDate.getMonth() + 1;
+                             button.innerHTML = `<span class="fw-bold">${dayOfWeek}</span><br><small>${dayOfMonth}/${month}</small>`; // Multi-line
+
+                             button.addEventListener('click', function() {
+                                 selectDate(this.dataset.date, this); // Pass button itself
+                             });
+
+                             quickDateContainer.appendChild(button);
+                             currentDate.setDate(currentDate.getDate() + 1);
+                         }
+                         // Update scroll button visibility
+                         updateQuickDateScrollButtons();
+                     }
+
+                      function selectDate(dateValue, clickedButton = null) {
+                         if (!dateValue) return; // Exit if no date value
+
+                         const selectedDateObj = new Date(dateValue + 'T00:00:00'); // Ensure parsing as local time
+                         const displayDateText = formatDateForDisplay(selectedDateObj);
+
+                         if (selectedDateHidden) selectedDateHidden.value = dateValue;
+                         if (selectedDateText) selectedDateText.textContent = displayDateText;
+                         if (selectedDateDisplay) selectedDateDisplay.style.display = 'block';
+
+                         // Update Flatpickr instance if it exists
+                         if (fpInstance) {
+                             fpInstance.setDate(dateValue, false); // Set date without triggering onChange again
+                         } else if (datePickerInput && datePickerInput.type === 'date') {
+                             datePickerInput.value = dateValue; // Update HTML5 date input
+                         } else if (datePickerInput && datePickerInput.type === 'text') {
+                             // Update the visible input text (assuming it's linked to altInput or similar)
+                             datePickerInput.value = selectedDateObj.toLocaleDateString('en-GB'); // Format dd/mm/yyyy for display input
+                         }
+
+
+                         // Update active state for quick buttons
+                         const allQuickButtons = quickDateContainer ? quickDateContainer.querySelectorAll('.quick-date-btn') : [];
+                         allQuickButtons.forEach(btn => btn.classList.remove('active', 'btn-primary')); // Remove primary style too
+                         allQuickButtons.forEach(btn => btn.classList.add('btn-outline-secondary')); // Reset others to outline
+
+                         if (clickedButton) {
+                             clickedButton.classList.add('active', 'btn-primary'); // Add primary style to active
+                             clickedButton.classList.remove('btn-outline-secondary');
+                         } else {
+                             // Find the button matching the dateValue if no button was passed (e.g., from datepicker)
+                             const matchingButton = quickDateContainer ? quickDateContainer.querySelector(`.quick-date-btn[data-date="${dateValue}"]`) : null;
+                             if (matchingButton) {
+                                 matchingButton.classList.add('active', 'btn-primary');
+                                 matchingButton.classList.remove('btn-outline-secondary');
+                             }
+                         }
+
+                        // Trigger validation feedback update if needed (Bootstrap 5)
+                        if (bookingForm && bookingForm.classList.contains('was-validated')) {
+                            if (selectedDateHidden.checkValidity()) {
+                                selectedDateHidden.classList.remove('is-invalid');
+                                selectedDateHidden.classList.add('is-valid');
+                            } else {
+                                selectedDateHidden.classList.remove('is-valid');
+                                selectedDateHidden.classList.add('is-invalid');
+                            }
+                        }
+                     }
+
+
+                     // --- Scroll Buttons for Quick Dates ---
+                     let scrollAmount = 200; // Adjust scroll distance
+                     function updateQuickDateScrollButtons() {
+                         if (!quickDateContainer || !prevDatesBtn || !nextDatesBtn) return;
+                         const scrollWidth = quickDateContainer.scrollWidth;
+                         const clientWidth = quickDateContainer.clientWidth;
+                         const scrollLeft = quickDateContainer.scrollLeft;
+
+                         prevDatesBtn.disabled = scrollLeft <= 0;
+                         nextDatesBtn.disabled = scrollLeft >= (scrollWidth - clientWidth - 1); // Allow for tiny rounding errors
+                     }
+
+                     if (quickDateContainer) {
+                         quickDateContainer.addEventListener('scroll', updateQuickDateScrollButtons);
+                     }
+
+                     if (prevDatesBtn) {
+                         prevDatesBtn.addEventListener('click', () => {
+                             if(quickDateContainer) quickDateContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+                         });
+                     }
+                     if (nextDatesBtn) {
+                         nextDatesBtn.addEventListener('click', () => {
+                             if(quickDateContainer) quickDateContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+                         });
+                     }
+
+                     // --- Khởi tạo Flatpickr ---
+                     let fpInstance = null;
+                     if (typeof flatpickr !== 'undefined' && datePickerInput) {
+                         flatpickr.localize(flatpickr.l10ns.vn); // Set locale globally or in config
+                         const flatpickrConfig = {
+                             //dateFormat: "Y-m-d", // Use this if input type="hidden" stores the value
+                             altInput: true,      // The visible input uses altFormat
+                             altFormat: "d/m/Y",  // Format for the visible input (dd/mm/yyyy)
+                             dateFormat: "Y-m-d", // Format for the actual hidden input (value submitted)
+                             minDate: "today",
+                             locale: "vn",
+                             appendTo: document.body, // Better positioning
+                             onChange: function(selectedDates, dateStr, instance) {
+                                 if (selectedDates.length > 0) {
+                                     const selectedDate = selectedDates[0];
+                                     const formattedValue = formatDateForValue(selectedDate);
+                                     selectDate(formattedValue); // Update hidden input and highlights
+                                 } else {
+                                     // Clear selection if date is cleared in picker
+                                     selectDate(null);
+                                     if (selectedDateHidden) selectedDateHidden.value = '';
+                                     if (selectedDateDisplay) selectedDateDisplay.style.display = 'none';
+                                 }
+                             },
+                             // Map the visible input (datePickerInput) to the hidden one (selectedDateHidden)
+                             onReady: function(selectedDates, dateStr, instance) {
+                                if (selectedDateHidden) {
+                                    // Link the hidden input. Flatpickr will manage its value based on dateFormat.
+                                    instance.input.parentNode.appendChild(selectedDateHidden);
+                                }
+                             }
+                         };
+
+                         // Initialize on the VISIBLE input element
+                         fpInstance = flatpickr(datePickerInput, flatpickrConfig);
+
+                         // Open picker on icon click
+                         if (calendarIcon) {
+                             calendarIcon.addEventListener('click', (e) => {
+                                  e.stopPropagation(); // Prevent potential conflicts
+                                  fpInstance.open();
+                             });
+                         }
+
+                     } else {
+                          console.warn('Flatpickr library not loaded or datePickerInput not found. Date picker functionality will be limited.');
+                          // Fallback: Use basic HTML5 date input if flatpickr isn't available
+                          if(datePickerInput) {
+                             datePickerInput.type = 'date';
+                             datePickerInput.readOnly = false;
+                             datePickerInput.style.cursor = 'auto';
+                             datePickerInput.min = formatDateForValue(new Date());
+                             if (calendarIcon) calendarIcon.style.display = 'none'; // Hide icon if using native picker
+
+                             datePickerInput.addEventListener('change', function() {
+                                 if(this.value) {
+                                     // Ensure correct date object creation (avoid timezone issues)
+                                     const dateParts = this.value.split('-'); // YYYY-MM-DD
+                                     if (dateParts.length === 3) {
+                                         const selectedDate = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+                                         const formattedValue = this.value; // Already YYYY-MM-DD
+                                         selectDate(formattedValue);
+                                         if(selectedDateHidden) selectedDateHidden.value = formattedValue; // Ensure hidden is updated
+                                     }
+                                 } else {
+                                     selectDate(null);
+                                     if(selectedDateHidden) selectedDateHidden.value = '';
+                                     if(selectedDateDisplay) selectedDateDisplay.style.display = 'none';
+                                 }
+                             });
+                         }
+                         // Hide scroll buttons if no quick dates generated? (Or maybe keep them)
+                         // if (prevDatesBtn) prevDatesBtn.style.display = 'none';
+                         // if (nextDatesBtn) nextDatesBtn.style.display = 'none';
+                     }
+
+                    // --- Add Review Stars ---
+                    if (addRatingStarsContainer) {
+                        const stars = addRatingStarsContainer.querySelectorAll('i');
+                        const ratingInput = document.getElementById('addReviewRatingValue');
+
+                        stars.forEach(star => {
+                            star.addEventListener('mouseover', function() {
+                                const currentValue = parseInt(this.dataset.value);
+                                // Highlight stars up to the hovered one
+                                stars.forEach(s => {
+                                    const starValue = parseInt(s.dataset.value);
+                                    if (starValue <= currentValue) {
+                                        s.classList.remove('fa-regular', 'text-light');
+                                        s.classList.add('fa-solid', 'text-warning');
+                                    } else {
+                                        s.classList.remove('fa-solid', 'text-warning');
+                                        s.classList.add('fa-regular', 'text-light');
+                                    }
+                                });
+                            });
+
+                            star.addEventListener('mouseout', function() {
+                                // Reset to selected value on mouseout
+                                const selectedValue = parseInt(ratingInput.value);
+                                stars.forEach(s => {
+                                    const starValue = parseInt(s.dataset.value);
+                                    if (starValue <= selectedValue) {
+                                        s.classList.remove('fa-regular', 'text-light');
+                                        s.classList.add('fa-solid', 'text-warning');
+                                    } else {
+                                        s.classList.remove('fa-solid', 'text-warning');
+                                        s.classList.add('fa-regular', 'text-light'); // Ensure 'text-light' or similar default color
+                                    }
+                                });
+                            });
+
+                            star.addEventListener('click', function() {
+                                const selectedValue = parseInt(this.dataset.value);
+                                ratingInput.value = selectedValue;
+                                // Permanently set style up to selected star
+                                stars.forEach(s => {
+                                    const starValue = parseInt(s.dataset.value);
+                                    if (starValue <= selectedValue) {
+                                        s.classList.remove('fa-regular', 'text-light');
+                                        s.classList.add('fa-solid', 'text-warning');
+                                    } else {
+                                        s.classList.remove('fa-solid', 'text-warning');
+                                        s.classList.add('fa-regular', 'text-light');
+                                    }
+                                });
+                            });
+                        });
+                    }
+
+
+                    // --- Bootstrap Form Validation ---
+                     // Example starter JavaScript for disabling form submissions if there are invalid fields
+                     (() => {
+                       'use strict'
+                       // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                       const forms = document.querySelectorAll('.needs-validation')
+                       // Loop over them and prevent submission
+                       Array.from(forms).forEach(form => {
+                         form.addEventListener('submit', event => {
+                           if (!form.checkValidity()) {
+                             event.preventDefault()
+                             event.stopPropagation()
+                           }
+                           form.classList.add('was-validated')
+                         }, false)
+                       })
+                     })()
+
+                    // --- Swiper Initialization (for Featured Tours) ---
+                    if (typeof Swiper !== 'undefined') {
+                        const featuredToursSlider = new Swiper('.featured-tours__slider', {
+                            slidesPerView: 1,
+                            spaceBetween: 20, // Space between slides
+                            loop: true, // Enable looping
+                            autoplay: {
+                                delay: 5000, // Autoplay delay
+                                disableOnInteraction: false, // Continue autoplay after user interaction
+                            },
+                            pagination: {
+                                el: '.featured-tours__pagination',
+                                clickable: true,
+                            },
+                            navigation: {
+                                nextEl: '.featured-tours__button-next',
+                                prevEl: '.featured-tours__button-prev',
+                            },
+                            breakpoints: {
+                                // when window width is >= 576px
+                                576: {
+                                    slidesPerView: 2,
+                                    spaceBetween: 25
+                                },
+                                // when window width is >= 992px
+                                992: {
+                                    slidesPerView: 3, // Show 3 slides on larger screens
+                                    spaceBetween: 30
+                                },
+                                // when window width is >= 1200px
+                                 1200: {
+                                    slidesPerView: 4, // Show 4 slides on XL screens
+                                    spaceBetween: 30
+                                }
+                            }
+                        });
+                    } else {
+                         console.warn('Swiper library not loaded. Featured tours slider will not work.');
+                    }
+
+
+                     // --- Initial Setup Calls ---
+                     generateQuickDateButtons(new Date());
+                     updateTotalPrice(); // Calculate initial price
+
+                     // Automatically select today's date only if the generated buttons exist
+                     if (quickDateContainer && quickDateContainer.children.length > 0) {
+                        const todayValue = formatDateForValue(new Date());
+                        const todayButton = quickDateContainer.querySelector(`.quick-date-btn[data-date="${todayValue}"]`);
+                        if (todayButton) { // Select only if button exists
+                            selectDate(todayValue, todayButton);
+                        } else {
+                             // Optionally select the first available date if today is not available
+                             const firstAvailableButton = quickDateContainer.querySelector('.quick-date-btn');
+                             if(firstAvailableButton){
+                                  selectDate(firstAvailableButton.dataset.date, firstAvailableButton);
+                             }
+                        }
+                     } else if (datePickerInput) {
+                         // If no quick buttons, set date picker to today if possible
+                         const todayValue = formatDateForValue(new Date());
+                         selectDate(todayValue);
+                     }
+
+                     updateQuickDateScrollButtons(); // Initial check for scroll buttons
+
+                 });
+            </script>
+}
+
+
+
