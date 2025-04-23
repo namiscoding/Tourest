@@ -160,5 +160,16 @@ namespace Tourest.Data.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<IEnumerable<TourGuideAssignment>> GetAssignmentsByManagerAsync(int managerUserId)
+        {
+            return await _context.TourGuideAssignments
+                .Where(a => a.TourManagerID == managerUserId)
+                .Include(a => a.TourGroup)       // Lấy thông tin Đoàn
+                    .ThenInclude(tg => tg.Tour) // Từ Đoàn lấy thông tin Tour
+                .Include(a => a.TourGuide)       // Lấy thông tin User của Hướng dẫn viên được gán
+                .OrderByDescending(a => a.AssignmentDate) // Sắp xếp theo ngày gán mới nhất
+                .AsNoTracking()
+                .ToListAsync();
+        }
     }
 }
