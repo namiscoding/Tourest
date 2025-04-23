@@ -159,7 +159,6 @@ namespace Tourest.Data.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
         }
-
         public async Task<IEnumerable<TourGuideAssignment>> GetAssignmentsByManagerAsync(int managerUserId)
         {
             return await _context.TourGuideAssignments
@@ -170,6 +169,33 @@ namespace Tourest.Data.Repositories
                 .OrderByDescending(a => a.AssignmentDate) // Sắp xếp theo ngày gán mới nhất
                 .AsNoTracking()
                 .ToListAsync();
+        }
+        public async Task<(bool Success, string? ErrorMessage)> UpdateFullNameAndAddressAsync(int userId, string fullName, string address)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            Console.WriteLine(user);
+            Console.WriteLine(userId);
+            Console.WriteLine(fullName);
+              Console.WriteLine(address);
+            if (user == null)
+            {
+                return (false, "Không tìm thấy người dùng.");
+            }
+
+            user.FullName = fullName;
+            user.Address = address;
+
+            try
+            {
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                // Log nếu cần
+                return (false, "Lỗi khi cập nhật: " + ex.Message);
+            }
         }
     }
 }

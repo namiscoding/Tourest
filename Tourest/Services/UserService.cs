@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.EntityFrameworkCore;
 using Tourest.Data.Entities;
 using Tourest.Data.Repositories;
 using Tourest.Helpers;
@@ -399,6 +400,18 @@ namespace Tourest.Services
                 _logger.LogError("Failed to toggle active status for UserID {UserId}", userId);
             }
             return success;
+        }
+
+        // Implement ValidateUserCredentialsAsync, GetAccountByUsernameAsync nếu cần cho logic login (do teammate làm)
+        public Task<(bool Success, User? User)> ValidateUserCredentialsAsync(string username, string plainPassword)
+        {
+            throw new NotImplementedException(); // Teammate sẽ implement phần này
+        }
+
+       
+        public Task<Account?> GetAccountByUsernameAsync(string username)
+        {
+            throw new NotImplementedException(); // Teammate sẽ implement phần này
         }
     }
 }
