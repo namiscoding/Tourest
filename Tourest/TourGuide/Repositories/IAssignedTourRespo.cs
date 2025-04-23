@@ -6,5 +6,6 @@ namespace Tourest.TourGuide.Repositories
     public interface IAssignedTourRespo
     {
         Task<List<TourGuideAssignmentViewModel>> GetTourAssigned(int tourGuideId);
+        Task<TourGuideAssignmentViewModel> GetTourGuideRatingsAndComments(int tourGuideId, int tourGroupId);
     }
 }

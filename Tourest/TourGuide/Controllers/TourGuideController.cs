@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Tourest.TourGuide.Repositories;
 using Tourest.TourGuide.Services;
 
 namespace Tourest.TourGuide.Controllers
@@ -23,5 +24,13 @@ namespace Tourest.TourGuide.Controllers
 
             return View();
         }
+        public async Task<IActionResult> TourGuideScheduleWork(int tourGuideId, int tourGroupId)
+        {
+         
+            var schedule = await _tourAssignmentService.GetTourAssignmentsAsync(3);
+
+            return View("TourGuideScheduleWork", schedule);
+        }
+
     }
 }
