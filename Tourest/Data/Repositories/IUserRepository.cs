@@ -14,6 +14,6 @@ namespace Tourest.Data.Repositories
         Task<bool> UpdateUserAsync(User user);
         Task<bool> UpdateAccountAsync(Account account);
         Task<User?> GetGuideByIdAsync(int userId);
-
+        Task<(bool Success, string? ErrorMessage)> UpdateFullNameAndAddressAsync(int userId, string fullName, string address);
     }
 }

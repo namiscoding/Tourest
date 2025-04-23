@@ -50,6 +50,9 @@ namespace Tourest.Services
             return check != null ? check : null;
         }
 
-   
+        public Task<UserViewModel> UpdateProfile(UserViewModel userViewModel)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

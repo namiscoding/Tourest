@@ -9,6 +9,7 @@ using Tourest.TourGuide.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authentication.Cookies;
 namespace Tourest
 {
 	public class Program
@@ -51,14 +52,12 @@ namespace Tourest
             builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
 
-            builder.Services.AddAuthentication()
-    .AddCookie(options => {
-        options.Events.OnValidatePrincipal = context => {
-            var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            context.Principal.AddIdentity(new ClaimsIdentity(new[] { new Claim("userId", userId) }));
-            return Task.CompletedTask;
-        };
-    });
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+              .AddCookie(options =>
+              {
+                  options.LoginPath = "/Authentication/Login";
+                  options.AccessDeniedPath = "/Authentication/AccessDenied";
+              });
             builder.Services.AddAuthorization();
             builder.Services.ConfigureApplicationCookie(options =>
             {
