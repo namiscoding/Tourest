@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 
 using Microsoft.Extensions.DependencyInjection;
+using Tourest.Helpers;
 
 
 
@@ -108,26 +109,17 @@ namespace Tourest
             builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-
-            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-
-
-            // Add services to the container.
-            builder.Services.AddScoped<ITourService, TourService>();
-
+            builder.Services.AddScoped<IAccountService, AccountService>();
 
             builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
             builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
 
-
-
-
-            builder.Services.AddScoped<IAccountService, AccountService>();
-      
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
 
-      
+            builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+            builder.Services.AddScoped<IPhotoService, CloudinaryPhotoService>();
+
             builder.Services.AddControllersWithViews();
             
             var app = builder.Build();

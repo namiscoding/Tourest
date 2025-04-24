@@ -20,6 +20,13 @@ namespace Tourest.Services
         Task<EditTourManagerViewModel?> GetTourManagerForEditAsync(int userId); // Method mới cho Edit GET
         Task<(bool Success, string ErrorMessage)> UpdateTourManagerByAdminAsync(EditTourManagerViewModel model); // Method mới cho Edit POST
 
+        // Tour Guide Management
+        Task<PaginatedList<AdminTourGuideViewModel>> GetTourGuidesForAdminAsync(int pageIndex = 1, int pageSize = 10, string searchTerm = "");
+        Task<AdminTourGuideDetailsViewModel?> GetTourGuideDetailsForAdminAsync(int userId);
+        Task<(bool Success, string ErrorMessage)> CreateTourGuideByAdminAsync(AdminCreateTourGuideViewModel model);
+        Task<EditTourGuideViewModel?> GetTourGuideForEditAsync(int userId);
+        Task<(bool Success, string ErrorMessage)> UpdateTourGuideByAdminAsync(EditTourGuideViewModel model);
+
         // General User Actions
         Task<bool> ToggleUserActiveStatusAsync(int userId);
     }
