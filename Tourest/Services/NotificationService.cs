@@ -11,16 +11,12 @@ namespace Tourest.Services
         private readonly INotificationRepository notificationRepository;
         private readonly IHubContext<NotificationHub> _hubContext;
 
-        public NotificationService(IHubContext<NotificationHub> hubContext)
+        public NotificationService(IHubContext<NotificationHub> hubContext, INotificationRepository notificationRepository)
         {
             _hubContext = hubContext;
-        }
-
-        public NotificationService(INotificationRepository notificationRepository)
-        {
             this.notificationRepository = notificationRepository;
-        }
 
+        }
         public async Task<string> SendingMessage(List<int> listUserID, NotificationViewModel notificationView)
 
         {

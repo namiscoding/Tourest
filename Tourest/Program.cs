@@ -9,6 +9,7 @@ using Tourest.TourGuide.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
+using Tourest.Hubs;
 namespace Tourest
 {
 	public class Program
@@ -101,9 +102,22 @@ namespace Tourest
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
 
-      
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+            builder.Services.AddScoped<IBookingService, BookingService>();
+
+            builder.Services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
+            builder.Services.AddScoped<ISupportRequestService, SupportRequestService>();
+
+            builder.Services.AddScoped<ITourGroupRepository, TourGroupRepository>();
+
+            builder.Services.AddScoped<IRatingRepository, RatingRepository>();
+            builder.Services.AddScoped<ITourRatingRepository, TourRatingRepository>();
+            builder.Services.AddScoped<IRatingService, RatingService>();
+
             builder.Services.AddControllersWithViews();
-            
+
+            builder.Services.AddSignalR();
+
             var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
@@ -120,8 +134,9 @@ namespace Tourest
 			app.UseStaticFiles();
             app.UseRouting();
             app.UseSession();
-         
+
             //app.MapHub<NotificationHub>("/notificationHub");
+            app.MapHub<RatingHub>("/ratingHub"); 
 
             app.MapControllerRoute(
 				name: "default",

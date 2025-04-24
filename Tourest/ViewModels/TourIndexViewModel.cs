@@ -16,5 +16,10 @@ namespace Tourest.ViewModels
 
         public int? SelectedMinPrice { get; set; }
         public int? SelectedMaxPrice { get; set; }
+
+        public string? CurrentSearchDestination { get; set; }
+        public string? CurrentSearchCategoryName { get; set; }
+        public DateTime? CurrentSearchDate { get; set; }
+        public int? CurrentSearchGuests { get; set; }
     }
 }
