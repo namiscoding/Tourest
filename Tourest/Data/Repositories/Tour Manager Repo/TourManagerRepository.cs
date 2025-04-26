@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tourest.Data.Entities;
 using Tourest.ViewModels.Tour;
-
+using Tourest.ViewModels.TourManager;
 namespace Tourest.Data.Repositories
 {
     public class TourManagerRepository : ITourManagerRepository
@@ -231,6 +231,20 @@ namespace Tourest.Data.Repositories
                 .FirstOrDefaultAsync();
 
             return tour;
+        }
+
+        public async Task<List<TourGuideAssignmentViewModel>> GetTourGuideScheduleAsync(int tourGuideId)
+        {
+            return await _context.TourGuideAssignments
+                .Where(t => t.TourGuideID == tourGuideId)
+                .Select(t => new TourGuideAssignmentViewModel
+                {
+                    AssignmentDate = t.AssignmentDate,
+                    ConfirmationDate = t.ConfirmationDate,
+                    Status = t.Status,
+                    RejectionReason = t.RejectionReason
+                })
+                .ToListAsync();
         }
     }
 }

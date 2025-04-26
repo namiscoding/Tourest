@@ -1,5 +1,5 @@
 ﻿using Tourest.ViewModels.Tour;
-
+using Tourest.ViewModels.TourManager;
 namespace Tourest.Services
 {
     public interface ITourManagerService
@@ -14,6 +14,7 @@ namespace Tourest.Services
         Task EditTourAsync(TourListViewModel tourViewModel);
         Task RemoveTourAsync(int id);
         Task<TourListViewModel?> GetTourByIdAsync(int id);
+        Task<List<TourGuideAssignmentViewModel>> GetTourGuideScheduleAsync(int tourGuideId);
 
     }
 }

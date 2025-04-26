@@ -217,5 +217,12 @@ namespace Tourest.Controllers
                 return RedirectToAction(nameof(ListTour));  
             }
         }
+        public async Task<IActionResult> ViewSchedule(int id)
+        {
+            var schedule = await _tourManagerService.GetTourGuideScheduleAsync(id);
+            ViewBag.TourGuideId = id; 
+            return View(schedule);
+        }
+
     }
 }
