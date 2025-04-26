@@ -3,16 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Tourest.Data;
 using Tourest.Data.Repositories;
 using Tourest.Services;
-
+using Tourest.Data.Entities.Momo;
 using Tourest.TourGuide.Repositories;
 using Tourest.TourGuide.Services;
-
-
-
+using Tourest.Services.Momo;
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
-
+using Tourest.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Tourest
@@ -24,8 +22,22 @@ namespace Tourest
 
 			var builder = WebApplication.CreateBuilder(args);
 
-			// Lấy connection string từ appsettings.json
-			var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            // connect momo API
+            builder.Services.Configure<Tourest.Services.Momo.MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
+            builder.Services.AddScoped<IMomoService, MomoService>();
+
+            // In program.cs or Startup.cs, add debug-level logging for MoMo-related services
+            builder.Services.AddLogging(logging =>
+            {
+                logging.AddFilter("Tourest.Services.Momo", LogLevel.Debug);
+                logging.AddFilter("Tourest.Controllers.PaymentController", LogLevel.Debug);
+                // Add console for development environment
+                logging.AddConsole();
+                logging.AddDebug();
+            });
+
+            // Lấy connection string từ appsettings.json
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 			// Đăng ký ApplicationDbContext với DI Container và chỉ định dùng SQL Server
 			builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -118,10 +130,28 @@ namespace Tourest
       
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
+
             builder.Services.AddScoped<IEmailService, EmailService>();
       
+
+
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+            builder.Services.AddScoped<IBookingService, BookingService>();
+
+            builder.Services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
+            builder.Services.AddScoped<ISupportRequestService, SupportRequestService>();
+
+            builder.Services.AddScoped<ITourGroupRepository, TourGroupRepository>();
+
+            builder.Services.AddScoped<IRatingRepository, RatingRepository>();
+            builder.Services.AddScoped<ITourRatingRepository, TourRatingRepository>();
+            builder.Services.AddScoped<IRatingService, RatingService>();
+
+
             builder.Services.AddControllersWithViews();
-            
+
+            builder.Services.AddSignalR();
+
             var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
@@ -138,8 +168,8 @@ namespace Tourest
 			app.UseStaticFiles();
             app.UseRouting();
             app.UseSession();
-         
             //app.MapHub<NotificationHub>("/notificationHub");
+            app.MapHub<RatingHub>("/ratingHub"); 
 
             app.MapControllerRoute(
 				name: "default",

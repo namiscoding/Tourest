@@ -14,6 +14,7 @@ namespace Tourest.Services
 
 
 
+
         public NotificationService(INotificationRepository notificationRepository, IHubContext<NotificationHub> hubContext)
         {
             this.notificationRepository = notificationRepository;
@@ -21,6 +22,7 @@ namespace Tourest.Services
         }
 
         public async Task<string> SendingMessage(int userId, NotificationViewModel notificationView)
+
 
         {
          
