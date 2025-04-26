@@ -17,7 +17,7 @@ namespace Tourest.Controllers
             _tourManagerService = tourManagerService;
         }
 
-        public List<TourGuideListViewModel> TourGuides {  get; set; }
+        public List<TourGuideListViewModel> TourGuides { get; set; }
         // GET: /TourManager
         public IActionResult Index()
         {
@@ -26,7 +26,7 @@ namespace Tourest.Controllers
 
         public IActionResult TourGuide()
         {
-            var tourGuides = _tourManagerService.GetAllTourGuides(); 
+            var tourGuides = _tourManagerService.GetAllTourGuides();
             return View("TourGuide", tourGuides);
         }
         public IActionResult IndexDetail()
@@ -45,19 +45,19 @@ namespace Tourest.Controllers
         }
         public async Task<IActionResult> TourGuideFeedback(int id)
         {
-            var feedbacks = await _tourManagerService.GetFeedbacksByTourGuideIdAsync(id);   
+            var feedbacks = await _tourManagerService.GetFeedbacksByTourGuideIdAsync(id);
 
             if (feedbacks == null || !feedbacks.Any())
             {
-                return NotFound();   
+                return NotFound();
             }
 
-            return View(feedbacks);   
+            return View(feedbacks);
         }
         public async Task<IActionResult> ViewCustomers(int tourId)
         {
             var customers = await _tourManagerService.GetCustomersForTourAsync(tourId);
-            return View(customers);  
+            return View(customers);
         }
         public IActionResult ListTour()
         {
@@ -65,39 +65,39 @@ namespace Tourest.Controllers
             return View(tours);
         }
 
-       
-       public async Task<IActionResult> GetUnassignedBookings()
-{
-    try
-    {
-       
-        var unassignedBookings = await _context.Bookings
-            .Where(b => b.TourGroupID != null)
-            .Include(b => b.Tour)
-            .Include(b => b.Customer)
-            .Join(_context.TourGroups,
-                booking => booking.TourGroupID,
-                tourGroup => tourGroup.TourGroupID,
-                (booking, tourGroup) => new { Booking = booking, TourGroup = tourGroup })
-            .Where(joined => joined.TourGroup.AssignedTourGuideID == null)
-            .Select(joined => joined.Booking)
-            .AsNoTracking()
-            .ToListAsync();
 
-       
-        Console.WriteLine($"Found {unassignedBookings.Count} unassigned bookings");
-        
-        
-        return View("UnassignedBookings", unassignedBookings ?? new List<Booking>());
-    }
-    catch (Exception ex)
-    {
-       
-        Console.WriteLine($"Error in GetUnassignedBookings: {ex}");
-        
-        
-        return StatusCode(500, "An error occurred while processing your request.");
-    }
-}
+        public async Task<IActionResult> GetUnassignedBookings()
+        {
+            try
+            {
+
+                var unassignedBookings = await _context.Bookings
+                    .Where(b => b.TourGroupID != null)
+                    .Include(b => b.Tour)
+                    .Include(b => b.Customer)
+                    .Join(_context.TourGroups,
+                        booking => booking.TourGroupID,
+                        tourGroup => tourGroup.TourGroupID,
+                        (booking, tourGroup) => new { Booking = booking, TourGroup = tourGroup })
+                    .Where(joined => joined.TourGroup.AssignedTourGuideID == null)
+                    .Select(joined => joined.Booking)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+
+                Console.WriteLine($"Found {unassignedBookings.Count} unassigned bookings");
+
+
+                return View("GetUnassignedBookings", unassignedBookings ?? new List<Booking>());
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Error in GetUnassignedBookings: {ex}");
+
+
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
     }
 }
