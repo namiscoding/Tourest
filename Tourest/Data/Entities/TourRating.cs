@@ -1,9 +1,9 @@
 ﻿namespace Tourest.Data.Entities
 {
-	public class TourRating // Can inherit Rating if preferred, but TPT setup in DbContext works too
+	public class TourRating 
 	{
-		public int RatingID { get; set; } // PK & FK property
-		public int TourID { get; set; } // FK property
+		public int RatingID { get; set; } 
+		public int TourID { get; set; } 
 
 		// Navigation Properties
 		public virtual Rating Rating { get; set; } = null!;

@@ -1,0 +1,66 @@
+﻿@using System.Globalization
+@{
+    ViewData["Title"] = "Thanh toán thành công";
+    // Giả sử bạn có Layout chính
+    // Layout = "_Layout";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-success text-center">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="fa-solid fa-check-circle me-2"></i>@ViewData["Title"]</h4>
+                </div>
+                <div class="card-body p-4">
+                    @if (ViewBag.IsSignatureValid == true)
+                    {
+                        <div class="alert alert-success" role="alert">
+                            @ViewBag.Message
+                        </div>
+
+                        <p class="lead">Cảm ơn bạn đã hoàn tất thanh toán cho đơn hàng.</p>
+
+                        <ul class="list-group list-group-flush mb-4">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Mã đơn hàng:
+                                <span class="fw-bold">@ViewBag.OrderId</span>
+                            </li>
+                            @if (ViewBag.Amount != null && ViewBag.Amount is decimal)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Số tiền đã thanh toán:
+                                    <span class="fw-bold text-danger">@(((decimal)ViewBag.Amount).ToString("N0", CultureInfo.GetCultureInfo("vi-VN"))) đ</span>
+                                </li>
+                            }
+                            @if (ViewBag.TransactionId != null)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Mã giao dịch MoMo:
+                                    <span class="fw-bold">@ViewBag.TransactionId</span>
+                                </li>
+                            }
+                        </ul>
+
+                        <p>Thông tin chi tiết đã được gửi đến email của bạn (nếu có).</p>
+
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+                            <a asp-controller="BookingHistory" asp-action="Index" class="btn btn-outline-primary btn-lg px-4 gap-3">Xem lịch sử đặt tour</a> @* <<< THAY THẾ Controller/Action xem lịch sử booking *@
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg px-4">Về trang chủ</a>
+                        </div>
+                    }
+                    else
+                    {
+                        // Trường hợp này không nên xảy ra nếu logic controller đúng,
+                        // nhưng vẫn nên có để đề phòng
+                        <div class="alert alert-danger" role="alert">
+                            Lỗi: Giao dịch có vấn đề về xác thực chữ ký. Vui lòng liên hệ hỗ trợ ngay lập tức.
+                        </div>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Về trang chủ</a>
+                        <a asp-controller="Contact" asp-action="Index" class="btn btn-info ms-2">Liên hệ hỗ trợ</a> @* <<< THAY THẾ Controller/Action liên hệ *@
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

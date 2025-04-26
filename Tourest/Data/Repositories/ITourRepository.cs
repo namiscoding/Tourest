@@ -13,7 +13,12 @@ namespace Tourest.Data.Repositories
             IEnumerable<int>? ratings = null,
             string? sortBy = null, 
             int? minPrice = null, // THÊM
-            int? maxPrice = null);
+            int? maxPrice = null,
+             // --- THÊM THAM SỐ ---
+             string? searchDestination = null,
+             string? searchCategoryName = null,
+             DateTime? searchDate = null, // Nhận nhưng chưa dùng để lọc
+             int? searchGuests = null);
         Task<Tour?> GetByIdAsync(int id);
         Task<IEnumerable<string>> GetDistinctActiveDestinationsAsync();
     }

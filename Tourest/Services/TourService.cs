@@ -115,32 +115,36 @@ namespace Tourest.Services
             return viewModel;
         }
         public async Task<IEnumerable<TourListViewModel>> GetActiveToursForDisplayAsync(
-            IEnumerable<int>? categoryIds = null,
-            IEnumerable<string>? destinations = null,
-            IEnumerable<int>? ratings = null,
-            string? sortBy = null,
-            int? minPrice = null, // THÊM
-            int? maxPrice = null)
+         IEnumerable<int>? categoryIds = null,
+         IEnumerable<string>? destinations = null,
+         IEnumerable<int>? ratings = null,
+         string? sortBy = null,
+         int? minPrice = null, // Nhận minPrice
+         int? maxPrice = null,
+         string? searchDestination = null,
+  string? searchCategoryName = null,
+  DateTime? searchDate = null, // Nhận nhưng chưa dùng để lọc ở Repo
+  int? searchGuests = null) // Nhận maxPrice
         {
+            // === SỬA LỖI: Truyền minPrice và maxPrice xuống Repository ===
             var tours = await _tourRepository.GetActiveToursAsync(
-                categoryIds, destinations, ratings, sortBy); // Đã Include ratings
+         categoryIds, destinations, ratings, sortBy, minPrice, maxPrice,
+         // --- TRUYỀN THAM SỐ ---
+         searchDestination, searchCategoryName, searchDate, searchGuests
+      ); // Truyền đủ tham số
+            // === KẾT THÚC SỬA LỖI ===
 
+            // Mapping giữ nguyên logic tính toán rating tức thời
             var tourViewModels = tours.Select(tour => new TourListViewModel
             {
                 TourId = tour.TourID,
                 Name = tour.Name,
                 Destination = tour.Destination,
                 DurationDays = tour.DurationDays,
-                ChildPrice = tour.ChildPrice,
+                ChildPrice = tour.ChildPrice, // Hoặc AdultPrice
                 ThumbnailImageUrl = tour.ImageUrls?.Split(';', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault(),
-
-                // --- Tính toán Rating từ dữ liệu đã Include ---
-                AverageRating = (tour.TourRatings != null && tour.TourRatings.Any())
-                              ? tour.TourRatings.Average(tr => tr.Rating.RatingValue) // Tính trung bình
-                              : (decimal?)null, // Trả về null nếu không có rating
-                SumRating = (tour.TourRatings != null) ? tour.TourRatings.Count() : 0 // Đếm số lượng rating
-                                                                                      // --- Kết thúc tính toán Rating ---
-
+                AverageRating = (tour.TourRatings != null && tour.TourRatings.Any()) ? tour.TourRatings.Average(tr => tr.Rating.RatingValue) : (decimal?)null,
+                SumRating = (tour.TourRatings != null) ? tour.TourRatings.Count() : 0
             }).ToList();
 
             return tourViewModels;

@@ -29,13 +29,20 @@ namespace Tourest.Data.Repositories
             IEnumerable<int>? ratings = null,
             string? sortBy = null, 
             int? minPrice = null, // THÊM
-            int? maxPrice = null)
+            int? maxPrice = null,
+             // --- THÊM THAM SỐ ---
+             string? searchDestination = null,
+             string? searchCategoryName = null,
+             DateTime? searchDate = null, // Nhận nhưng chưa lọc
+             int? searchGuests = null)
         {
             var query = _context.Tours
                                 .Where(t => t.Status == "Active")
                                 // KHÔNG dùng AsNoTracking() ở đây vội nếu cần navigation properties để tính toán sau đó
                                 ;
-
+            query = query
+         .Include(t => t.TourRatings).ThenInclude(tr => tr.Rating)
+         .Include(t => t.TourCategories).ThenInclude(tc => tc.Category);
             // --- Áp dụng Filters ---
             if (categoryIds != null && categoryIds.Any())
             {
@@ -61,6 +68,24 @@ namespace Tourest.Data.Repositories
             {
                 query = query.Where(t => t.ChildPrice <= maxPrice.Value);
             }
+            if (!string.IsNullOrWhiteSpace(searchDestination))
+            {
+                // Tìm kiếm gần đúng trong Destination (không phân biệt hoa thường tùy DB collation)
+                query = query.Where(t => t.Destination.Contains(searchDestination));
+            }
+            if (!string.IsNullOrWhiteSpace(searchCategoryName))
+            {
+                // Tìm kiếm gần đúng trong tên Category (cần Include ở trên)
+                query = query.Where(t => t.TourCategories.Any(tc => tc.Category.Name.Contains(searchCategoryName)));
+            }
+            if (searchGuests.HasValue && searchGuests.Value > 0)
+            {
+                // Lọc tour có MaxGroupSize null (không giới hạn) hoặc >= số khách yêu cầu
+                query = query.Where(t => t.MaxGroupSize == null || t.MaxGroupSize >= searchGuests.Value);
+            }
+            // !! Lọc theo searchDate cần thay đổi Schema DB để lưu ngày khởi hành/khoảng thời gian hoạt động của Tour !!
+            // if (searchDate.HasValue) { /* Logic lọc theo ngày (ví dụ: nếu có bảng TourDepartures) */ }
+            // --- KẾT THÚC FILTER MỚI ---
             // --- Tải kèm dữ liệu liên quan ---
             // Include TourRatings và Rating sau khi lọc để tính toán ở Service
             query = query

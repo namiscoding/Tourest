@@ -1,0 +1,49 @@
+﻿@{
+    ViewData["Title"] = "Thanh toán thất bại";
+    // Layout = "_Layout";
+}
+
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-sm border-danger text-center">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fa-solid fa-triangle-exclamation me-2"></i>@ViewData["Title"]</h4>
+                </div>
+                <div class="card-body p-4">
+
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Lỗi:</strong> @ViewBag.Message
+                    </div>
+
+                    @if (ViewBag.OrderId != null)
+                    {
+                        <p>Đơn hàng của bạn: <strong>@ViewBag.OrderId</strong></p>
+                    }
+
+                    @if (ViewBag.IsSignatureValid == false) // Chỉ hiển thị khi lỗi do chữ ký
+                    {
+                        <p class="text-danger fw-bold mt-3">
+                            <i class="fa-solid fa-shield-halved me-1"></i> Cảnh báo: Chữ ký giao dịch không hợp lệ. Vui lòng không thử lại và liên hệ bộ phận hỗ trợ của chúng tôi ngay để được kiểm tra.
+                        </p>
+                    }
+
+                    <hr class="my-4">
+
+                    <p>Vui lòng kiểm tra lại thông tin hoặc thử lại thanh toán sau.</p>
+
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+                        @if (ViewBag.IsSignatureValid != false && ViewBag.OrderId != null) // Chỉ cho phép thử lại nếu lỗi không phải do signature
+                        {
+                            // Nút quay lại trang danh sách booking để thử lại
+                            <a asp-controller="BookingHistory" asp-action="Index" class="btn btn-warning btn-lg px-4 gap-3">Thử lại thanh toán</a> @* <<< THAY THẾ Controller/Action xem lịch sử booking *@
+                        }
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-lg px-4">Về trang chủ</a>
+                        <a asp-controller="Contact" asp-action="Index" class="btn btn-info btn-lg px-4 ms-sm-2">Liên hệ hỗ trợ</a> @* <<< THAY THẾ Controller/Action liên hệ *@
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

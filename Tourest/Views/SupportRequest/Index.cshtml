@@ -1,0 +1,326 @@
+﻿@* File: Views/SupportRequest/Create.cshtml *@
+@model Tourest.ViewModels.SupportRequest.MySupportRequestsViewModel
+@{
+    ViewData["Title"] = "Gửi yêu cầu hỗ trợ";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collapsible Chat</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css"
+          rel="stylesheet" />
+
+    <style>
+        #chat4 .form-control {
+            border-color: transparent;
+        }
+
+            #chat4 .form-control:focus {
+                border-color: transparent;
+                box-shadow: inset 0px 0px 0px 1px transparent;
+            }
+
+        .divider:after,
+        .divider:before {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #eee;
+        }
+        /* Tùy chọn: Cải thiện style cho ảnh đại diện */
+        .chat-avatar {
+            width: 45px;
+            height: 45px; /* Đặt chiều cao cố định */
+            object-fit: cover; /* Đảm bảo ảnh không bị méo */
+            flex-shrink: 0; /* Ngăn ảnh bị co lại trong flex container */
+        }
+        /* Đảm bảo thanh cuộn hiển thị đúng */
+        .chat-body-scroll {
+            position: relative;
+            height: 400px;
+            overflow-y: auto; /* Luôn hiển thị thanh cuộn nếu nội dung dài */
+        }
+
+        /* --- CSS TÙY CHỈNH CHO MÀU #039e9d --- */
+        .custom-chat-button {
+            background-color: #039e9d !important; /* Màu nền mới */
+            border-color: #039e9d !important; /* Đổi cả màu viền cho nhất quán */
+            color: white; /* Giữ chữ màu trắng */
+        }
+
+            /* Tùy chọn: Thêm hiệu ứng khi rê chuột qua nút */
+            .custom-chat-button:hover {
+                background-color: #028a89 !important; /* Làm màu tối hơn một chút khi hover */
+                border-color: #028a89 !important;
+            }
+
+
+        .message-outgoing-custom {
+            background-color: #039e9d; /* Màu nền mới cho tin nhắn đi */
+            color: white; /* Giữ chữ màu trắng */
+        }
+        /* --- KẾT THÚC CSS TÙY CHỈNH --- */
+
+    </style>
+</head>
+<body>
+    @* Hiển thị thông báo thành công/lỗi từ TempData *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <section class="breadcrumb__section section-padding-top-bottom"
+             style="
+          --bg-image: url('../images/breadcrumb-section/faq-breadcrumb-bg.png');
+        ">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumb__content">
+                        <h1 class="breadcrumb-title">FAQ Page</h1>
+                        <nav>
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="index.html">home</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">
+                                    blog
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb__section end  -->
+    <!-- faq__section start  -->
+    <section class="faq__section section-padding-top-bottom">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="section__header">
+                        <h4 class="section__sub-title">Popular Questions</h4>
+                        <h2 class="section__title title-anim">
+                            Câu hỏi thường gặp
+                        </h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center section-mini-padding-top">
+                <div class="col-lg-9 col-xl-8">
+                    <div class="row justify-content-center section-mini-padding-top">
+                        <div>
+                            <div class="faq__accordion accordion accordion-reset"
+                                 id="faqAccordionExample">
+
+                                <div class="accordion-item item-stagger">
+                                    <h6 class="accordion-header">
+                                        <button class="accordion-button collapsed"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapseFour"
+                                                aria-expanded="false"
+                                                aria-controls="collapseFour">
+                                            Tôi có thể hủy tour đã đặt không?
+                                        </button>
+                                    </h6>
+                                    <div id="collapseFour"
+                                         class="accordion-collapse collapse"
+                                         data-bs-parent="#faqAccordionExample">
+                                        <div class="accordion-body">
+                                            Có, bạn có thể hủy tour theo chính sách của chúng tôi. Tùy thuộc vào thời điểm hủy, bạn có thể được hoàn tiền một phần hoặc toàn bộ. Vui lòng kiểm tra chính sách hủy tour trên website hoặc liên hệ đội ngũ hỗ trợ để biết thêm chi tiết.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item item-stagger">
+                                    <h6 class="accordion-header">
+                                        <button class="accordion-button collapsed"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapseFive"
+                                                aria-expanded="false"
+                                                aria-controls="collapseFive">
+                                            Tour du lịch của bạn có hướng dẫn viên không?
+                                        </button>
+                                    </h6>
+                                    <div id="collapseFive"
+                                         class="accordion-collapse collapse"
+                                         data-bs-parent="#faqAccordionExample">
+                                        <div class="accordion-body">
+                                            Tất cả các tour của chúng tôi đều có hướng dẫn viên chuyên nghiệp, am hiểu về điểm đến và luôn sẵn sàng hỗ trợ bạn trong suốt hành trình. Họ sẽ mang đến những trải nghiệm thú vị và thông tin bổ ích về văn hóa, lịch sử của nơi bạn tham quan.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item item-stagger">
+                                    <h6 class="accordion-header">
+                                        <button class="accordion-button collapsed"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#collapseSix"
+                                                aria-expanded="false"
+                                                aria-controls="collapseSix">
+                                            Tôi có thể đặt tour tùy chỉnh theo nhu cầu riêng không?
+                                        </button>
+                                    </h6>
+                                    <div id="collapseSix"
+                                         class="accordion-collapse collapse"
+                                         data-bs-parent="#faqAccordionExample">
+                                        <div class="accordion-body">
+                                            Chắc chắn rồi! Chúng tôi cung cấp dịch vụ thiết kế tour du lịch theo yêu cầu cá nhân hoặc nhóm. Bạn chỉ cần gửi thông tin về điểm đến, thời gian và sở thích, chúng tôi sẽ tạo ra một hành trình độc đáo dành riêng cho bạn.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="container mt-4">
+                <div class="row mb-4 g-4">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div>
+                                @* Giới hạn độ rộng form *@
+                                <form asp-action="Create" asp-controller="SupportRequest" method="post">
+                                    @Html.AntiForgeryToken() @* Chống CSRF *@
+
+                                    @* Hiển thị lỗi tổng hợp (nếu có) *@
+                                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="NewRequest.Subject" style="font-weight: bold; color: #039e9d" class="form-label"></label>
+                                        <input asp-for="NewRequest.Subject" class="form-control" />
+                                        <span asp-validation-for="NewRequest.Subject" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="NewRequest.Message" class="form-label" style="font-weight: bold; color: #039e9d"></label>
+                                        <textarea asp-for="NewRequest.Message" class="form-control" rows="6"></textarea> @* Dùng textarea cho Message *@
+                                        <span asp-validation-for="NewRequest.Message" class="text-danger"></span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <button type="submit" class="btn" style="font-weight: bold; background-color: #039e9d; color: white">
+                                            Gửi yêu cầu
+                                        </button>
+                                        <a asp-action="Index" asp-controller="Home" style="font-weight: bold;" class="btn btn-outline-secondary ms-2">
+                                            Hủy bỏ
+                                        </a> @* Nút hủy về trang chủ *@
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <section>
+                            <div class="container">
+
+                                <div class="row d-flex justify-content-center">
+                                    <div>
+
+                                        <a data-mdb-ripple-init class="btn btn-lg btn-block custom-chat-button" data-mdb-collapse-init href="#collapseExample"
+                                           role="button" aria-expanded="false" aria-controls="collapseExample">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Những câu hỏi đã được gửi đi</span>
+                                                <i class="fas fa-chevron-down"></i>
+                                            </div>
+                                        </a>
+
+                                        <div class="collapse mt-3" id="collapseExample">
+                                            <div class="card" id="chat4">
+                                                <div class="card-body chat-body-scroll" data-mdb-perfect-scrollbar-init>
+                                                    @foreach (var request in Model.Requests)
+                                                    {
+                                                    <div class="d-flex flex-row justify-content-start mb-4">
+                                                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava5-bg.webp"
+                                                             alt="Avatar người gửi" class="chat-avatar">
+                                                        <div class="ms-3">
+
+                                                            <p class="small p-2 ms-3 mb-1 rounded-3 bg-body-tertiary">
+                                                                    @request.Subject
+                                                            </p>
+                                                                @{
+                                                                    var messageSnippet = request.Message.Length > 100 ? request.Message.Substring(0, 100) + "..." : request.Message;
+                                                                }
+                                                                <p class="small p-2 ms-3 mb-1 rounded-3 bg-body-tertiary">
+                                                                    @messageSnippet
+                                                                </p>
+
+                                                                <p class="small ms-3 mb-3 rounded-3 text-muted">@request.SubmissionDate.ToString("dd/MM/yyyy HH:mm")</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="divider d-flex align-items-center mb-4">
+                                                            <p class="text-center mx-3 mb-0" style="color: #a2aab7;">@request.Status</p>
+                                                    </div>
+
+                                                    <div class="d-flex flex-row justify-content-end mb-4 pt-1">
+                                                        <div class="me-3">
+                                                                @if (!string.IsNullOrWhiteSpace(request.ResolutionNotes))
+                                                                {
+                                                                    <p class="small p-2 mb-1 text-white rounded-3 message-outgoing-custom">@request.ResolutionNotes</p>
+                                                                }
+                                                                else if (request.Status.Equals("Submitted", StringComparison.OrdinalIgnoreCase) || request.Status.Equals("Open", StringComparison.OrdinalIgnoreCase))
+                                                                {
+                                                                    <em class="text-muted">Chưa có phản hồi</em>
+                                                                }
+                                                            
+                                                        </div>
+                                                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp"
+                                                             alt="Avatar của bạn" class="chat-avatar">
+                                                    </div>
+                                                    }
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.umd.min.js"></script>
+</body>
+</html>
+
+
+
+@* Section để load các script validation phía client (nếu bạn dùng) *@
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
