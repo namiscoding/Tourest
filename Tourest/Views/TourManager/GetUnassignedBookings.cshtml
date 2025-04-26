@@ -55,6 +55,11 @@
             color: #721c24;
         }
 
+        .badge-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
         .action-buttons .btn {
             min-width: 120px;
         }
@@ -129,6 +134,11 @@
         .badge.bg-info, .badge.bg-primary, .badge.bg-secondary {
             color: white;
         }
+
+        .reject-reason {
+            color: #721c24;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -190,6 +200,9 @@
                                                         case "pendingassignment":
                                                             <i class="fas fa-clock me-1"></i>
                                                             break;
+                                                        case "rejected":
+                                                            <i class="fas fa-times-circle me-1"></i>
+                                                            break;
                                                         default:
                                                             <i class="fas fa-times-circle me-1"></i>
                                                             break;
@@ -218,7 +231,7 @@
                                                 </div>
                                                 <div>
                                                     <i class="fas fa-money-bill-wave text-primary me-1"></i>
-                                                    <span>Total: @booking.TotalPrice.ToString("C0")</span>
+                                                    <span>Total: $@booking.TotalPrice.ToString("#,##0")</span>
                                                 </div>
                                             </div>
                                             <div class="mt-2">
@@ -228,6 +241,15 @@
                                                     <span class="countdown-timer" id="countdown-@booking.BookingId"></span>
                                                 </small>
                                             </div>
+                                            @if (booking.Status.ToLower() == "rejected" && !string.IsNullOrEmpty(booking.RejectReason))
+                                            {
+                                                <div class="mt-2">
+                                                    <small class="reject-reason">
+                                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                                        Rejection Reason: @booking.RejectReason
+                                                    </small>
+                                                </div>
+                                            }
                                         </div>
                                         <div class="action-buttons">
                                             <div class="d-flex flex-column gap-2">

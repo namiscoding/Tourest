@@ -15,6 +15,7 @@
         public string Status { get; set; }
         public int TotalGuests => NumberOfAdults + NumberOfChildren;
         public int TourId { get; set; }
+        public string RejectReason { get; set; }
     }
 
     public class RecommendedGuideViewModel
@@ -29,6 +30,18 @@
         public double SuitabilityScore { get; set; }
         public int TourDifficulty { get; set; } 
         public int RequiredExperience { get; set; }
+        public string RejectReason { get; set; }
     }
-  
+    public class RejectedAssignedTourViewModel
+    {
+        public int TourGroupId { get; set; }
+        public int TourId { get; set; }
+        public string TourName { get; set; }
+        public int AssignedTourGuideId { get; set; }
+        public string TourGuideName { get; set; }
+        public DateTime DepartureDate { get; set; }
+        public string RejectionReason { get; set; }
+        public string Status { get; set; }
+    }
+
 }
