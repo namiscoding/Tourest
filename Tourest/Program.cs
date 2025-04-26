@@ -146,7 +146,7 @@ namespace Tourest
 			app.UseStaticFiles();
             app.UseRouting();
             app.UseSession();
-         
+            
             //app.MapHub<NotificationHub>("/notificationHub");
 
             app.MapControllerRoute(
