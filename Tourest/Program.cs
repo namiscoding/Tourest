@@ -131,6 +131,10 @@ namespace Tourest
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
 
+            builder.Services.AddScoped<IEmailService, EmailService>();
+      
+
+
             builder.Services.AddScoped<IBookingRepository, BookingRepository>();
             builder.Services.AddScoped<IBookingService, BookingService>();
 
@@ -142,6 +146,7 @@ namespace Tourest
             builder.Services.AddScoped<IRatingRepository, RatingRepository>();
             builder.Services.AddScoped<ITourRatingRepository, TourRatingRepository>();
             builder.Services.AddScoped<IRatingService, RatingService>();
+
 
             builder.Services.AddControllersWithViews();
 
