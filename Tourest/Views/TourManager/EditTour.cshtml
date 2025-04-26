@@ -1,0 +1,15 @@
+﻿@model Tourest.ViewModels.Tour.TourListViewModel
+
+<h2>Edit Tour</h2>
+<form method="post" asp-controller="TourManager" asp-action="EditTour" asp-route-id="@Model.TourId">
+    <div>
+        <label for="Name">Name</label>
+        <input asp-for="Name" />
+    </div>
+    <div>
+        <label for="Destination">Destination</label>
+        <input asp-for="Destination" />
+    </div>
+    <!-- Thêm các input field khác nếu cần -->
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>

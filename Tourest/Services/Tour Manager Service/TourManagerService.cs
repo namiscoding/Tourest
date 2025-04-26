@@ -37,5 +37,25 @@ namespace Tourest.Services
         {
             return tourManagerRepository.GetAllTours();
         }
+
+        public Task<TourListViewModel?> GetTourDetailsAsync(int id)
+        {
+            return tourManagerRepository.GetTourByIdAsync(id);
+        }
+
+        public Task CreateTourAsync(TourListViewModel tourViewModel)
+        {
+            return tourManagerRepository.AddTourAsync(tourViewModel);
+        }
+
+        public Task EditTourAsync(TourListViewModel tourViewModel)
+        {
+            return tourManagerRepository.UpdateTourAsync(tourViewModel);
+        }
+
+        public Task RemoveTourAsync(int id)
+        {
+            return tourManagerRepository.DeleteTourAsync(id);
+        }
     }
 }

@@ -91,10 +91,109 @@ namespace Tourest.Data.Repositories
     {
         TourID = t.TourID,
         Name = t.Name,
-        // Bỏ comment các dòng nếu cần thêm dữ liệu khác từ Tour entity
     })
     .ToList();
 
+        }
+
+        public async Task<TourListViewModel?> GetTourByIdAsync(int id)
+        {
+            var tour = await _context.Tours
+                .Where(t => t.TourID == id)
+                .Select(t => new TourListViewModel
+                {
+                    TourId = t.TourID,
+                    Name = t.Name,
+                    Destination = t.Destination,
+                    DurationDays = t.DurationDays,
+                    DurationNights = t.DurationNights,
+                    ChildPrice = t.ChildPrice,
+                    AdultPrice = t.AdultPrice,
+                    Status = t.Status,
+                    AverageRating = t.AverageRating,
+                    MinGroupSize = t.MinGroupSize,
+                    MaxGroupSize = t.MaxGroupSize,
+                    DeparturePoints = t.DeparturePoints,
+                    IncludedServices = t.IncludedServices,
+                    ExcludedServices = t.ExcludedServices,
+                    ImageUrls = t.ImageUrls, 
+                    Description = t.Description,
+                    IsCancellable = t.IsCancellable,
+                    CancellationPolicyDescription = t.CancellationPolicyDescription
+                })
+                .FirstOrDefaultAsync();
+
+            if (tour != null && string.IsNullOrEmpty(tour.ImageUrls))
+            {
+                var defaultImagePath = Path.Combine("wwwroot/images/tours", $"{tour.TourId}.png");
+                if (System.IO.File.Exists(defaultImagePath))
+                {
+                    tour.ImageUrls = $"/images/tours/{tour.TourId}.png";
+                }
+                else
+                {
+                    tour.ImageUrls = "/images/default.png"; 
+                }
+            }
+
+            return tour;
+        }
+
+        public async Task AddTourAsync(TourListViewModel tourViewModel)
+        {
+            var entity = new Tour
+            {
+                Name = tourViewModel.Name,
+                Destination = tourViewModel.Destination,
+                DurationDays = tourViewModel.DurationDays,
+                ChildPrice = tourViewModel.ChildPrice,
+                ImageUrls = tourViewModel.ImageUrls,
+                AverageRating = tourViewModel.AverageRating,
+                Description = tourViewModel.Description,
+                DurationNights = tourViewModel.DurationNights,
+                AdultPrice = tourViewModel.AdultPrice,
+                Status = tourViewModel.Status,
+                IncludedServices = tourViewModel.IncludedServices,
+                ExcludedServices = tourViewModel.ExcludedServices,
+                DeparturePoints = tourViewModel.DeparturePoints,
+                MinGroupSize = tourViewModel.MinGroupSize,
+                MaxGroupSize = tourViewModel.MaxGroupSize,
+                CancellationPolicyDescription = tourViewModel.CancellationPolicyDescription
+
+            };
+            _context.Add(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateTourAsync(TourListViewModel tourViewModel)
+        {
+            var entity = await _context.Tours.FindAsync(tourViewModel.TourId);
+            if (entity != null)
+            {
+                entity.Name = tourViewModel.Name;
+                entity.Destination = tourViewModel.Destination;
+                entity.Description = tourViewModel.Description;
+                entity.DurationDays = tourViewModel.DurationDays;
+                entity.DurationNights = tourViewModel.DurationNights;
+                entity.AdultPrice = tourViewModel.AdultPrice;
+                entity.ChildPrice = tourViewModel.ChildPrice;
+                entity.Status = tourViewModel.Status;
+                entity.AverageRating = tourViewModel.AverageRating;
+                await _context.SaveChangesAsync();
+            }
+        }
+        public async Task DeleteTourAsync(int TourID)
+        {
+            var tour = await _context.Tours.FindAsync(TourID); 
+            if (tour != null)
+            {
+                _context.Tours.Remove(tour);   
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new Exception("Tour not found.");
+            }
         }
     }
 }

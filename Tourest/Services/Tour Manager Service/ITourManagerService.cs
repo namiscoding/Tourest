@@ -9,6 +9,11 @@ namespace Tourest.Services
         Task<List<TourGuideFeedbackViewModel>> GetFeedbacksByTourGuideIdAsync(int tourGuideUserId);
         Task<List<TourCustomerViewModel>> GetCustomersForTourAsync(int tourId);
         IEnumerable<TourListAllViewModel> GetAllTours();
+        Task<TourListViewModel?> GetTourDetailsAsync(int id);
+        Task CreateTourAsync(TourListViewModel tourViewModel);
+        Task EditTourAsync(TourListViewModel tourViewModel);
+        Task RemoveTourAsync(int id);
+
 
     }
 }

@@ -1,0 +1,139 @@
+﻿@model Tourest.ViewModels.Tour.TourListViewModel
+
+@{
+    ViewData["Title"] = "Tour Details";
+}
+
+<style>
+    .container-centered {
+        max-width: 800px;
+        margin: 2rem auto;
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-group {
+        margin-bottom: 1rem;
+    }
+
+        .detail-group strong {
+            display: inline-block;
+            min-width: 200px;
+            color: #555;
+        }
+
+    .thumbnail {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+        .thumbnail img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+    .actions {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+
+        .actions a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #007bff;
+        }
+
+            .actions a:hover {
+                text-decoration: underline;
+            }
+</style>
+
+<div class="container-centered">
+    <h2>@ViewData["Title"]</h2>
+
+    <!-- Thumbnail Image -->
+    @if (!string.IsNullOrEmpty(Model.ThumbnailImageUrl))
+    {
+        <div class="thumbnail">
+            <img src="@Model.ThumbnailImageUrl" alt="@Model.Name" />
+        </div>
+    }
+
+    <!-- Detail Fields -->
+    <div class="detail-group">
+        <strong>ID:</strong> @Model.TourId
+    </div>
+    <div class="detail-group">
+        <strong>Name:</strong> @Model.Name
+    </div>
+    <div class="detail-group">
+        <strong>Destination:</strong> @Model.Destination
+    </div>
+    <div class="detail-group">
+        <strong>Duration (Days):</strong> @Model.DurationDays
+    </div>
+    <div class="detail-group">
+        <strong>Duration (Nights):</strong> @Model.DurationNights
+    </div>
+    <div class="detail-group">
+        <strong>Child Price:</strong> @Model.ChildPrice
+    </div>
+    <div class="detail-group">
+        <strong>Adult Price:</strong> @Model.AdultPrice
+    </div>
+    <div class="detail-group">
+        <strong>Status:</strong> @Model.Status
+    </div>
+    <div class="detail-group">
+        <strong>Average Rating:</strong> @Model.AverageRating
+    </div>
+    <div class="detail-group">
+        <strong>Min Group Size:</strong> @Model.MinGroupSize
+    </div>
+    <div class="detail-group">
+        <strong>Max Group Size:</strong> @Model.MaxGroupSize
+    </div>
+    <div class="detail-group">
+        <strong>Departure Points:</strong> @Model.DeparturePoints
+    </div>
+    <div class="detail-group">
+        <strong>Included Services:</strong> @Model.IncludedServices
+    </div>
+    <div class="detail-group">
+        <strong>Excluded Services:</strong> @Model.ExcludedServices
+    </div>
+    <div class="detail-group">
+        <strong>Image:</strong>
+        @if (!string.IsNullOrEmpty(Model.ImageUrls))
+        {
+            <img src="@Model.ImageUrls" alt="Tour Image" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);" />
+        }
+        else
+        {
+            <span>No Image Available</span>
+        }
+    </div>
+    <div class="detail-group">
+        <strong>Description:</strong> @Model.Description
+    </div>
+    <div class="detail-group">
+        <strong>Is Cancellable:</strong> @(Model.IsCancellable ? "Yes" : "No")
+    </div>
+    <div class="detail-group">
+        <strong>Cancellation Policy:</strong> @Model.CancellationPolicyDescription
+    </div>
+
+    <!-- Back to List Button -->
+    <div class="actions">
+        <a asp-controller="TourManager" asp-action="ListTour">🗺️ View Tour List</a>
+    </div>
+</div>
