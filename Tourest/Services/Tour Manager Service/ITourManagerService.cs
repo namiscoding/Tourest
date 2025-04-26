@@ -13,7 +13,7 @@ namespace Tourest.Services
         Task CreateTourAsync(TourListViewModel tourViewModel);
         Task EditTourAsync(TourListViewModel tourViewModel);
         Task RemoveTourAsync(int id);
-
+        Task<TourListViewModel?> GetTourByIdAsync(int id);
 
     }
 }

@@ -14,6 +14,7 @@ namespace Tourest.Data.Repositories
         Task AddTourAsync(TourListViewModel tourViewModel);
         Task UpdateTourAsync(TourListViewModel tourViewModel);
         Task DeleteTourAsync(int id);
+        Task<TourListViewModel?> GetTourByIDAsync(int tourId);
 
     }
 }

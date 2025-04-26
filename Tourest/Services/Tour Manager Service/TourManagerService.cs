@@ -57,5 +57,10 @@ namespace Tourest.Services
         {
             return tourManagerRepository.DeleteTourAsync(id);
         }
+
+        public Task<TourListViewModel?> GetTourByIdAsync(int id)
+        {
+            return tourManagerRepository.GetTourByIDAsync(id);
+        }
     }
 }

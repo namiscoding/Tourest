@@ -158,8 +158,8 @@ namespace Tourest.Data.Repositories
                 DeparturePoints = tourViewModel.DeparturePoints,
                 MinGroupSize = tourViewModel.MinGroupSize,
                 MaxGroupSize = tourViewModel.MaxGroupSize,
-                CancellationPolicyDescription = tourViewModel.CancellationPolicyDescription
-
+                CancellationPolicyDescription = tourViewModel.CancellationPolicyDescription,
+                IsCancellable = tourViewModel.IsCancellable
             };
             _context.Add(entity);
             await _context.SaveChangesAsync();
@@ -172,13 +172,21 @@ namespace Tourest.Data.Repositories
             {
                 entity.Name = tourViewModel.Name;
                 entity.Destination = tourViewModel.Destination;
-                entity.Description = tourViewModel.Description;
                 entity.DurationDays = tourViewModel.DurationDays;
+                entity.ChildPrice = tourViewModel.ChildPrice;
+                entity.ImageUrls = tourViewModel.ImageUrls;
+                entity.AverageRating = tourViewModel.AverageRating;
+                entity.Description = tourViewModel.Description;
                 entity.DurationNights = tourViewModel.DurationNights;
                 entity.AdultPrice = tourViewModel.AdultPrice;
-                entity.ChildPrice = tourViewModel.ChildPrice;
                 entity.Status = tourViewModel.Status;
-                entity.AverageRating = tourViewModel.AverageRating;
+                entity.IncludedServices = tourViewModel.IncludedServices;
+                entity.ExcludedServices = tourViewModel.ExcludedServices;
+                entity.DeparturePoints = tourViewModel.DeparturePoints;
+                entity.MinGroupSize = tourViewModel.MinGroupSize;
+                entity.MaxGroupSize = tourViewModel.MaxGroupSize;
+                entity.CancellationPolicyDescription = tourViewModel.CancellationPolicyDescription;
+                entity.IsCancellable = tourViewModel.IsCancellable;
                 await _context.SaveChangesAsync();
             }
         }
@@ -194,6 +202,35 @@ namespace Tourest.Data.Repositories
             {
                 throw new Exception("Tour not found.");
             }
+        }
+
+        public async Task<TourListViewModel?> GetTourByIDAsync(int tourId)
+        {
+            var tour = await _context.Tours
+                .Where(t => t.TourID == tourId)
+                .Select(t => new TourListViewModel
+                {
+                    TourId = t.TourID,
+                    Name = t.Name,
+                    Destination = t.Destination,
+                    DurationDays = t.DurationDays,
+                    DurationNights = t.DurationNights,
+                    ChildPrice = t.ChildPrice,
+                    AdultPrice = t.AdultPrice,
+                    Description = t.Description,
+                    Status = t.Status,
+                    MinGroupSize = t.MinGroupSize,
+                    MaxGroupSize = t.MaxGroupSize,
+                    DeparturePoints = t.DeparturePoints,
+                    ExcludedServices = t.ExcludedServices,
+                    IncludedServices = t.IncludedServices,
+                    ImageUrls = t.ImageUrls,
+                    IsCancellable = t.IsCancellable,
+                    CancellationPolicyDescription = t.CancellationPolicyDescription
+                })
+                .FirstOrDefaultAsync();
+
+            return tour;
         }
     }
 }

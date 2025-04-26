@@ -1,15 +1,165 @@
 ﻿@model Tourest.ViewModels.Tour.TourListViewModel
 
-<h2>Edit Tour</h2>
-<form method="post" asp-controller="TourManager" asp-action="EditTour" asp-route-id="@Model.TourId">
-    <div>
-        <label for="Name">Name</label>
-        <input asp-for="Name" />
-    </div>
-    <div>
-        <label for="Destination">Destination</label>
-        <input asp-for="Destination" />
-    </div>
-    <!-- Thêm các input field khác nếu cần -->
-    <button type="submit" class="btn btn-primary">Save</button>
-</form>
+@{
+    ViewData["Title"] = "Edit Tour";
+}
+
+<style>
+    .container-centered {
+        max-width: 800px;
+        margin: 2rem auto;
+        background-color: #fff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+
+        input[type="submit"] {
+            width: auto;
+            padding: 0.6rem 1.2rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+            input[type="submit"]:hover {
+                background-color: #0056b3;
+            }
+</style>
+
+<div class="container-centered">
+    <h2>Edit Tour: @Model.Name</h2>
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <form method="post" asp-controller="TourManager" asp-action="EditTour" asp-route-id="@Model.TourId" enctype="multipart/form-data">
+        <input type="hidden" asp-for="TourId" />
+
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Destination"></label>
+            <input asp-for="Destination" class="form-control" />
+            <span asp-validation-for="Destination" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DurationDays"></label>
+            <input asp-for="DurationDays" type="number" class="form-control" />
+            <span asp-validation-for="DurationDays" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DurationNights"></label>
+            <input asp-for="DurationNights" type="number" class="form-control" />
+            <span asp-validation-for="DurationNights" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ChildPrice"></label>
+            <input asp-for="ChildPrice" type="number" class="form-control" />
+            <span asp-validation-for="ChildPrice" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="AdultPrice"></label>
+            <input asp-for="AdultPrice" type="number" class="form-control" />
+            <span asp-validation-for="AdultPrice" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Description"></label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Status"></label>
+            <input asp-for="Status" class="form-control" />
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="MinGroupSize"></label>
+            <input asp-for="MinGroupSize" type="number" class="form-control" />
+            <span asp-validation-for="MinGroupSize" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="MaxGroupSize"></label>
+            <input asp-for="MaxGroupSize" type="number" class="form-control" />
+            <span asp-validation-for="MaxGroupSize" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="DeparturePoints"></label>
+            <textarea asp-for="DeparturePoints" class="form-control"></textarea>
+            <span asp-validation-for="DeparturePoints" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ExcludedServices"></label>
+            <textarea asp-for="ExcludedServices" class="form-control"></textarea>
+            <span asp-validation-for="ExcludedServices" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IncludedServices"></label>
+            <textarea asp-for="IncludedServices" class="form-control"></textarea>
+            <span asp-validation-for="IncludedServices" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ImageUrls">Current Image URL</label>
+            <input asp-for="ImageUrls" readonly class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Upload New PNG File</label>
+            <input type="file" name="imageFile" id="imageFile" accept=".png" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="IsCancellable"></label>
+            <input asp-for="IsCancellable" type="checkbox" class="form-check-input" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CancellationPolicyDescription"></label>
+            <textarea asp-for="CancellationPolicyDescription" class="form-control"></textarea>
+            <span asp-validation-for="CancellationPolicyDescription" class="text-danger"></span>
+        </div>
+
+        <input type="submit" value="Save Changes" class="btn btn-primary" />
+    </form>
+</div>

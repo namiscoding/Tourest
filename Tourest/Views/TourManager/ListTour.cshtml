@@ -100,9 +100,9 @@
 						<a asp-controller="TourManager"
 						   asp-action="DeleteTour"
 						   asp-route-tourId="@tour.TourID"
-						   onclick="return confirmDeleteLink(this, @tour.TourID)">
+						   onclick="return confirm('Are you sure to delete tour with ID: @tour.TourID?')">
 							Delete
-						</a> 
+						</a>
 					</td>
 				</tr>
 			}
@@ -114,32 +114,4 @@
 		<a asp-controller="TourManager" asp-action="CreateTour" class="btn btn-primary">Create New Tour</a>
 	</div>
 </div>
-
-<script>
-	function confirmDelete(TourID) {
-		console.log("TourID being passed:", TourID); 
-		if (confirm(`Are you sure you want to delete this tour with ID: ${TourID}?`)) {
-			fetch(`/TourManager/DeleteTour`, {
-				method: "POST",
-					headers: {
-		"Content-Type": "application/json"
-	},
-
-				body: JSON.stringify({ TourID: TourID })
-			})
-			.then(response => response.json())
-			.then(data => {
-				if (data.success) {
-					alert("Tour deleted successfully.");
-					location.reload();
-				} else {
-					alert("Error: " + data.message);
-				}
-			})
-			.catch(error => {
-				alert("An error occurred while deleting the tour.");
-				console.error(error);
-			});
-		}
-	}
-</script>
+ 
