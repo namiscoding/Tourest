@@ -8,6 +8,8 @@ namespace Tourest.Services
         Task<IEnumerable<UserViewModel>> AuthenticationAsync();
         Task<UserViewModel> RegisterAsync(RegisterModel AccountRegister);
         Task<User?> CheckEmailAsync(string email);
- 
+        Task<UserViewModel> UpdateProfile(UserViewModel userViewModel);
+
+        
     }
 }

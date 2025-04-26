@@ -109,6 +109,8 @@ namespace Tourest.Controllers
     };
 
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var identity1 = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
                 var principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             }

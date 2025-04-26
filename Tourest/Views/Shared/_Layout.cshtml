@@ -10,6 +10,9 @@
     @using Tourest.ViewModels.Account;
     <link rel="stylesheet" href="~/assets/css/style.css" />
     <link rel="stylesheet" href="~/assets/css/plugins.css" />
+    <link rel="stylesheet" href="~/assets/css/StyleSheet.css" />
+    <link rel="stylesheet" href="~/assets/css/StyleSheet1.css" />
+    <link rel="stylesheet" href="~/assets/css/StyleSheet2.css" />
     <link rel="icon" href="assets/images/favicon.png" type="image/x-icon" />
 </head>
 @{
@@ -154,7 +157,7 @@
                                         <i class="fa-regular fa-user"></i>
                                         @if (currentAccount != null)
                                         {
-                                            <a href="#">Hello, @currentAccount.FullName!</a>
+                                            <a href="/Profile/Index/@currentAccount.UserID">Hello, @currentAccount.FullName!</a>
                                         } 
                                         else
                                         {

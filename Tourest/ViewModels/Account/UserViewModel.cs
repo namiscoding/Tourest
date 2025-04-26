@@ -28,6 +28,17 @@ namespace Tourest.ViewModels.Account
         public virtual ICollection<TourAuditLog> TourAuditLogsPerformed { get; set; } = new List<TourAuditLog>();
         public virtual ICollection<Notification> NotificationsReceived { get; set; } = new List<Notification>();
         public virtual ICollection<Notification> NotificationsSent { get; set; } = new List<Notification>();
+        public override string ToString()
+        {
+            return $"UserID: {UserID}, " +
+                   $"FullName: {FullName}, " +
+                   $"Email: {Email}, " +
+                   $"PhoneNumber: {PhoneNumber}, " +
+                   $"Address: {Address}, " +
+                   $"ProfilePictureUrl: {ProfilePictureUrl}, " +
+                   $"RegistrationDate: {RegistrationDate:yyyy-MM-dd HH:mm:ss}, " +
+                   $"IsActive: {IsActive}";
+        }
 
     }
 }
