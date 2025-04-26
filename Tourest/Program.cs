@@ -15,14 +15,6 @@ using Microsoft.AspNetCore.SignalR;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 
-
-
-
-using Microsoft.Extensions.DependencyInjection;
-
-
-
-
 namespace Tourest
 {
 	public class Program
@@ -126,7 +118,7 @@ namespace Tourest
       
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
-
+            builder.Services.AddScoped<IEmailService, EmailService>();
       
             builder.Services.AddControllersWithViews();
             

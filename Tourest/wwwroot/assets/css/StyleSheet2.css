@@ -26977,3 +26977,76 @@ body:not(.modal-open) .layout-content-navbar .layout-navbar {
         --bs-footer-link-color: var(--bs-body-color);
         --bs-footer-brand-color: var(--bs-heading-color);
     }
+/* Notification Styles */
+.bell-container {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #ff4838; /* Matches your site's orange-red color */
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-modal {
+    position: absolute;
+    width: 300px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    right: 0;
+    top: 45px;
+    z-index: 1000;
+    display: none;
+    overflow: hidden;
+}
+
+.notification-header {
+    background-color: #f8f9fa;
+    padding: 10px 15px;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: bold;
+}
+
+.notification-body {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+}
+
+    .notification-item:last-child {
+        border-bottom: none;
+    }
+
+.notification-footer {
+    padding: 8px 15px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* Make sure the notification bell stands out */
+#notificationButton {
+    padding: 0;
+    font-size: 1.2rem;
+    color: inherit;
+    transition: color 0.3s;
+}
+
+    #notificationButton:hover {
+        color: #ff4838; /* Matches your site's orange-red color */
+    }
