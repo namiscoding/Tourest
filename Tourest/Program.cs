@@ -3,9 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Tourest.Data;
 using Tourest.Data.Repositories;
 using Tourest.Services;
-
+using Tourest.Data.Entities.Momo;
 using Tourest.TourGuide.Repositories;
 using Tourest.TourGuide.Services;
+using Tourest.Services.Momo;
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
@@ -19,8 +20,12 @@ namespace Tourest
 
 			var builder = WebApplication.CreateBuilder(args);
 
-			// Lấy connection string từ appsettings.json
-			var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            // connect momo API
+            builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
+            builder.Services.AddScoped<IMomoService, MomoService>();
+
+            // Lấy connection string từ appsettings.json
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 			// Đăng ký ApplicationDbContext với DI Container và chỉ định dùng SQL Server
 			builder.Services.AddDbContext<ApplicationDbContext>(options =>
