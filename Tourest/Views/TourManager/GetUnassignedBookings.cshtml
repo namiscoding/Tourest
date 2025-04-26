@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Tourest.Data.Entities.Booking>
+﻿@model IEnumerable<Tourest.ViewModels.UnassignedBookingViewModel>
 @{
     ViewData["Title"] = "Unassigned Bookings";
 }
@@ -9,14 +9,18 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Tourest</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <style>
         :root {
             --primary-color: #28a745;
             --secondary-color: #6c757d;
             --danger-color: #dc3545;
             --warning-color: #ffc107;
+        }
+
+        body {
+            background-color: #f4f6f9;
         }
 
         .booking-card {
@@ -36,7 +40,7 @@
             padding: 0.35rem 0.65rem;
         }
 
-        .badge-pending {
+        .badge-pendingassignment {
             background-color: #fff3cd;
             color: #856404;
         }
@@ -55,46 +59,90 @@
             min-width: 120px;
         }
 
-        .new-booking-indicator {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 12px;
-            height: 12px;
-            background-color: var(--danger-color);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @@keyframes pulse {
-            0% {
-                transform: scale(0.95);
-            }
-
-            50% {
-                transform: scale(1.1);
-            }
-
-            100% {
-                transform: scale(0.95);
-            }
-        }
-
         .countdown-timer {
             font-weight: 600;
             color: var(--danger-color);
+        }
+
+        .guide-card {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .guide-card:hover {
+                background-color: #f8f9fa;
+            }
+
+            .guide-card.selected {
+                border: 2px solid var(--primary-color);
+                background-color: #e8f5e9;
+            }
+
+        .guide-rating {
+            color: #ffc107;
+        }
+
+        .specialization-badge {
+            font-size: 0.7rem;
+            margin-right: 0.3rem;
+        }
+
+        .difficulty-badge {
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .difficulty-1 {
+            background-color: #28a745;
+        }
+
+        .difficulty-2 {
+            background-color: #5bc0de;
+        }
+
+        .difficulty-3 {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .difficulty-4 {
+            background-color: #fd7e14;
+        }
+
+        .difficulty-5 {
+            background-color: #dc3545;
+        }
+
+        .modal-content {
+            border-radius: 0.5rem;
+        }
+
+        .modal-header {
+            background-color: var(--warning-color);
+            color: #000;
+        }
+
+        #bookingDetails p {
+            margin-bottom: 0.5rem;
+        }
+
+        .badge.bg-info, .badge.bg-primary, .badge.bg-secondary {
+            color: white;
         }
     </style>
 </head>
 <body>
     <div class="container-fluid px-0">
         <!-- Header -->
-        <header class="bg-warning text-dark py-4 mb-4 shadow">
+        <header class="bg-white text-dark py-4 mb-4 shadow">
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h1 class="h3 mb-0"><i class="fas fa-calendar-exclamation me-2"></i> Unassigned Bookings</h1>
-                        <p class="mb-0">Bookings waiting for tour guide assignment</p>
+                        <h1 class="h3 mb-0">
+                            <img src="https://via.placeholder.com/30x30.png?text=T" alt="Tourest Logo" class="me-2" style="vertical-align: middle;" />
+                            Unassigned Bookings
+                        </h1>
+                        <p class="mb-0">Manage bookings awaiting tour guide assignment</p>
                     </div>
                     <div class="d-flex align-items-center">
                         <img src="https://via.placeholder.com/40" alt="Profile" class="rounded-circle me-2" width="40" height="40">
@@ -106,24 +154,11 @@
 
         <!-- Main Content -->
         <main class="container">
-            <!-- Filter and Status -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="h4 mb-0"><i class="fas fa-list me-2"></i> Unassigned Bookings List</h2>
-                <div>
-                    <div class="dropdown d-inline-block me-2">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown">
-                            <i class="fas fa-filter me-1"></i> Filter
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">All Bookings</a></li>
-                            <li><a class="dropdown-item" href="#">New Today</a></li>
-                            <li><a class="dropdown-item" href="#">Upcoming (7 days)</a></li>
-                        </ul>
-                    </div>
-                    <button class="btn btn-primary" id="refreshBtn">
-                        <i class="fas fa-sync-alt me-1"></i> Refresh
-                    </button>
-                </div>
+                <button class="btn btn-primary" id="refreshBtn">
+                    <i class="fas fa-sync-alt me-1"></i> Refresh
+                </button>
             </div>
 
             <!-- Bookings List -->
@@ -133,38 +168,41 @@
                     {
                         @foreach (var booking in Model)
                         {
-                            <div class="card booking-card mb-3 position-relative" id="booking-@booking.BookingID" data-booking-id="@booking.BookingID">
-                               
+                            <div class="card booking-card mb-3" id="booking-@booking.BookingId"
+                                 data-booking-id="@booking.BookingId"
+                                 data-tour-group-id="@booking.TourGroupId"
+                                 data-tour-id="@booking.TourId"
+                                 data-booking-date="@booking.BookingDate.ToString("o")">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
                                             <h5 class="card-title mb-2">
-                                                <i class="fas fa-map-marked-alt text-warning me-2"></i>
-                                                @booking.Tour?.Name
+                                                <span class="tour-name">
+                                                    <i class="fas fa-map-marked-alt text-warning me-2"></i>
+                                                    @booking.TourName
+                                                </span>
                                                 <span class="status-badge badge-@booking.Status.ToLower() ms-2">
-                                                    @if (booking.Status.ToLower() == "confirmed")
+                                                    @switch (booking.Status.ToLower())
                                                     {
-                                                        <i class="fas fa-check-circle me-1"></i>
-                                                    }
-                                                    else if (booking.Status.ToLower() == "pending")
-                                                    {
-                                                        <i class="fas fa-clock me-1"></i>
-                                                    }
-                                                    else
-                                                    {
-                                                        <i class="fas fa-times-circle me-1"></i>
+                                                        case "confirmed":
+                                                            <i class="fas fa-check-circle me-1"></i>
+                                                            break;
+                                                        case "pendingassignment":
+                                                            <i class="fas fa-clock me-1"></i>
+                                                            break;
+                                                        default:
+                                                            <i class="fas fa-times-circle me-1"></i>
+                                                            break;
                                                     }
                                                     @booking.Status
                                                 </span>
                                             </h5>
-
                                             <div class="card-text mb-2">
                                                 <small class="text-muted">
                                                     <i class="far fa-calendar me-1"></i>
                                                     Booked on @booking.BookingDate.ToString("MMM dd, yyyy 'at' hh:mm tt")
                                                 </small>
                                             </div>
-
                                             <div class="d-flex flex-wrap gap-3 mb-2">
                                                 <div>
                                                     <i class="fas fa-calendar-day text-info me-1"></i>
@@ -183,23 +221,24 @@
                                                     <span>Total: @booking.TotalPrice.ToString("C0")</span>
                                                 </div>
                                             </div>
-
                                             <div class="mt-2">
                                                 <small class="text-muted">
                                                     <i class="fas fa-hourglass-half me-1"></i>
                                                     Time unassigned:
-                                                    <span class="countdown-timer" id="countdown-@booking.BookingID"></span>
+                                                    <span class="countdown-timer" id="countdown-@booking.BookingId"></span>
                                                 </small>
                                             </div>
                                         </div>
-
                                         <div class="action-buttons">
                                             <div class="d-flex flex-column gap-2">
-                                                <button class="btn btn-primary assign-guide-btn" data-booking-id="@booking.BookingID">
+                                                <button class="btn btn-primary assign-guide-btn"
+                                                        data-booking-id="@booking.BookingId"
+                                                        data-tour-group-id="@booking.TourGroupId"
+                                                        data-tour-id="@booking.TourId">
                                                     <i class="fas fa-user-plus me-1"></i> Assign Guide
                                                 </button>
-                                                <a href="@Url.Action("Details", "Booking", new { id = booking.BookingID })" class="btn btn-outline-secondary">
-                                                    <i class="fas fa-info-circle me-1"></i> Details
+                                                <a href="@Url.Action("ViewCustomers", "TourManager", new { tourId = booking.TourId })" class="btn btn-outline-secondary">
+                                                    <i class="fas fa-users me-1"></i> View Customers
                                                 </a>
                                             </div>
                                         </div>
@@ -225,63 +264,66 @@
     </div>
 
     <!-- Assign Guide Modal -->
-    <div class="modal fade" id="assignGuideModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="assignGuideModal" tabindex="-1" aria-labelledby="assignGuideModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-warning text-dark">
-                    <h5 class="modal-title"><i class="fas fa-user-plus me-2"></i> Assign Tour Guide</h5>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignGuideModalLabel"><i class="fas fa-user-plus me-2"></i> Assign Tour Guide</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="assignGuideForm">
-                        <input type="hidden" id="bookingId" name="bookingId" value="">
-                        <div class="mb-3">
-                            <label for="guideSelect" class="form-label">Select Tour Guide</label>
-                            <select class="form-select" id="guideSelect" required>
-                                <option value="">-- Select Guide --</option>
-                                <!-- Options will be loaded via AJAX -->
-                            </select>
+                    <input type="hidden" id="bookingId" />
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Booking Details</h6>
+                            <div id="bookingDetails" class="border p-3 rounded bg-light"></div>
                         </div>
-                        <div class="mb-3">
-                            <label for="assignmentNotes" class="form-label">Assignment Notes</label>
-                            <textarea class="form-control" id="assignmentNotes" rows="3"></textarea>
+                        <div class="col-md-6">
+                            <h6>TOUR DIFFICULTY: <span id="tourDifficultyBadge" class="badge difficulty-badge"></span></h6>
+                            <h6>GROUP SIZE: <span id="groupSizeBadge" class="badge bg-info"></span></h6>
+                            <h6>REQUIRED EXPERIENCE: <span id="requiredExpBadge" class="badge bg-primary"></span></h6>
                         </div>
-                    </form>
+                    </div>
+                    <h5 class="mb-3">Recommended Guides</h5>
+                    <div id="recommendedGuides" class="row mb-4"></div>
+                    <div class="mb-3">
+                        <label for="assignmentNotes" class="form-label">Assignment Notes</label>
+                        <textarea class="form-control" id="assignmentNotes" rows="4" placeholder="Add any special instructions for the guide..."></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="confirmAssignBtn">Assign Guide</button>
+                    <button type="button" class="btn btn-primary" id="confirmAssignBtn" disabled>Assign Selected Guide</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- JavaScript Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 
     <script>
         $(document).ready(function() {
             // Initialize countdown timers
             $('.booking-card').each(function() {
                 const bookingId = $(this).data('booking-id');
-                const createdTime = new Date('@DateTime.Now'); // Should use actual booking time
-                const deadline = new Date(createdTime);
-                deadline.setHours(deadline.getHours() + 24); // 24-hour deadline
+                const bookingDate = new Date($(this).data('booking-date'));
+                const deadline = new Date(bookingDate);
+                deadline.setHours(deadline.getHours() + 24);
 
                 function updateCountdown() {
                     const now = new Date();
                     const diff = deadline - now;
 
                     if (diff <= 0) {
-                        $(`#countdown-${bookingId}`).text("Overdue");
+                        $(`#countdown-${bookingId}`).text('Overdue').addClass('text-danger');
                         return;
                     }
 
                     const hours = Math.floor(diff / (1000 * 60 * 60));
                     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
                     $(`#countdown-${bookingId}`).text(`${hours}h ${minutes}m ${seconds}s`);
                 }
 
@@ -290,73 +332,218 @@
             });
 
             // Handle assign guide button click
-            $(document).on('click', '.assign-guide-btn', function() {
+            $('.assign-guide-btn').on('click', function() {
                 const bookingId = $(this).data('booking-id');
+                const tourGroupId = $(this).data('tour-group-id');
+                const tourId = $(this).data('tour-id');
+                const bookingCard = $(`#booking-${bookingId}`);
+
+                // Extract booking details
+                const tourName = bookingCard.find('.tour-name').contents().filter(function() {
+                    return this.nodeType === 3; // Text nodes only
+                }).text().trim();
+                const departure = bookingCard.find('.fa-calendar-day').parent().text().replace('Departure:', '').trim();
+                const groupSize = bookingCard.find('.fa-users').parent().text().trim();
+                const pickupPoint = bookingCard.find('.fa-map-marker-alt').parent().text().replace('Pickup:', '').trim();
+                const totalPrice = bookingCard.find('.fa-money-bill-wave').parent().text().replace('Total:', '').trim();
+
+                // Set booking ID
                 $('#bookingId').val(bookingId);
 
-                // Load available guides via AJAX
-                $.get('@Url.Action("GetAvailableGuides", "Booking")', function(data) {
-                    const guideSelect = $('#guideSelect');
-                    guideSelect.empty();
-                    guideSelect.append('<option value="">-- Select Guide --</option>');
+                // Populate booking details
+                $('#bookingDetails').html(`
+                    <p><strong>TOUR:</strong> ${tourName || 'N/A'}</p>
+                    <p><strong>DEPARTURE:</strong> ${departure || 'N/A'}</p>
+                    <p><strong>GROUP SIZE:</strong> ${groupSize || 'N/A'}</p>
+                    <p><strong>PICKUP POINT:</strong> ${pickupPoint || 'N/A'}</p>
+                    <p><strong>TOTAL PRICE:</strong> ${totalPrice || 'N/A'}</p>
+                `);
 
-                    data.forEach(guide => {
-                        guideSelect.append(`<option value="${guide.id}">${guide.name} (${guide.languages})</option>`);
-                    });
+                // Set group size badge
+                $('#groupSizeBadge').text(groupSize || 'N/A').removeClass('bg-secondary').addClass('bg-info');
 
-                    $('#assignGuideModal').modal('show');
-                }).fail(function() {
-                    alert('Failed to load available guides');
-                });
+                // Reset other badges
+                $('#tourDifficultyBadge').text('Loading...').removeClass().addClass('badge difficulty-badge bg-secondary');
+                $('#requiredExpBadge').text('Loading...').removeClass().addClass('badge bg-secondary');
+
+                // Show modal
+                $('#assignGuideModal').modal('show');
+
+                // Load recommended guides
+                loadRecommendedGuides(tourGroupId);
             });
 
-            // Handle confirm assignment
-            $('#confirmAssignBtn').click(function() {
+            // Load recommended guides
+            function loadRecommendedGuides(tourGroupId) {
+                console.log(`Loading guides for tourGroupId: ${tourGroupId}`);
+                $('#recommendedGuides').html(`
+                    <div class="col-12 text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p>Loading recommended guides...</p>
+                    </div>
+                `);
+
+                $.ajax({
+                    url: `/TourManager/GetRecommendedGuides/${tourGroupId}`,
+                    type: 'GET',
+                    success: function(data) {
+                        console.log('Recommended guides response:', data);
+                        if (data && Array.isArray(data) && data.length > 0) {
+                            let html = '';
+                            data.forEach((guide, index) => {
+                                // Update badges for the first guide
+                                if (index === 0) {
+                                    $('#tourDifficultyBadge')
+                                        .text(guide.tourDifficulty ? `Level ${guide.tourDifficulty}` : 'Unknown')
+                                        .removeClass()
+                                        .addClass(`badge difficulty-badge ${guide.tourDifficulty ? 'difficulty-' + guide.tourDifficulty : 'bg-secondary'}`);
+                                    $('#requiredExpBadge')
+                                        .text(guide.requiredExperience ? `${guide.requiredExperience} years` : 'Unknown')
+                                        .removeClass()
+                                        .addClass(`badge ${guide.requiredExperience ? 'bg-primary' : 'bg-secondary'}`);
+                                }
+
+                                html += `
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card guide-card" data-guide-id="${guide.id}" onclick="selectGuide(this)">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h5 class="card-title mb-1 text-uppercase">${guide.name || 'Unknown'}</h5>
+                                                        <div class="mb-2">
+                                                            ${renderStars(guide.rating || 0)}
+                                                            <span class="small ms-1">${(guide.rating || 0).toFixed(1)}</span>
+                                                        </div>
+                                                        <p class="small mb-1 text-uppercase"><i class="fas fa-language me-1"></i> ${guide.languages || 'N/A'}</p>
+                                                        <p class="small mb-1 text-uppercase"><i class="fas fa-briefcase me-1"></i> ${guide.experience || 0} years</p>
+                                                        <p class="small mb-1 text-uppercase"><i class="fas fa-users me-1"></i> Max: ${guide.maxCapacity || 0}</p>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <span class="badge bg-success">Suitability: ${(guide.suitabilityScore || 0).toFixed(0)}%</span>
+                                                        ${index < 3 ? '<span class="badge bg-warning text-dark ms-1">Top Pick</span>' : ''}
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2">
+                                                    ${renderSpecializations(guide.specializations)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            $('#recommendedGuides').html(html);
+                        } else {
+                            $('#recommendedGuides').html('<div class="col-12 text-center py-3"><p>No recommended guides available.</p></div>');
+                            $('#tourDifficultyBadge').text('Unknown').removeClass().addClass('badge difficulty-badge bg-secondary');
+                            $('#requiredExpBadge').text('Unknown').removeClass().addClass('badge bg-secondary');
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error(`Failed to load guides: ${textStatus} - ${errorThrown}`);
+                        console.log('Error response:', jqXHR.responseText);
+                        $('#recommendedGuides').html('<div class="col-12 text-center py-3"><p class="text-danger">Error loading guides. Please try again.</p></div>');
+                        $('#tourDifficultyBadge').text('Unknown').removeClass().addClass('badge difficulty-badge bg-secondary');
+                        $('#requiredExpBadge').text('Unknown').removeClass().addClass('badge bg-secondary');
+                        showToast('Failed to load recommended guides.', 'error');
+                    }
+                });
+            }
+
+            // Render star ratings
+            function renderStars(rating) {
+                let stars = '';
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = rating % 1 >= 0.5;
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= fullStars) {
+                        stars += '<i class="fas fa-star guide-rating"></i>';
+                    } else if (i === fullStars + 1 && hasHalfStar) {
+                        stars += '<i class="fas fa-star-half-alt guide-rating"></i>';
+                    } else {
+                        stars += '<i class="far fa-star guide-rating"></i>';
+                    }
+                }
+                return stars;
+            }
+
+            // Render specializations
+            function renderSpecializations(specializations) {
+                if (!specializations) return '';
+                const specs = specializations.split(';').filter(spec => spec.trim());
+                return specs.map(spec => `<span class="badge specialization-badge bg-info text-uppercase">${spec.trim()}</span>`).join('');
+            }
+
+            // Select guide
+            window.selectGuide = function(element) {
+                $('.guide-card').removeClass('selected');
+                $(element).addClass('selected');
+                $('#confirmAssignBtn').prop('disabled', false);
+            };
+
+            // Confirm assignment
+            $('#confirmAssignBtn').on('click', function() {
                 const bookingId = $('#bookingId').val();
-                const guideId = $('#guideSelect').val();
+                const selectedGuideId = $('.guide-card.selected').data('guide-id');
                 const notes = $('#assignmentNotes').val();
 
-                if (!guideId) {
-                    alert('Please select a tour guide');
+                if (!bookingId || !selectedGuideId) {
+                    showToast('Please select a tour guide.', 'error');
                     return;
                 }
 
-                $.post('@Url.Action("AssignGuide", "Booking")', {
-                    bookingId: bookingId,
-                    guideId: guideId,
-                    notes: notes
-                }, function(response) {
-                    if (response.success) {
-                        $('#assignGuideModal').modal('hide');
-                        // Remove the assigned booking from the list
-                        $(`#booking-${bookingId}`).fadeOut(300, function() {
-                            $(this).remove();
-                            // If no bookings left, show empty state
-                            if ($('.booking-card').length === 0) {
-                                $('.col-12').html(`
-                                    <div class="text-center py-5 bg-light rounded">
-                                        <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
-                                        <h3 class="h4 text-muted">No Unassigned Bookings</h3>
-                                        <p class="text-muted">All bookings have been assigned to tour guides.</p>
-                                        <button class="btn btn-primary" id="checkForNewBtn">
-                                            <i class="fas fa-sync-alt me-2"></i> Check for New Bookings
-                                        </button>
-                                    </div>
-                                `);
-                            }
-                        });
-                    } else {
-                        alert('Error: ' + response.message);
+                $.ajax({
+                    url: '@Url.Action("AssignGuide", "TourManager")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ bookingId: parseInt(bookingId), guideId: selectedGuideId, notes: notes }),
+                    success: function(response) {
+                        if (response.success) {
+                            $('#assignGuideModal').modal('hide');
+                            $(`#booking-${bookingId}`).fadeOut(300, function() {
+                                $(this).remove();
+                                if (!$('.booking-card').length) {
+                                    $('.col-12').html(`
+                                        <div class="text-center py-5 bg-light rounded">
+                                            <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                                            <h3 class="h4 text-muted">No Unassigned Bookings</h3>
+                                            <p class="text-muted">All bookings have been assigned to tour guides.</p>
+                                            <button class="btn btn-primary" id="checkForNewBtn">
+                                                <i class="fas fa-sync-alt me-2"></i> Check for New Bookings
+                                            </button>
+                                        </div>
+                                    `);
+                                }
+                            });
+                            showToast('Guide assigned successfully!', 'success');
+                        } else {
+                            showToast(response.message || 'Failed to assign guide.', 'error');
+                        }
+                    },
+                    error: function() {
+                        showToast('Error assigning guide. Please try again.', 'error');
                     }
-                }).fail(function() {
-                    alert('Failed to assign guide');
                 });
             });
 
             // Refresh button
-            $('#refreshBtn, #checkForNewBtn').click(function() {
+            $('#refreshBtn, #checkForNewBtn').on('click', function() {
                 location.reload();
             });
+
+            // Show toast
+            function showToast(message, type) {
+                const toastClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const toastHtml = `
+                    <div class="alert ${toastClass} alert-dismissible fade show position-fixed bottom-0 end-0 m-3" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                $('body').append(toastHtml);
+                setTimeout(() => $('.alert').alert('close'), 5000);
+            }
         });
     </script>
 </body>

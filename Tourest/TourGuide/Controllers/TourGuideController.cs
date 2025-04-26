@@ -13,6 +13,14 @@ public class TourGuideController : Controller
         _context = context;
         _assignmentService = assignmentService;
     }
+
+    [HttpGet("Index")]
+    public async Task<IActionResult> Index(int tourGuideId)
+    {
+        var assignments = await _assignmentService.GetTourAssignmentsAsync(3);
+        ViewData["AssignedTours"] = assignments;
+        return View();
+    }
     [HttpGet("TourGuideScheduleWork")]
     public async Task<IActionResult> TourGuideScheduleWork(int tourGuideId, int tourGroupId)
     {
@@ -23,14 +31,8 @@ public class TourGuideController : Controller
     }
 
 
-    // GET: TourGuide/Index
-    [HttpGet("Index")]
-    public async Task<IActionResult> Index(int tourGuideId)
-    {
-        var assignments = await _assignmentService.GetTourAssignmentsAsync(3);
-        ViewData["AssignedTours"] = assignments;
-        return View();
-    }
+    
+  
 
     // POST: TourGuide/AcceptAssignment
     [HttpPost("AcceptAssignment")]
