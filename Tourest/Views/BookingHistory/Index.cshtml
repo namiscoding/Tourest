@@ -11,7 +11,7 @@
     {
         return status?.ToLowerInvariant() switch
         {
-            "confirmed" => "bg-success text-white", // Thêm text-white nếu nền tối
+            "paid" => "bg-success text-white", // Thêm text-white nếu nền tối
             "completed" => "bg-primary text-white",
             "cancelled" => "bg-danger text-white",
             "pending" => "bg-warning text-dark", // Nền vàng chữ tối
@@ -121,22 +121,15 @@
                                                 </td>
                                                 <td>
                                                     <span class="badge rounded-pill @GetStatusBadgeClass(booking.Status)">@booking.Status</span>
-                                                    @*@if (booking.CancellationDate.HasValue)
-                                                    {
-                                                        <span class="d-block text-muted fs-7" title="Ngày hủy">@booking.CancellationDate.Value.ToString("dd/MM/yy")</span>
-                                                        @if (booking.RefundAmount.HasValue)
-                                                        {
-                                                            <span class="d-block text-danger fs-7" title="Tiền hoàn">@booking.RefundAmount.Value.ToString("N0")K</span>
-                                                        }
-                                                    }*@
+                                                    
                                                 </td>
                                                 <td>
                                                     @* Cột Action *@
                                                     @if (booking.Status != null && booking.Status.Equals("PendingPayment", StringComparison.OrdinalIgnoreCase))
                                                     {
-                                                        <a asp-controller="Payment" asp-action="Create" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-warning" title="Hoàn tất thanh toán">
-                                                            <i class="fa-solid fa-credit-card me-1"></i> Thanh toán
-                                                        </a>
+                                                        @*<a asp-controller="Payment" asp-action="Create" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-warning" title="Hoàn tất thanh toán">
+                                                             <i class="fa-solid fa-credit-card me-1"></i> Thanh toán
+                                                        </a>*@
 
                                                         <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payment" class="needs-validation" novalidate id="momoPaymentForm">
                                                             @* Thêm id và validation *@
@@ -149,7 +142,7 @@
                                                             <input type="hidden" name="TourId" value="@booking.TourId" />
 
                                                             @* Nút Submit cho Form MoMo *@
-                                                            <button type="submit" class="common-btn w-100 mt-1" style="background-color: #a60067; color: white;" id="book-momo-button">
+                                                            <button type="submit" class="common-btn  mt-1" style="background-color: #a60067; color: white;" id="book-momo-button">
                                                                 @* Style cơ bản cho MoMo *@
                                                                 <img src="~/assets/images/momo-icon.png" alt="MoMo" height="20" style="vertical-align: middle; margin-right: 5px; border-radius: 4px;"> @* <<< Thêm logo MoMo (điều chỉnh đường dẫn nếu cần) *@
                                                                 Thanh toán ngay bằng MoMo
@@ -158,7 +151,7 @@
                                                     }
                                                     else if (booking.Status != null && booking.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase))
                                                     {
-                                                        <a asp-controller="Rating" asp-action="CreateTourRating" asp-route-tourId="@booking.TourId" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-outline-primary" title="Đánh giá tour này">
+                                                        <a asp-controller="Rating" asp-action="CreateTourRating" asp-route-tourId="@booking.TourId" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-outline-warning" title="Đánh giá tour này">
                                                             <i class="fa-regular fa-star me-1"></i> Rate Tour
                                                         </a>
                                                     }

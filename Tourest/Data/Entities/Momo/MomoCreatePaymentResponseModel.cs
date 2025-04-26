@@ -2,17 +2,14 @@
 {
     public class MomoCreatePaymentResponseModel
     {
-        public string RequestId { get; set; }
-        public int ErrorCode { get; set; }
+        public string PartnerCode { get; set; }
         public string OrderId { get; set; }
-        public string Message { get; set; }
-        public string LocalMessage { get; set; }
-        public string RequestType { get; set; }
-        public string PayUrl { get; set; }
-        public string Signature { get; set; }
-        public string QrCodeUrl { get; set; }
-        public string Deeplink { get; set; }
-        public string DeeplinkWebInApp { get; set; }
-
+        public string RequestId { get; set; }
+        public long Amount { get; set; } // Kiểu long
+        public long ResponseTime { get; set; } // Kiểu long (Unix ms timestamp)
+        public string Message { get; set; } // Kiểu string
+        public int ResultCode { get; set; } // Kiểu int
+        public string PayUrl { get; set; } // Kiểu string
+                                           // Thêm các trường khác nếu MoMo trả về và bạn cần (deeplink, qrCodeUrl...)
     }
 }

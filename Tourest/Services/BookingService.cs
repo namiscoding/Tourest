@@ -50,7 +50,7 @@ namespace Tourest.Services
 
 
             // === TÍNH TOÁN DỮ LIỆU BIỂU ĐỒ ===
-            var completedStatuses = new[] { "Confirmed", "Completed" }; // Các trạng thái tính chi tiêu
+            var completedStatuses = new[] { "Paid", "Completed" }; // Các trạng thái tính chi tiêu
 
             // 4. Tính tổng chi tiêu (Confirmed/Completed)
             var totalSpent = filteredBookings // Tính trên danh sách đã lọc hoặc allUserBookings tùy yêu cầu
@@ -177,7 +177,7 @@ namespace Tourest.Services
                     // Kiểm tra sức chứa của nhóm hiện tại trước khi thêm khách mới
                     // Tính toán lại tổng số khách hiện tại trong nhóm cho chắc chắn (trừ các booking đã hủy)
                     int confirmedGuestsInGroup = await _context.Bookings
-                                          .Where(b => b.TourGroupID == tourGroup.TourGroupID && b.Status == "Confirmed") // Chỉ đếm "Confirmed"
+                                          .Where(b => b.TourGroupID == tourGroup.TourGroupID && b.Status == "Paid") // Chỉ đếm "Confirmed"
                                           .SumAsync(b => b.NumberOfAdults + b.NumberOfChildren);
 
                     int potentialTotalGuests = confirmedGuestsInGroup + totalNewGuests; // Tổng tiềm năng nếu thêm khách mới

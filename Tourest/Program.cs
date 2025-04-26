@@ -21,8 +21,18 @@ namespace Tourest
 			var builder = WebApplication.CreateBuilder(args);
 
             // connect momo API
-            builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
+            builder.Services.Configure<Tourest.Services.Momo.MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
             builder.Services.AddScoped<IMomoService, MomoService>();
+
+            // In program.cs or Startup.cs, add debug-level logging for MoMo-related services
+            builder.Services.AddLogging(logging =>
+            {
+                logging.AddFilter("Tourest.Services.Momo", LogLevel.Debug);
+                logging.AddFilter("Tourest.Controllers.PaymentController", LogLevel.Debug);
+                // Add console for development environment
+                logging.AddConsole();
+                logging.AddDebug();
+            });
 
             // Lấy connection string từ appsettings.json
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
