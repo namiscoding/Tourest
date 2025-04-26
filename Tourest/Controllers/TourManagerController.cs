@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Tourest.Data;
+using Tourest.Data.Entities;
 using Tourest.Services;
 using Tourest.ViewModels.Tour;
 
@@ -63,5 +64,40 @@ namespace Tourest.Controllers
             var tours = _tourManagerService.GetAllTours();
             return View(tours);
         }
+
+       
+       public async Task<IActionResult> GetUnassignedBookings()
+{
+    try
+    {
+       
+        var unassignedBookings = await _context.Bookings
+            .Where(b => b.TourGroupID != null)
+            .Include(b => b.Tour)
+            .Include(b => b.Customer)
+            .Join(_context.TourGroups,
+                booking => booking.TourGroupID,
+                tourGroup => tourGroup.TourGroupID,
+                (booking, tourGroup) => new { Booking = booking, TourGroup = tourGroup })
+            .Where(joined => joined.TourGroup.AssignedTourGuideID == null)
+            .Select(joined => joined.Booking)
+            .AsNoTracking()
+            .ToListAsync();
+
+       
+        Console.WriteLine($"Found {unassignedBookings.Count} unassigned bookings");
+        
+        
+        return View("UnassignedBookings", unassignedBookings ?? new List<Booking>());
+    }
+    catch (Exception ex)
+    {
+       
+        Console.WriteLine($"Error in GetUnassignedBookings: {ex}");
+        
+        
+        return StatusCode(500, "An error occurred while processing your request.");
+    }
+}
     }
 }

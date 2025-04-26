@@ -1,0 +1,653 @@
+﻿@model List<Tourest.TourGuide.ViewModels.TourGuideRatingViewModel>
+
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="My Completed Tours - View all tours you've guided with Touest." />
+    <meta name="keywords" content="Tour Guide, Completed Tours, Tour History, Tour Management" />
+    <meta name="author" content="wprealizer" />
+    <title>My Completed Tours - Touest</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="assets/images/favicon.png" type="image/x-icon" />
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="assets/css/plugins.css" />
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Roboto', 'Arial', sans-serif;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+            padding: 2rem 0;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .tours-section {
+            padding: 2rem 0;
+        }
+
+        .tours-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stats-summary {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #28a745;
+        }
+
+            .stat-card h3 {
+                font-size: 1rem;
+                color: #6c757d;
+                margin-bottom: 0.5rem;
+            }
+
+            .stat-card .value {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: #2c3e50;
+            }
+
+            .stat-card .change {
+                font-size: 0.8rem;
+                color: #28a745;
+                margin-top: 0.25rem;
+            }
+
+                .stat-card .change.negative {
+                    color: #dc3545;
+                }
+
+        .tours-list {
+            margin-top: 1.5rem;
+        }
+
+        .tour-card {
+            display: flex;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid #28a745;
+        }
+
+            .tour-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            }
+
+        .tour-image {
+            width: 200px;
+            height: 150px;
+            border-radius: 6px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .tour-content {
+            flex: 1;
+        }
+
+        .tour-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .tour-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .tour-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            margin-left: 1rem;
+        }
+
+        .tour-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+            .tour-meta span {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+        .tour-description {
+            color: #495057;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .tour-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tour-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        .rating-count {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .tour-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+            .btn-primary:hover {
+                background-color: #218838;
+            }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #28a745;
+            color: #28a745;
+        }
+
+            .btn-outline:hover {
+                background-color: #f8f9fa;
+            }
+
+        .btn-sm {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .badge-pending-review {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-accepted {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .no-tours {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            gap: 0.5rem;
+        }
+
+        .page-item {
+            list-style: none;
+        }
+
+        .page-link {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #dee2e6;
+            color: #28a745;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+            .page-link:hover {
+                background-color: #f1f8ff;
+            }
+
+        .page-item.active .page-link {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        /* Rating Distribution Styles */
+        .rating-distribution {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .rating-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rating-label {
+            width: 70px;
+            font-weight: 500;
+        }
+
+        .rating-bar-bg {
+            flex-grow: 1;
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .rating-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        }
+
+        .rating-count {
+            width: 40px;
+            text-align: right;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        /* Responsive Adjustments */
+        
+
+        .tour-image {
+            width: 100%;
+            height: 180px;
+        }
+
+        .tour-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .tour-date {
+            margin-left: 0;
+        }
+
+        .tour-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .tour-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .tour-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+
+        .rating-distribution {
+            width: 100%;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loading-container">
+            <div class="loading"></div>
+            <div id="loading-icon">
+                <img alt="logo-sm" src="assets/images/logo.svg" width="90" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <a href="#" id="scroll-top" class="back-to-top-btn">
+        <i class="fa-solid fa-arrow-up"></i>
+    </a>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="mb-2"><i class="fas fa-clipboard-check me-2"></i> My Completed Tours</h1>
+                        <p class="mb-0">View all tours you've guided and manage your history</p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <div class="d-inline-flex align-items-center bg-white p-2 rounded">
+                            <img src="https://via.placeholder.com/40" alt="User" class="rounded-circle me-2" width="40" height="40">
+                            <div>
+                                <p class="mb-0 text-dark fw-bold">Tour Guide</p>
+                                <small class="text-muted">Online</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tours Section -->
+        <section class="tours-section section-padding-top-bottom">
+            <div class="container">
+                <div class="tours-container">
+                    <!-- Filter Bar -->
+                    <div class="filter-bar">
+                        <h2 class="mb-0"><i class="fas fa-history me-2"></i>Tour History</h2>
+                        <div class="d-flex gap-2">
+                            <select class="form-select" id="time-filter">
+                                <option value="all">All Time</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                                <option value="last-month">Last Month</option>
+                            </select>
+                            <select class="form-select" id="status-filter">
+                                <option value="all">All Status</option>
+                                <option value="completed">Completed</option>
+                                <option value="pending-review">Pending Review</option>
+                                <option value="cancelled">Cancelled</option>
+                                <option value="accepted">Accepted</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Stats Summary -->
+                    <div class="stats-summary">
+                        <div class="stat-card">
+                            <h3>Total Tours Guided</h3>
+                            <div class="value">@Model?.Count</div>
+                            <div class="change">+@((Model?.Count * 0.12))% from last month</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Average Rating</h3>
+                            <div class="value">@( Model.Average(t => t.AverageRating).ToString("0.0") ) <small>/5</small></div>
+                            <div class="change">+0.1 from last month</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total Participants</h3>
+                            <div class="value">@(Model?.Sum(t => t.TotalPeople).ToString("N0"))</div>
+                            <div class="change">+18% from last month</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Earnings</h3>
+                            <div class="value">$@(Model?.Sum(t => t.TotalPeople * 150).ToString("N0"))</div>
+                            <div class="change negative">-5% from last month</div>
+                        </div>
+                    </div>
+
+                    <!-- Tours List -->
+                    <div class="tours-list">
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var tour in Model)
+                            {
+                                <!-- Default image if tour.ImageUrl is null or invalid -->
+                                var defaultImage = "https://via.placeholder.com/200x150?text=No+Image"; // Reliable fallback
+                                var imageUrl = !string.IsNullOrWhiteSpace(tour.ImageUrl) ? tour.ImageUrl : defaultImage;
+
+                                <div class="tour-card animate__animated animate__fadeInUp">
+                                   
+                                    <div class="tour-content">
+                                        <div class="tour-header">
+                                            <h3 class="tour-title">@tour.TourName</h3>
+                                            <span class="tour-date">Completed: @tour.CompletedDate.ToString("MMMM d, yyyy")</span>
+                                        </div>
+                                        <div class="tour-meta">
+                                            <span><i class="fas fa-users"></i> @tour.TotalPeople participants (@tour.TotalAdults adults, @tour.TotalChildren children)</span>
+                                            <span><i class="fas fa-map-marker-alt"></i> @tour.Destination - @tour.PickupPoint</span>
+                                            <span><i class="fas fa-calendar-alt"></i> @tour.DepartureDate.ToString("MMMM d, yyyy")</span>
+                                            <span class="status-badge @($"badge-{tour.Status.ToLower().Replace(" ", "-")}")">@tour.Status</span>
+                                        </div>
+                                        <p class="tour-description">
+                                            @tour.Description
+                                        </p>
+
+                                        <!-- Enhanced Rating Section -->
+                                        <div class="tour-footer">
+                                            <div>
+                                                <div class="tour-rating">
+                                                    <div class="rating-stars" title="Average rating: @tour.AverageRating.ToString("0.0")">
+                                                        @{
+                                                            var fullStars = (int)Math.Floor(tour.AverageRating);
+                                                            var hasHalfStar = tour.AverageRating - fullStars >= 0.5m;
+                                                            var emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                                                        }
+                                                        @for (int i = 0; i < fullStars; i++)
+                                                        {
+                                                            <i class="fas fa-star"></i>
+                                                        }
+                                                        @if (hasHalfStar)
+                                                        {
+                                                            <i class="fas fa-star-half-alt"></i>
+                                                        }
+                                                        @for (int i = 0; i < emptyStars; i++)
+                                                        {
+                                                            <i class="far fa-star"></i>
+                                                        }
+                                                    </div>
+                                                    <span class="rating-count">@tour.TotalRatings review@(tour.TotalRatings != 1 ? "s" : "")</span>
+                                                </div>
+
+                                                <!-- Rating Distribution -->
+                                                @if (tour.RatingDistribution != null)
+                                                {
+                                                    <div class="rating-distribution">
+                                                        @for (int i = 5; i >= 1; i--)
+                                                        {
+                                                            var count = i switch
+                                                            {
+                                                                5 => tour.RatingDistribution.FiveStar,
+                                                                4 => tour.RatingDistribution.FourStar,
+                                                                3 => tour.RatingDistribution.ThreeStar,
+                                                                2 => tour.RatingDistribution.TwoStar,
+                                                                _ => tour.RatingDistribution.OneStar
+                                                            };
+                                                            var percentage = tour.TotalRatings > 0 ? (count * 100.0 / tour.TotalRatings) : 0;
+                                                            <div class="rating-bar-container">
+                                                                <span class="rating-label">@i <i class="fas fa-star"></i></span>
+                                                                <div class="rating-bar-bg">
+                                                                    <div class="rating-bar-fill" style="width: @percentage%"></div>
+                                                                </div>
+                                                                <span class="rating-count">@count</span>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="tour-actions">
+                                                <button class="btn btn-outline btn-sm">View Details</button>
+                                                <a href="@Url.Action("TourFeedback", "TourGuide", new { tourGuideId = tour.TourGuideId, tourGroupId = tour.AssignmentId })"
+                                                   class="btn btn-primary btn-sm">
+                                                    See Feedback (@tour.Ratings?.Count)
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="no-tours">
+                                <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                                <h4>No Completed Tours Found</h4>
+                                <p>Your completed tours will appear here once available.</p>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Tours pagination">
+                        <ul class="pagination">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- JS Files -->
+    <script src="assets/js/jquery-3.7.1.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/main.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Filter tours by time period and status
+            $('#time-filter, #status-filter').on('change', function () {
+                const timeFilter = $('#time-filter').val();
+                const statusFilter = $('#status-filter').val();
+
+                $('.no-tours-filtered').remove();
+
+                $('.tour-card').each(function () {
+                    const cardStatus = $(this).find('.status-badge').text().toLowerCase().replace(' ', '-');
+                    const cardDateText = $(this).find('.tour-date').text().replace('Completed: ', '');
+                    const cardDate = new Date(cardDateText);
+                    const now = new Date();
+
+                    let timeMatch = true;
+                    if (timeFilter !== 'all') {
+                        const monthAgo = new Date();
+                        monthAgo.setMonth(monthAgo.getMonth() - 1);
+
+                        if (timeFilter === 'month' && cardDate.getMonth() !== now.getMonth()) {
+                            timeMatch = false;
+                        } else if (timeFilter === 'year' && cardDate.getFullYear() !== now.getFullYear()) {
+                            timeMatch = false;
+                        } else if (timeFilter === 'last-month' && (cardDate < monthAgo || cardDate > now)) {
+                            timeMatch = false;
+                        }
+                    }
+
+                    let statusMatch = statusFilter === 'all' || cardStatus === statusFilter.toLowerCase();
+
+                    $(this).toggle(timeMatch && statusMatch);
+                });
+
+                if ($('.tour-card:visible').length === 0) {
+                    $('.tours-list').append(`
+                        <div class="no-tours-filtered">
+                            <i class="fas fa-filter fa-3x mb-3"></i>
+                            <h4>No Tours Match Your Filters</h4>
+                            <p>Try adjusting your filter criteria.</p>
+                        </div>
+                    `);
+                }
+            });
+
+            // Click handler for tour cards
+            $('.tour-card').on('click', function (e) {
+                if (!$(e.target).closest('.btn').length) {
+                    const tourId = $(this).find('.btn-primary').attr('href').split('=')[2];
+                    window.location.href = '@Url.Action("TourDetails", "TourGuide")' + '?id=' + tourId;
+                }
+            });
+
+            // Prevent feedback button click from triggering card click
+            $('.btn-primary').on('click', function (e) {
+                e.stopPropagation();
+            });
+        });
+    </script>
+</body>
+</html>

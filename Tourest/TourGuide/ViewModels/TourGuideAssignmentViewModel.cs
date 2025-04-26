@@ -16,6 +16,7 @@ namespace Tourest.TourGuide.ViewModels
         public DateTime AssignmentDate { get; set; }
         public List<Rating> TourRating { get; set; }
         public double TourGuideRating { get; set; }
+        public double Destination {  get; set; }
         
     }
 }
