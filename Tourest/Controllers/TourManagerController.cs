@@ -272,5 +272,65 @@ namespace Tourest.Controllers
             var match = Regex.Match(experience, @"\d+");
             return match.Success ? int.Parse(match.Value) : 0;
         }
+        [HttpGet("GetRejectedAssignedTours")]
+        public async Task<IActionResult> GetRejectedAssignedTours()
+        {
+            try
+            {
+                var rejectedTours = await _context.TourGroups
+                    .Where(tg => tg.AssignedTourGuideID != null) // Ensure the tour has been assigned
+                    .Join(_context.TourGuideAssignments,
+                        tg => tg.TourGroupID,
+                        tga => tga.TourGroupID,
+                        (tg, tga) => new { TourGroup = tg, TourGuideAssignment = tga })
+                    .Where(joined => joined.TourGuideAssignment.Status == "Rejected") // Filter for rejected assignments
+                    .Join(_context.Tours,
+                        joined => joined.TourGroup.TourID,
+                        tour => tour.TourID,
+                        (joined, tour) => new { joined.TourGroup, joined.TourGuideAssignment, Tour = tour })
+                    .Join(_context.TourGuides,
+                        joined => joined.TourGroup.AssignedTourGuideID,
+                        tg => tg.TourGuideUserID,
+                        (joined, tourGuide) => new { joined.TourGroup, joined.TourGuideAssignment, joined.Tour, TourGuide = tourGuide })
+                    .Join(_context.Users,
+                        joined => joined.TourGuide.TourGuideUserID,
+                        user => user.UserID,
+                        (joined, user) => new { joined.TourGroup, joined.TourGuideAssignment, joined.Tour, TourGuideName = user.FullName })
+                    .Select(x => new RejectedAssignedTourViewModel
+                    {
+                        TourGroupId = x.TourGroup.TourGroupID,
+                        TourId = x.TourGroup.TourID,
+                        TourName = x.Tour.Name,
+                        AssignedTourGuideId = x.TourGroup.AssignedTourGuideID ?? 0,
+                        TourGuideName = x.TourGuideName ?? "Unknown",
+                        DepartureDate = x.TourGroup.DepartureDate,
+                        Status = x.TourGuideAssignment.Status,
+                        RejectionReason = x.TourGuideAssignment.RejectionReason
+                    })
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                // Logging for debugging
+              
+                foreach (var tour in rejectedTours)
+                {
+                    Console.WriteLine($"TourGroupID: {tour.TourGroupId}, TourID: {tour.TourId}, TourName: {tour.TourName}");
+                    Console.WriteLine($"AssignedTourGuideID: {tour.AssignedTourGuideId}, TourGuideName: {tour.TourGuideName}");
+                    Console.WriteLine($"DepartureDate: {tour.DepartureDate}, Status: {tour.Status}, RejectionReason: {(tour.RejectionReason ?? "N/A")}");
+                }
+
+                return View("GetRejectedAssignedTours", rejectedTours);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetRejectedAssignedTours: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                }
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
     }
 }
