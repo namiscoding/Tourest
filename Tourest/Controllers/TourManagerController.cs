@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Tourest.Data;
@@ -8,6 +9,7 @@ using Tourest.ViewModels.Tour;
 
 namespace Tourest.Controllers
 {
+    [Authorize(Roles = "Admin,Manager")]
     public class TourManagerController : Controller
     {
         private readonly ITourManagerService _tourManagerService;
