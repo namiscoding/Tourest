@@ -12,6 +12,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 using Tourest.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Tourest.BackgroundServices;
 
 namespace Tourest
 {
@@ -147,6 +148,8 @@ namespace Tourest
             builder.Services.AddScoped<ITourRatingRepository, TourRatingRepository>();
             builder.Services.AddScoped<IRatingService, RatingService>();
 
+            builder.Services.AddScoped<IBookingProcessingService, BookingProcessingService>();
+            builder.Services.AddHostedService<BookingStatusUpdaterService>();
 
             builder.Services.AddControllersWithViews();
 

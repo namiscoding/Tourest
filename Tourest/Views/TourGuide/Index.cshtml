@@ -151,7 +151,7 @@
 </head>
 <body>
     <div class="container-fluid px-0">
-        <!-- Header -->
+        <!-- Header 
         <header class="bg-primary text-white py-4 mb-4 shadow">
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center">
@@ -166,7 +166,7 @@
                 </div>
             </div>
         </header>
-
+        -->
         <!-- Main Content -->
         <main class="container">
             <!-- Filter and Status -->
@@ -198,7 +198,7 @@
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
                                             <h5 class="card-title mb-2">
-                                                <i class="fas fa-map-marked-alt text-primary me-2"></i>
+                                                <i style="color: #039e9d;" class="fas fa-map-marked-alt me-2"></i>
                                                 @tour.TourName
                                                 <span class="status-badge badge-@tour.Status.ToLower() ms-2">
                                                     @switch (tour.Status.ToLower())
@@ -270,7 +270,7 @@
 
                                         <div class="action-buttons">
                                             <div class="d-flex flex-wrap">
-                                                <button class="btn btn-primary details-btn" data-assignment-id="@tour.AssignmentId">
+                                                <button style="background-color: #039e9d; color: white" class="btn details-btn" data-assignment-id="@tour.AssignmentId">
                                                     <i class="fas fa-info-circle me-1"></i> Details
                                                 </button>
                                                 @if (tour.Status.ToLower() == "pending" && DateTime.Now < tour.Deadline)
@@ -315,7 +315,7 @@
                             <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
                             <h3 class="h4 text-muted">No Tour Assignments</h3>
                             <p class="text-muted">You don't have any assigned tours at the moment.</p>
-                            <button class="btn btn-primary" id="refresh-btn">
+                            <button style="background-color: #039e9d; color: white" class="btn" id="refresh-btn">
                                 <i class="fas fa-sync-alt me-2"></i> Refresh
                             </button>
                         </div>
@@ -329,7 +329,7 @@
     <div class="modal fade" id="assignmentDetailsModal" tabindex="-1" aria-labelledby="assignmentDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
+                <div style="background-color: #039e9d; color: white" class="modal-header text-white">
                     <h5 class="modal-title" id="assignmentDetailsModalLabel">
                         <i class="fas fa-info-circle me-2"></i> Assignment Details
                     </h5>

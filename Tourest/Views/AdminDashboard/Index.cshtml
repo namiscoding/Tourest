@@ -1,0 +1,65 @@
+﻿@* File: Views/AdminDashboard/Index.cshtml (Hoặc trang Admin phù hợp) *@
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+@* Hiển thị thông báo thành công/lỗi từ TempData (nếu có) *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+<section class="admin-actions mt-4">
+    <h2>Công cụ quản trị</h2>
+    <div class="card mt-3">
+        <div class="card-header">
+            Cập nhật trạng thái Booking
+        </div>
+        <div class="card-body">
+            <p class="card-text">Nhấn nút dưới đây để chạy quy trình cập nhật trạng thái cho các booking có ngày khởi hành đã qua (từ Confirmed sang Completed, từ PendingPayment sang Cancelled).</p>
+            <p><small class="text-muted">Lưu ý: Tác vụ này thường chạy tự động mỗi ngày. Chỉ chạy thủ công khi cần kiểm tra hoặc xử lý gấp.</small></p>
+
+          
+            <form asp-action="TriggerBookingUpdate" asp-controller="AdminDashboard" method="post">
+                @* <<< Sửa lại asp-controller nếu cần *@
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-warning">
+                    <i class="fa-solid fa-arrows-rotate me-2"></i> Chạy cập nhật trạng thái Booking ngay
+                </button>
+            </form>
+            
+        </div>
+        <div class="card-footer text-muted">
+            Tác vụ này có thể mất vài giây để hoàn thành tùy thuộc vào số lượng booking.
+        </div>
+    </div>
+
+    @* Thêm các công cụ quản trị khác ở đây *@
+
+</section>
+
+@section Scripts {
+    @* Thêm script nếu cần, ví dụ: xác nhận trước khi chạy *@
+    <script>
+        // document.getElementById('triggerFormId').addEventListener('submit', function(e) {
+        //     if (!confirm('Bạn có chắc muốn chạy cập nhật trạng thái booking thủ công?')) {
+        //         e.preventDefault();
+        //     }
+        // });
+    </script>
+}
