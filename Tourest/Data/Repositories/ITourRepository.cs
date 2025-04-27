@@ -16,5 +16,15 @@ namespace Tourest.Data.Repositories
             int? maxPrice = null);
         Task<Tour?> GetByIdAsync(int id);
         Task<IEnumerable<string>> GetDistinctActiveDestinationsAsync();
+        Task<(IEnumerable<Tour> Tours, int TotalCount)> GetToursPagedAsync(int pageIndex, int pageSize, string? searchTerm, string? statusFilter);
+        Task<Tour?> GetTourDetailsByIdAsync(int tourId); 
+        Task<Tour?> GetTourForEditByIdAsync(int tourId);
+        Task<Tour> AddTourAsync(Tour tour); 
+        Task UpdateTourAsync(Tour tour); 
+        Task DeleteTourAsync(int tourId); 
+        Task UpdateTourCategoriesAsync(int tourId, List<int> selectedCategoryIds); 
+        Task UpdateItineraryAsync(int tourId, List<ItineraryDay> currentItinerary); 
+        Task<bool> IsTourInUseAsync(int tourId); 
+
     }
 }

@@ -10,6 +10,7 @@ namespace Tourest.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IPhotoService _photoService; 
         private readonly ILogger<UserService> _logger;
 
         // Role constants
@@ -18,8 +19,9 @@ namespace Tourest.Services
         private const string TOURGUIDE_ROLE = "TourGuide";
         private const string ADMIN_ROLE = "Admin";
 
-        public UserService(IUserRepository userRepository, ILogger<UserService> logger)
+        public UserService(IUserRepository userRepository, IPhotoService photoService, ILogger<UserService> logger)
         {
+            _photoService = photoService;
             _userRepository = userRepository;
             _logger = logger;
         }
@@ -37,7 +39,8 @@ namespace Tourest.Services
                 Email = u.Email,
                 PhoneNumber = u.PhoneNumber,
                 IsActive = u.IsActive,
-                RegistrationDate = u.RegistrationDate
+                RegistrationDate = u.RegistrationDate,
+                ProfilePictureUrl = u.ProfilePictureUrl
             }).ToList();
 
             // Tạo PaginatedList từ kết quả đã phân trang và tổng số bản ghi
@@ -64,7 +67,8 @@ namespace Tourest.Services
                 PhoneNumber = user.PhoneNumber,
                 IsActive = user.IsActive,
                 RegistrationDate = user.RegistrationDate,
-                Address = user.Address
+                Address = user.Address,
+                ProfilePictureUrl = user.ProfilePictureUrl
                 // Thêm các trường khác nếu cần
             };
         }
@@ -77,11 +81,11 @@ namespace Tourest.Services
             {
                 return (false, "Email đã tồn tại.");
             }
-            // Username thường dùng email, kiểm tra lại nếu có username riêng
-            // if (await _userRepository.CheckUsernameExistsAsync(model.Email)) // Dùng Email làm Username
-            // {
-            //     return (false, "Username (Email) đã tồn tại.");
-            // }
+            // Giả sử Username là Email
+            if (await _userRepository.CheckUsernameExistsAsync(model.Email))
+            {
+                return (false, "Username đã tồn tại.");
+            }
 
             // 2. Hash password (Install BCrypt.Net-Next package)
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
@@ -94,7 +98,8 @@ namespace Tourest.Services
                 PhoneNumber = model.PhoneNumber,
                 Address = model.Address,
                 IsActive = model.IsActive,
-                RegistrationDate = DateTime.UtcNow // Hoặc để DB tự tạo Default
+                RegistrationDate = DateTime.UtcNow,
+                ProfilePictureUrl = null
             };
 
             // 4. Create Account entity
@@ -112,13 +117,13 @@ namespace Tourest.Services
             if (repoSuccess && createdUser != null)
             {
                 _logger.LogInformation("Customer created successfully by admin. UserID: {UserId}", createdUser.UserID);
-                return (true, string.Empty);
             }
             else
             {
                 _logger.LogError("Failed to create customer by admin in repository. Email: {Email}", model.Email);
                 return (false, "Đã có lỗi xảy ra trong quá trình tạo tài khoản.");
             }
+
             // --- 6. Xử lý Upload Ảnh (SAU KHI USER ĐƯỢC TẠO) ---
             string? finalPublicId = null; // PublicId của ảnh sẽ được lưu
             if (model.ProfilePictureFile != null && model.ProfilePictureFile.Length > 0)
@@ -170,7 +175,7 @@ namespace Tourest.Services
             _logger.LogInformation("Getting customer for edit. UserID: {UserId}", userId);
             var user = await _userRepository.GetUserWithAccountByIdAsync(userId);
 
-            if (user?.Account?.Role != "Customer")
+            if (user?.Account?.Role != CUSTOMER_ROLE)
             {
                 _logger.LogWarning("User {UserId} not found or is not a customer for editing.", userId);
                 return null;
@@ -184,48 +189,87 @@ namespace Tourest.Services
                 Email = user.Email, // Cho phép sửa Email cần kiểm tra unique lại trong Update
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
-                IsActive = user.IsActive
+                IsActive = user.IsActive,
+                ProfilePictureUrl = user.ProfilePictureUrl
             };
         }
 
         public async Task<(bool Success, string ErrorMessage)> UpdateCustomerByAdminAsync(EditCustomerViewModel model)
         {
             _logger.LogInformation("Attempting to update customer by admin. UserID: {UserId}", model.UserId);
-            var user = await _userRepository.GetUserWithAccountByIdAsync(model.UserId);
+            // 1. Lấy User và Account hiện tại từ DB
+            var userToUpdate = await _userRepository.GetUserWithAccountByIdAsync(model.UserId);
 
-            if (user?.Account?.Role != "Customer")
+            if (userToUpdate?.Account?.Role != CUSTOMER_ROLE)
             {
                 return (false, "Không tìm thấy khách hàng hoặc người dùng không phải khách hàng.");
             }
 
-            // Kiểm tra unique Email nếu nó bị thay đổi
-            if (user.Email.ToLower() != model.Email.ToLower())
+            // 2. Kiểm tra unique Email/Username nếu bị thay đổi
+            string oldEmail = userToUpdate.Email;
+            string oldUsername = userToUpdate.Account.Username;
+            bool emailChanged = oldEmail.ToLower() != model.Email.ToLower();
+            bool usernameChanged = oldUsername.ToLower() != model.Email.ToLower(); // Giả sử username = email
+
+            if (emailChanged && await _userRepository.CheckEmailExistsAsync(model.Email, model.UserId))
             {
-                if (await _userRepository.CheckEmailExistsAsync(model.Email, model.UserId))
+                return (false, "Email mới đã tồn tại.");
+            }
+            if (usernameChanged && await _userRepository.CheckUsernameExistsAsync(model.Email, model.UserId))
+            {
+                return (false, "Username (Email) mới đã tồn tại.");
+            }
+
+            // 3. Xử lý Upload/Delete Ảnh
+            string? oldPublicId = userToUpdate.ProfilePictureUrl;
+            string? newPublicId = oldPublicId; // Giữ lại ID cũ nếu không có ảnh mới
+
+            if (model.ProfilePictureFile != null && model.ProfilePictureFile.Length > 0)
+            {
+                _logger.LogInformation("Processing new profile picture for UserID: {UserId}", model.UserId);
+                // Tạo PublicId mới gợi ý
+                string desiredPublicId = $"users/{model.UserId}/profile_{DateTime.UtcNow.Ticks}";
+                var uploadResult = await _photoService.UploadPhotoAsync(model.ProfilePictureFile, "users", desiredPublicId);
+
+                if (uploadResult.Success && !string.IsNullOrEmpty(uploadResult.PublicId))
                 {
-                    return (false, "Email mới đã tồn tại.");
+                    newPublicId = uploadResult.PublicId; // Cập nhật PublicId mới
+                    _logger.LogInformation("New photo uploaded. PublicId: {PublicId}", newPublicId);
+
+                    // Xóa ảnh cũ trên Cloudinary nếu upload mới thành công và có ảnh cũ
+                    if (!string.IsNullOrWhiteSpace(oldPublicId))
+                    {
+                        _logger.LogInformation("Deleting old photo with PublicId: {PublicId}", oldPublicId);
+                        // Không cần chặn luồng nếu xóa lỗi, chỉ cần ghi log
+                        var deleteSuccess = await _photoService.DeletePhotoAsync(oldPublicId);
+                        if (!deleteSuccess) _logger.LogWarning("Failed to delete old photo {PublicId} from Cloudinary.", oldPublicId);
+                    }
                 }
-                user.Email = model.Email;
-                // Nếu username = email, cũng cần cập nhật account.Username và kiểm tra unique username
-                if (user.Account != null && user.Account.Username.ToLower() != model.Email.ToLower())
+                else
                 {
-                    // if (await _userRepository.CheckUsernameExistsAsync(model.Email, model.UserId))
-                    // {
-                    //     return (false, "Username (Email) mới đã tồn tại.");
-                    // }
-                    user.Account.Username = model.Email; // Cập nhật Username
-                    await _userRepository.UpdateAccountAsync(user.Account); // Lưu thay đổi Account
+                    // Nếu upload lỗi, báo lỗi và không tiếp tục cập nhật
+                    _logger.LogWarning("Photo upload failed for UserID: {UserId}. Error: {Error}", model.UserId, uploadResult.ErrorMessage);
+                    return (false, $"Lỗi upload ảnh: {uploadResult.ErrorMessage}");
                 }
             }
 
-            // Cập nhật các trường User
-            user.FullName = model.FullName;
-            user.PhoneNumber = model.PhoneNumber;
-            user.Address = model.Address;
-            user.IsActive = model.IsActive;
+            // 4. Cập nhật thông tin trên Entity
+            userToUpdate.FullName = model.FullName;
+            userToUpdate.Email = model.Email; // Cập nhật Email mới
+            userToUpdate.PhoneNumber = model.PhoneNumber;
+            userToUpdate.Address = model.Address;
+            userToUpdate.IsActive = model.IsActive;
+            userToUpdate.ProfilePictureUrl = newPublicId; // Cập nhật PublicId ảnh (mới hoặc cũ)
 
-            // Lưu thay đổi User
-            bool updateSuccess = await _userRepository.UpdateUserAsync(user);
+            // Cập nhật Username trong Account nếu cần
+            if (usernameChanged && userToUpdate.Account != null)
+            {
+                userToUpdate.Account.Username = model.Email;
+                await _userRepository.UpdateAccountAsync(userToUpdate.Account); // Lưu Account riêng nếu cần
+            }
+
+            // 5. Gọi Repository để lưu thay đổi User
+            bool updateSuccess = await _userRepository.UpdateUserAsync(userToUpdate);
 
             if (updateSuccess)
             {
@@ -235,7 +279,13 @@ namespace Tourest.Services
             else
             {
                 _logger.LogError("Failed to update customer {UserId} in repository.", model.UserId);
-                return (false, "Đã có lỗi xảy ra trong quá trình cập nhật.");
+                // Cố gắng xóa ảnh mới đã upload nếu việc lưu User thất bại? (Logic phức tạp hơn)
+                if (newPublicId != oldPublicId && !string.IsNullOrWhiteSpace(newPublicId))
+                {
+                    _logger.LogWarning("Rolling back photo upload by deleting new PublicId: {PublicId}", newPublicId);
+                    await _photoService.DeletePhotoAsync(newPublicId);
+                }
+                return (false, "Đã có lỗi xảy ra trong quá trình cập nhật thông tin người dùng.");
             }
         }
 
@@ -253,7 +303,8 @@ namespace Tourest.Services
                 Email = u.Email,
                 PhoneNumber = u.PhoneNumber,
                 IsActive = u.IsActive,
-                RegistrationDate = u.RegistrationDate
+                RegistrationDate = u.RegistrationDate,
+                ProfilePictureUrl = u.ProfilePictureUrl
                 // Thêm các trường khác nếu ViewModel có
             }).ToList();
 
@@ -284,6 +335,7 @@ namespace Tourest.Services
                 IsActive = user.IsActive,
                 RegistrationDate = user.RegistrationDate,
                 Address = user.Address,
+                ProfilePictureUrl = user.ProfilePictureUrl,
                 AssignmentsMade = new List<AssignmentInfoViewModel>() // Khởi tạo list
             };
 
@@ -329,7 +381,8 @@ namespace Tourest.Services
                 PhoneNumber = model.PhoneNumber,
                 Address = model.Address,
                 IsActive = model.IsActive,
-                RegistrationDate = DateTime.UtcNow
+                RegistrationDate = DateTime.UtcNow,
+                ProfilePictureUrl = null // Ban đầu null
             };
 
             var newAccount = new Account
@@ -337,21 +390,50 @@ namespace Tourest.Services
                 Username = model.Email, // Dùng Email làm Username
                 PasswordHash = hashedPassword,
                 Role = TOURMANAGER_ROLE // Gán vai trò TourManager
-                // UserID sẽ được gán trong Repository
             };
 
             var (repoSuccess, createdUser) = await _userRepository.AddUserAndAccountAsync(newUser, newAccount);
 
-            if (repoSuccess && createdUser != null)
+            if (!repoSuccess || createdUser == null)
             {
-                _logger.LogInformation("Tour Manager created successfully by admin. UserID: {UserId}", createdUser.UserID);
-                return (true, string.Empty);
-            }
-            else
-            {
-                _logger.LogError("Failed to create tour manager by admin in repository. Email: {Email}", model.Email);
+                _logger.LogError("Failed to create user/account for Tour Manager. Email: {Email}", model.Email);
                 return (false, "Đã có lỗi xảy ra trong quá trình tạo tài khoản.");
             }
+
+            _logger.LogInformation("User/Account created for Tour Manager UserID: {UserId}. Processing photo upload...", createdUser.UserID);
+            string? finalPublicId = null;
+            string photoUploadWarning = string.Empty;
+
+            // --- 6. Xử lý Upload Ảnh ---
+            if (model.ProfilePictureFile != null && model.ProfilePictureFile.Length > 0)
+            {
+                string desiredPublicId = $"users/{createdUser.UserID}/profile_{DateTime.UtcNow.Ticks}";
+                var uploadResult = await _photoService.UploadPhotoAsync(model.ProfilePictureFile, "users", desiredPublicId);
+
+                if (uploadResult.Success && !string.IsNullOrEmpty(uploadResult.PublicId))
+                {
+                    finalPublicId = uploadResult.PublicId;
+                    createdUser.ProfilePictureUrl = finalPublicId; // Gán PublicId
+                    bool updateSuccess = await _userRepository.UpdateUserAsync(createdUser); // Lưu lại User
+                    if (!updateSuccess)
+                    {
+                        photoUploadWarning = " Tạo tài khoản thành công nhưng lỗi khi lưu ảnh đại diện.";
+                        _logger.LogWarning("... failed to update user with PublicId for UserID: {UserId}", createdUser.UserID);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Photo uploaded and user updated successfully for UserID: {UserId}. PublicId: {PublicId}", createdUser.UserID, finalPublicId);
+                    }
+                }
+                else
+                {
+                    photoUploadWarning = $" Tạo tài khoản thành công nhưng lỗi upload ảnh: {uploadResult.ErrorMessage}";
+                    _logger.LogWarning("Photo upload failed for UserID: {UserId}. Error: {Error}", createdUser.UserID, uploadResult.ErrorMessage);
+                }
+            }
+            _logger.LogInformation("Tour Manager creation process complete for UserID: {UserId}", createdUser.UserID);
+            return (true, photoUploadWarning);
+            // --- Kết thúc Upload Ảnh ---
         }
 
         public async Task<EditTourManagerViewModel?> GetTourManagerForEditAsync(int userId)
@@ -373,7 +455,8 @@ namespace Tourest.Services
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
-                IsActive = user.IsActive
+                IsActive = user.IsActive,
+                ProfilePictureUrl = user.ProfilePictureUrl
             };
         }
 
@@ -404,11 +487,35 @@ namespace Tourest.Services
                 }
             }
 
+            // --- Logic xử lý Ảnh (Tương tự Customer Edit) ---
+            string? oldPublicId = user.ProfilePictureUrl;
+            string? newPublicId = oldPublicId;
+
+            if (model.ProfilePictureFile != null && model.ProfilePictureFile.Length > 0)
+            {
+                string desiredPublicId = $"users/{model.UserId}/profile_{DateTime.UtcNow.Ticks}";
+                var uploadResult = await _photoService.UploadPhotoAsync(model.ProfilePictureFile, "users", desiredPublicId);
+
+                if (uploadResult.Success && !string.IsNullOrEmpty(uploadResult.PublicId))
+                {
+                    newPublicId = uploadResult.PublicId;
+                    if (!string.IsNullOrWhiteSpace(oldPublicId))
+                    {
+                        await _photoService.DeletePhotoAsync(oldPublicId); // Xóa ảnh cũ
+                    }
+                }
+                else
+                {
+                    return (false, $"Lỗi upload ảnh: {uploadResult.ErrorMessage}");
+                }
+            }
+            // --- Kết thúc xử lý Ảnh ---
             // Cập nhật các trường User
             user.FullName = model.FullName;
             user.PhoneNumber = model.PhoneNumber;
             user.Address = model.Address;
             user.IsActive = model.IsActive;
+            user.ProfilePictureUrl = newPublicId;
 
             bool updateSuccess = await _userRepository.UpdateUserAsync(user);
 
@@ -438,6 +545,7 @@ namespace Tourest.Services
                 Email = u.Email,
                 PhoneNumber = u.PhoneNumber,
                 IsActive = u.IsActive,
+                ProfilePictureUrl = u.ProfilePictureUrl,
                 ExperienceLevel = u.TourGuide?.ExperienceLevel, // Lấy từ profile
                 AverageRating = u.TourGuide?.AverageRating // Lấy từ profile
             }).ToList();
@@ -471,6 +579,7 @@ namespace Tourest.Services
                 IsActive = user.IsActive,
                 RegistrationDate = user.RegistrationDate,
                 Address = user.Address,
+                ProfilePictureUrl = user.ProfilePictureUrl,
                 // Profile info
                 ExperienceLevel = user.TourGuide.ExperienceLevel,
                 LanguagesSpoken = user.TourGuide.LanguagesSpoken,
@@ -510,9 +619,9 @@ namespace Tourest.Services
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
 
             // Create User
-            var newUser = new User { /* ... gán từ model ... */ FullName = model.FullName, Email = model.Email, PhoneNumber = model.PhoneNumber, Address = model.Address, IsActive = model.IsActive };
+            var newUser = new User { FullName = model.FullName, Email = model.Email, PhoneNumber = model.PhoneNumber, Address = model.Address, IsActive = model.IsActive };
             // Create Account
-            var newAccount = new Account { /* ... gán từ model ... */ Username = model.Email, PasswordHash = hashedPassword, Role = TOURGUIDE_ROLE };
+            var newAccount = new Account { Username = model.Email, PasswordHash = hashedPassword, Role = TOURGUIDE_ROLE };
             // Create TourGuide Profile
             var newGuideProfile = new Tourest.Data.Entities.TourGuide
             {
@@ -523,19 +632,43 @@ namespace Tourest.Services
                 // AverageRating sẽ tự tính hoặc null ban đầu
             };
 
-            // Call Repo to add all three in transaction
+            // 6. Call Repo to add all three in transaction
             var (repoSuccess, createdUser) = await _userRepository.AddUserAccountAndGuideProfileAsync(newUser, newAccount, newGuideProfile);
 
-            if (repoSuccess && createdUser != null)
+            if (!repoSuccess || createdUser == null)
             {
-                _logger.LogInformation("Tour Guide created successfully by admin. UserID: {UserId}", createdUser.UserID);
-                return (true, string.Empty);
-            }
-            else
-            {
-                _logger.LogError("Failed to create tour guide by admin in repository. Email: {Email}", model.Email);
+                _logger.LogError("Failed to create user/account/profile for Tour Guide. Email: {Email}", model.Email);
                 return (false, "Đã có lỗi xảy ra trong quá trình tạo tài khoản.");
             }
+
+            _logger.LogInformation("User/Account/Profile created for Tour Guide UserID: {UserId}. Processing photo upload...", createdUser.UserID);
+            string? finalPublicId = null;
+            string photoUploadWarning = string.Empty;
+
+            // --- 7. Xử lý Upload Ảnh ---
+            if (model.ProfilePictureFile != null && model.ProfilePictureFile.Length > 0)
+            {
+                string desiredPublicId = $"users/{createdUser.UserID}/profile_{DateTime.UtcNow.Ticks}";
+                var uploadResult = await _photoService.UploadPhotoAsync(model.ProfilePictureFile, "users", desiredPublicId);
+
+                if (uploadResult.Success && !string.IsNullOrEmpty(uploadResult.PublicId))
+                {
+                    finalPublicId = uploadResult.PublicId;
+                    createdUser.ProfilePictureUrl = finalPublicId; // Gán PublicId
+                    bool updateSuccess = await _userRepository.UpdateUserAsync(createdUser); // Lưu lại User
+                    if (!updateSuccess) { photoUploadWarning = " Tạo tài khoản thành công nhưng lỗi khi lưu ảnh đại diện."; _logger.LogWarning("... failed to update user with PublicId for UserID: {UserId}", createdUser.UserID); }
+                    else { _logger.LogInformation("Photo uploaded and user updated successfully for UserID: {UserId}. PublicId: {PublicId}", createdUser.UserID, finalPublicId); }
+                }
+                else
+                {
+                    photoUploadWarning = $" Tạo tài khoản thành công nhưng lỗi upload ảnh: {uploadResult.ErrorMessage}";
+                    _logger.LogWarning("Photo upload failed for UserID: {UserId}. Error: {Error}", createdUser.UserID, uploadResult.ErrorMessage);
+                }
+            }
+            // --- Kết thúc Upload Ảnh ---
+
+            _logger.LogInformation("Tour Guide creation process complete for UserID: {UserId}", createdUser.UserID);
+            return (true, photoUploadWarning);
         }
 
         public async Task<EditTourGuideViewModel?> GetTourGuideForEditAsync(int userId)
@@ -558,6 +691,7 @@ namespace Tourest.Services
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
                 IsActive = user.IsActive,
+                ProfilePictureUrl = user.ProfilePictureUrl,
                 // Profile fields
                 ExperienceLevel = user.TourGuide.ExperienceLevel,
                 LanguagesSpoken = user.TourGuide.LanguagesSpoken,
@@ -592,12 +726,32 @@ namespace Tourest.Services
                     await _userRepository.UpdateAccountAsync(user.Account);
                 }
             }
+            // 3. Xử lý Upload/Delete Ảnh
+            string? oldPublicId = user.ProfilePictureUrl;
+            string? newPublicId = oldPublicId;
+
+            if (model.ProfilePictureFile != null && model.ProfilePictureFile.Length > 0)
+            {
+                string desiredPublicId = $"users/{model.UserId}/profile_{DateTime.UtcNow.Ticks}";
+                var uploadResult = await _photoService.UploadPhotoAsync(model.ProfilePictureFile, "users", desiredPublicId);
+                if (uploadResult.Success && !string.IsNullOrEmpty(uploadResult.PublicId))
+                {
+                    newPublicId = uploadResult.PublicId;
+                    if (!string.IsNullOrWhiteSpace(oldPublicId))
+                    {
+                        await _photoService.DeletePhotoAsync(oldPublicId); // Xóa ảnh cũ
+                    }
+                }
+                else { return (false, $"Lỗi upload ảnh: {uploadResult.ErrorMessage}"); }
+            }
+            // --- Kết thúc xử lý Ảnh ---
 
             // Update User fields
             user.FullName = model.FullName;
             user.PhoneNumber = model.PhoneNumber;
             user.Address = model.Address;
             user.IsActive = model.IsActive;
+            user.ProfilePictureUrl = newPublicId;
 
             // Update TourGuide profile fields
             user.TourGuide.ExperienceLevel = model.ExperienceLevel;

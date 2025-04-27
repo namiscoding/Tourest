@@ -23,5 +23,9 @@ namespace Tourest.ViewModels.Admin
 
         [Display(Name = "Is Active?")]
         public bool IsActive { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+
+        [Display(Name = "Ảnh đại diện mới (Chọn file nếu muốn thay đổi)")]
+        public IFormFile? ProfilePictureFile { get; set; } // Nhận file upload mới
     }
 }

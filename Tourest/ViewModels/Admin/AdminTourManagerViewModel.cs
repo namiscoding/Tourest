@@ -8,5 +8,6 @@
         public string? PhoneNumber { get; set; }
         public bool IsActive { get; set; }
         public DateTime RegistrationDate { get; set; }
+        public string? ProfilePictureUrl { get; set; }
     }
 }

@@ -1,10 +1,13 @@
 ﻿@* File: /Views/AdminTourGuides/Index.cshtml *@
 @model PaginatedList<AdminTourGuideViewModel>
-
+@using Tourest.Helpers 
+@inject IConfiguration Configuration
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Quản lý Hướng dẫn viên";
     string currentFilter = ViewData["CurrentFilter"] as string ?? "";
+    var cloudName = Configuration["CloudinarySettings:CloudName"];
+    var defaultAvatar = "assets/images/default-avatar.png";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -41,6 +44,7 @@
 <table class="table table-striped table-hover table-responsive-md">
     <thead>
         <tr>
+            <th>Ảnh</th>
             <th>ID</th>
             <th>Họ Tên</th>
             <th>Email</th>
@@ -55,6 +59,10 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>
+                    <img src="@CloudinaryHelper.GetThumbnailUrl(item.ProfilePictureUrl, 50, 50, cloudName, defaultAvatar)"]
+                         alt="Avatar của @item.FullName" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;" />
+                </td>
                 <td>@item.UserId</td>
                 <td>@Html.DisplayFor(modelItem => item.FullName)</td>
                 <td>@Html.DisplayFor(modelItem => item.Email)</td>

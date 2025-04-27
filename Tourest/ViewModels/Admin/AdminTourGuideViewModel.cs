@@ -9,5 +9,6 @@
         public bool IsActive { get; set; }
         public string? ExperienceLevel { get; set; }
         public decimal? AverageRating { get; set; }
+        public string? ProfilePictureUrl { get; set; }
     }
 }

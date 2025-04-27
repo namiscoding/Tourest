@@ -40,5 +40,9 @@ namespace Tourest.ViewModels.Admin
         [Display(Name = "Max Group Size Capacity")]
         [Range(1, 1000)]
         public int? MaxGroupSizeCapacity { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+
+        [Display(Name = "Ảnh đại diện mới (Chọn file nếu muốn thay đổi)")]
+        public IFormFile? ProfilePictureFile { get; set; } // Nhận file upload mới
     }
 }

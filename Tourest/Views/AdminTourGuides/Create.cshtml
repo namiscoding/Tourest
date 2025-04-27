@@ -11,7 +11,7 @@
 <div class="row">
     <div class="col-md-8">
         @* Form có thể dài hơn *@
-        <form asp-action="Create" method="post">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
             <h4>Thông tin Tài khoản</h4>
@@ -45,6 +45,11 @@
                     <label asp-for="Address" class="form-label"></label>
                     <textarea asp-for="Address" class="form-control" rows="2"></textarea>
                     <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label asp-for="ProfilePictureFile" class="form-label"></label>
+                    <input asp-for="ProfilePictureFile" type="file" class="form-control" accept="image/*" />
+                    <span asp-validation-for="ProfilePictureFile" class="text-danger"></span>
                 </div>
                 <div class="col-md-12 mb-3 form-check">
                     <input asp-for="IsActive" type="checkbox" class="form-check-input" />

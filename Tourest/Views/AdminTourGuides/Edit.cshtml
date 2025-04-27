@@ -1,9 +1,13 @@
 ﻿@* File: /Views/AdminTourGuides/Edit.cshtml *@
 @model EditTourGuideViewModel
+@using Tourest.Helpers
+@inject IConfiguration Configuration
 
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Chỉnh sửa Hướng dẫn viên";
+    var cloudName = Configuration["CloudinarySettings:CloudName"];
+    var defaultAvatar = "assets/images/default-avatar.png";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -11,11 +15,29 @@
 <hr />
 <div class="row">
     <div class="col-md-8">
-        <form asp-action="Edit" method="post">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
             <input type="hidden" asp-for="UserId" />
 
             <h4>Thông tin Tài khoản</h4>
+            @* Hiển thị ảnh đại diện hiện tại *@
+            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+            {
+                <div class="mb-3">
+                    <label class="form-label">Ảnh đại diện hiện tại:</label><br />
+                    <img src="@CloudinaryHelper.GetThumbnailUrl(Model.ProfilePictureUrl, 150, 150, cloudName, defaultAvatar)"
+                         alt="Current Profile Picture" class="img-thumbnail mb-2" style="max-width: 150px; max-height: 150px;" />
+                </div>
+            }
+
+            @* Input để upload ảnh mới *@
+            <div class="mb-3">
+                <label asp-for="ProfilePictureFile" class="form-label"></label>
+                <input asp-for="ProfilePictureFile" type="file" class="form-control" accept="image/*" />
+                <span asp-validation-for="ProfilePictureFile" class="text-danger"></span>
+            </div>
+
+            <hr />
             <div class="row g-3">
                 <div class="col-md-6 mb-3">
                     <label asp-for="FullName" class="form-label"></label>

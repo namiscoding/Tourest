@@ -1,124 +1,146 @@
-﻿@* File: /Views/AdminTourGuides/Details.cshtml *@
-@model AdminTourGuideDetailsViewModel
+﻿@model AdminTourGuideDetailsViewModel
+@using Tourest.Helpers
+@inject IConfiguration Configuration
 
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Chi tiết Hướng dẫn viên";
+    var cloudName = Configuration["CloudinarySettings:CloudName"];
+    var defaultAvatar = "/images/default-avatar.png"; // Ảnh mặc định
 }
 
 <h1>@ViewData["Title"]: @Model.FullName</h1>
 
-<div>
-    <h4>Thông tin cơ bản & liên hệ</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">ID</dt>
-        <dd class="col-sm-9">@Model.UserId</dd>
+<div class="row">
+    @* Cột ảnh đại diện *@
+    <div class="col-md-3 text-center mb-3">
+        <h4>Ảnh đại diện</h4>
+        <img src="@CloudinaryHelper.GetThumbnailUrl(Model.ProfilePictureUrl, 200, 200, cloudName, defaultAvatar)"
+             alt="Ảnh đại diện của @Model.FullName" class="img-thumbnail rounded-circle" style="width: 200px; height: 200px; object-fit: cover;" />
+        @if (string.IsNullOrEmpty(Model.ProfilePictureUrl))
+        {
+            <small class="text-muted d-block mt-2">(Chưa có ảnh)</small>
+        }
+    </div>
 
-        <dt class="col-sm-3">Họ Tên</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.FullName)</dd>
+    @* Cột thông tin *@
+    <div class="col-md-9">
+        <div>
+            <h4>Thông tin cơ bản & liên hệ</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-4">ID</dt> @* Tăng độ rộng cột dt *@
+                <dd class="col-sm-8">@Model.UserId</dd>
 
-        <dt class="col-sm-3">Email</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Email)</dd>
+                <dt class="col-sm-4">Họ Tên</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.FullName)</dd>
 
-        <dt class="col-sm-3">Số Điện Thoại</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.PhoneNumber)</dd>
+                <dt class="col-sm-4">Email</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Email)</dd>
 
-        <dt class="col-sm-3">Địa chỉ</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Address)</dd>
+                <dt class="col-sm-4">Số Điện Thoại</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.PhoneNumber)</dd>
 
-        <dt class="col-sm-3">Trạng thái</dt>
-        <dd class="col-sm-9">@(Model.IsActive ? "Hoạt động" : "Vô hiệu hóa")</dd>
+                <dt class="col-sm-4">Địa chỉ</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Address)</dd>
 
-        <dt class="col-sm-3">Ngày Đăng Ký</dt>
-        <dd class="col-sm-9">@Model.RegistrationDate.ToString("g")</dd>
-    </dl>
+                <dt class="col-sm-4">Trạng thái</dt>
+                <dd class="col-sm-8">@(Model.IsActive ? "Hoạt động" : "Vô hiệu hóa")</dd>
 
-    <h4>Thông tin Hồ sơ Hướng dẫn viên</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">Kinh nghiệm</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.ExperienceLevel)</dd>
+                <dt class="col-sm-4">Ngày Đăng Ký</dt>
+                <dd class="col-sm-8">@Model.RegistrationDate.ToString("g")</dd>
+            </dl>
+        </div>
 
-        <dt class="col-sm-3">Ngôn ngữ</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.LanguagesSpoken)</dd>
+        <div class="mt-3">
+            <h4>Thông tin Hồ sơ Hướng dẫn viên</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-4">Kinh nghiệm</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.ExperienceLevel)</dd>
 
-        <dt class="col-sm-3">Chuyên môn</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.Specializations)</dd>
+                <dt class="col-sm-4">Ngôn ngữ</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.LanguagesSpoken)</dd>
 
-        <dt class="col-sm-3">Sức chứa tối đa</dt>
-        <dd class="col-sm-9">@(Model.MaxCapacity.HasValue ? Model.MaxCapacity.Value.ToString() : "Không giới hạn")</dd>
+                <dt class="col-sm-4">Chuyên môn</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Specializations)</dd>
 
-        <dt class="col-sm-3">Rating Trung bình</dt>
-        <dd class="col-sm-9">@(Model.AverageRating.HasValue ? Model.AverageRating.Value.ToString("0.0") + "/5.0" : "Chưa có đánh giá")</dd>
-    </dl>
+                <dt class="col-sm-4">Sức chứa tối đa</dt>
+                <dd class="col-sm-8">@(Model.MaxCapacity.HasValue ? Model.MaxCapacity.Value.ToString() : "Không giới hạn")</dd>
 
-    <hr />
-
-    <h4>Các chuyến đi đã nhận</h4>
-    @if (Model.AssignmentsLed.Any())
-    {
-        <table class="table table-sm table-bordered table-striped mt-2">
-            <thead>
-                <tr>
-                    <th>ID Giao việc</th>
-                    <th>Tên Tour</th>
-                    <th>Ngày đi</th>
-                    <th>Trạng thái</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var assignment in Model.AssignmentsLed)
-                {
-                    <tr>
-                        <td>@assignment.AssignmentId</td>
-                        <td>@assignment.TourName</td>
-                        <td>@(assignment.DepartureDate?.ToString("dd/MM/yyyy") ?? "N/A")</td>
-                        <td>@assignment.AssignmentStatus</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>Hướng dẫn viên này chưa nhận chuyến đi nào.</p>
-    }
-
-    <hr />
-
-    <h4>Các đánh giá đã nhận</h4>
-    @if (Model.RatingsReceived.Any())
-    {
-        <table class="table table-sm table-bordered table-striped mt-2">
-            <thead>
-                <tr>
-                    <th>Khách hàng</th>
-                    <th>Điểm</th>
-                    <th>Bình luận</th>
-                    <th>Ngày ĐG</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var rating in Model.RatingsReceived)
-                {
-                    <tr>
-                        <td>@rating.CustomerName</td>
-                        <td>@rating.RatingValue.ToString("0.0")</td>
-                        <td>@rating.Comment</td>
-                        <td>@rating.RatingDate.ToString("g")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>Hướng dẫn viên này chưa nhận được đánh giá nào.</p>
-    }
-
-
+                <dt class="col-sm-4">Rating Trung bình</dt>
+                <dd class="col-sm-8">@(Model.AverageRating.HasValue ? Model.AverageRating.Value.ToString("0.0") + "/5.0" : "Chưa có đánh giá")</dd>
+            </dl>
+        </div>
+    </div>
 </div>
+
+
+<hr />
+
+<h4>Các chuyến đi đã nhận</h4>
+@if (Model.AssignmentsLed.Any())
+{
+    <table class="table table-sm table-bordered table-striped mt-2">
+        <thead>
+            <tr>
+                <th>ID Giao việc</th>
+                <th>Tên Tour</th>
+                <th>Ngày đi</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var assignment in Model.AssignmentsLed)
+            {
+                <tr>
+                    <td>@assignment.AssignmentId</td>
+                    <td>@assignment.TourName</td>
+                    <td>@(assignment.DepartureDate?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                    <td>@assignment.AssignmentStatus</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Hướng dẫn viên này chưa nhận chuyến đi nào.</p>
+}
+
+<hr />
+
+<h4>Các đánh giá đã nhận</h4>
+@if (Model.RatingsReceived.Any())
+{
+    <table class="table table-sm table-bordered table-striped mt-2">
+        <thead>
+            <tr>
+                <th>Khách hàng</th>
+                <th>Điểm</th>
+                <th>Bình luận</th>
+                <th>Ngày ĐG</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var rating in Model.RatingsReceived)
+            {
+                <tr>
+                    <td>@rating.CustomerName</td>
+                    <td>@rating.RatingValue.ToString("0.0")</td>
+                    <td>@rating.Comment</td>
+                    <td>@rating.RatingDate.ToString("g")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Hướng dẫn viên này chưa nhận được đánh giá nào.</p>
+}
+
+
 <div class="mt-4">
     <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary">Sửa thông tin</a> |
     <a asp-action="Index" class="btn btn-secondary">Quay lại Danh sách</a>

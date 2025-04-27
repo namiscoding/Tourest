@@ -17,7 +17,7 @@
         public string? Specializations { get; set; }
         public int? MaxCapacity { get; set; }
         public decimal? AverageRating { get; set; }
-
+            
         // Related Data
         public List<AssignmentLedViewModel> AssignmentsLed { get; set; } = new List<AssignmentLedViewModel>();
         public List<RatingReceivedViewModel> RatingsReceived { get; set; } = new List<RatingReceivedViewModel>();
