@@ -11,8 +11,15 @@ namespace Tourest.Services
             IEnumerable<int>? ratings = null,
             string? sortBy = null,
             int? minPrice = null, // THÊM
-            int? maxPrice = null);
+            int? maxPrice = null,
+             string? searchDestination = null,
+             string? searchCategoryName = null,
+             DateTime? searchDate = null,
+             int? searchGuests = null);
         Task<IEnumerable<string>> GetDestinationsForFilterAsync();
         Task<TourDetailsViewModel?> GetTourDetailsAsync(int id);
+        Task<int> GetActiveTourCountAsync();
+        Task<int> GetDistinctDestinationCountAsync();
+        Task<List<TourListViewModel>> GetFeaturedToursForDisplayAsync(int count);
     }
 }

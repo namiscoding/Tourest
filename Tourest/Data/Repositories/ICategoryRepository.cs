@@ -1,4 +1,5 @@
 ﻿using Tourest.Data.Entities;
+using Tourest.ViewModels.Category;
 
 namespace Tourest.Data.Repositories
 {
@@ -11,6 +12,7 @@ namespace Tourest.Data.Repositories
         Task UpdateAsync(Category category);
         Task DeleteAsync(int categoryId);
         Task<bool> IsInUseAsync(int categoryId); // Kiểm tra Category có đang được Tour nào sử dụng không
-
+        Task<Category?> GetByIdAsync(int id); Task<IEnumerable<CategoryViewModel>> GetAllForDisplayAsync(); // Giả sử đã có
+        Task<IEnumerable<CategoryStatViewModel>> GetCategoryStatisticsAsync(); // Lấy thống kê
     }
 }

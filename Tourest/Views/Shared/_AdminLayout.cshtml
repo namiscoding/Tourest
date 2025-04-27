@@ -31,7 +31,7 @@
         #sidebar {
             min-width: 250px;
             max-width: 250px;
-            background: #343a40; /* Dark background */
+            background: #039e9d; /* Dark background */
             color: #fff;
             transition: all 0.3s;
             min-height: 100vh; /* Make sidebar full height */
@@ -44,7 +44,7 @@
 
             #sidebar .sidebar-header {
                 padding: 20px;
-                background: #212529;
+                background: #039e9d;
             }
 
             #sidebar ul.components {
@@ -68,12 +68,12 @@
 
                 #sidebar ul li a:hover {
                     color: #fff;
-                    background: #495057; /* Slightly lighter dark on hover */
+                    background: #F5EEDD; /* Slightly lighter dark on hover */
                 }
 
             #sidebar ul li.active > a, a[aria-expanded="true"] {
                 color: #fff;
-                background: #007bff; /* Bootstrap primary color for active */
+                background: #077A7D; /* Bootstrap primary color for active */
             }
 
         #content {
@@ -115,7 +115,12 @@
     <div class="wrapper">
         <nav id="sidebar">
             <div class="sidebar-header">
-                <h3>Tourest Admin</h3>
+                <div className="flex items-center gap-2 p-4 bg-white shadow">
+                    <img src="/assets/images/logo-2.svg"
+                         alt="Tourest Logo"
+                         className="h-8 w-auto" />
+                    <h3 className="text-lg font-semibold text-gray-800">Tourest Admin</h3>
+                </div>
                 <strong>TA</strong> @* Chữ viết tắt khi thu gọn (nếu có chức năng thu gọn) *@
             </div>
 

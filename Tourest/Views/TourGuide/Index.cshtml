@@ -1,573 +1,449 @@
-﻿@model Tourest.TourGuide.ViewModels.TourGuideAssignmentViewModel;
-<!DOCTYPE html>
-<html lang="en" class="light">
-<head>
-    <!-- Basic Meta Tags -->
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+﻿@model IEnumerable<Tourest.TourGuide.ViewModels.TourGuideAssignmentViewModel>
+@{
+    ViewData["Title"] = "Tour Assignments";
+}
 
-    <!-- SEO Meta Tags -->
-    <meta name="description"
-          content="Tour Guide Notifications - View and manage your assigned tour group notifications with Touest." />
-    <meta name="keywords"
-          content="Tour Guide, Notifications, Travel Agency, Tour Management" />
-    <meta name="author" content="wprealizer" />
+<div class="container-fluid px-0">
+    <!-- Header -->
+    <header class="bg-primary text-white py-4 mb-4 shadow">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0"><i class="fas fa-tasks me-2"></i>Tour Assignments</h1>
+                    <p class="mb-0">Manage your assigned tour groups</p>
+                </div>
+                <div class="d-flex align-items-center">
+                    <img src="https://via.placeholder.com/40" alt="Tour Guide Profile" class="rounded-circle me-2" width="40" height="40">
+                    <span>Tour Guide</span>
+                </div>
+            </div>
+        </div>
+    </header>
 
-    <!-- Title -->
-    <title>Tour Guide Notifications - Touest</title>
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Filter and Status -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4 mb-0"><i class="fas fa-list-check me-2"></i>Current Assignments</h2>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-filter me-1"></i> Filter
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="all">All Assignments</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="pending">Pending</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="confirmed">Confirmed</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="rejected">Rejected</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="completed">Completed</a></li>
+                </ul>
+            </div>
+        </div>
 
-    <!-- Favicon -->
-    <link rel="icon" href="assets/images/favicon.png" type="image/x-icon" />
+        <!-- Assignments List -->
+        <div class="row">
+            <div class="col-12">
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var tour in Model)
+                    {
+                        <div class="card assignment-card mb-3 @tour.Status.ToLower()"
+                             id="assignment-@tour.AssignmentId"
+                             data-assignment-id="@tour.AssignmentId"
+                             data-status="@tour.Status.ToLower()"
+                             aria-label="Tour Assignment @tour.TourName">
+                            <div class="card-body">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start">
+                                    <div class="flex-grow-1 me-md-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <h5 class="card-title mb-0 me-2">
+                                                <i class="fas fa-map-marked-alt text-primary me-2"></i>
+                                                @tour.TourName
+                                            </h5>
+                                            <span class="badge badge-@tour.Status.ToLower() status-badge">
+                                                @Html.Raw(GetStatusIcon(tour.Status)) @tour.Status
+                                            </span>
+                                        </div>
 
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="assets/css/plugins.css" />
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+                                        <div class="card-text mb-3">
+                                            <small class="text-muted">
+                                                <i class="far fa-clock me-1"></i>
+                                                Assigned on @tour.AssignmentDate.ToString("MMM dd, yyyy 'at' hh:mm tt")
+                                            </small>
+                                        </div>
 
-    <!-- Custom CSS -->
-    <style>
-        .tour-guide__notifications {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-        }
+                                        <div class="assignment-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label"><i class="fas fa-calendar-day me-1"></i> Departure</span>
+                                                <span class="detail-value">@tour.DepartureDate.ToString("MMM dd, yyyy")</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label"><i class="fas fa-users me-1"></i> Group Size</span>
+                                                <span class="detail-value">@tour.TotalAdults Adults, @tour.TotalChildren Children</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label"><i class="fas fa-map-marker-alt me-1"></i> Pickup</span>
+                                                <span class="detail-value">@tour.PickupPoint</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label"><i class="fas fa-star me-1"></i> Rating</span>
+                                                <span class="detail-value">@Html.Raw(GetRatingStars(tour.TourRating))</span>
+                                            </div>
+                                        </div>
 
-        .dashboard-header {
-            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-            color: white;
-            padding: 2rem 0;
-            margin-bottom: 2rem;
-            border-radius: 0 0 10px 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
+                                        @if (tour.Status.ToLower() == "pending" && DateTime.Now < tour.Deadline)
+                                        {
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-hourglass-half me-1"></i>
+                                                    Response deadline: <span class="countdown-timer" id="countdown-@tour.AssignmentId" data-deadline="@tour.Deadline.ToString("o")"></span>
+                                                </small>
+                                            </div>
+                                        }
+                                    </div>
 
-        .notification__list {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+                                    <div class="action-buttons mt-3 mt-md-0">
+                                        <div class="d-flex flex-column gap-2">
+                                           
 
-        .notification__item {
-            background-color: #ffffff;
-            border-left: 4px solid #28a745;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
+                                            @if (tour.Status.ToLower() == "pending" && DateTime.Now < tour.Deadline)
+                                            {
+                                                <button class="btn btn-sm btn-success accept-btn"
+                                                        data-assignment-id="@tour.AssignmentId"
+                                                        aria-label="Accept assignment for @tour.TourName">
+                                                    <i class="fas fa-check me-1"></i> Accept
+                                                </button>
+                                                <button class="btn btn-sm btn-danger reject-btn"
+                                                        data-assignment-id="@tour.AssignmentId"
+                                                        aria-label="Reject assignment for @tour.TourName">
+                                                    <i class="fas fa-times me-1"></i> Reject
+                                                </button>
+                                            }
+                                            else if (tour.Status.ToLower() == "confirmed")
+                                            {
+                                                <button class="btn btn-sm btn-info complete-btn"
+                                                        data-assignment-id="@tour.AssignmentId"
+                                                        aria-label="Mark @tour.TourName as completed">
+                                                    <i class="fas fa-flag-checkered me-1"></i> Complete
+                                                </button>
+                                            }
+                                        </div>
 
-            .notification__item:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-            }
+                                        @if (tour.Status.ToLower() == "pending" && DateTime.Now < tour.Deadline)
+                                        {
+                                            <div class="reject-reason-container mt-2" id="reject-reason-@tour.AssignmentId" aria-hidden="true">
+                                                <div class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="reject-error-@tour.AssignmentId">
+                                                    Please provide a reason for rejection
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                </div>
+                                                <textarea class="form-control form-control-sm mb-2"
+                                                          placeholder="Reason for rejection..."
+                                                          rows="2"
+                                                          aria-label="Reason for rejecting @tour.TourName"></textarea>
+                                                <div class="d-flex justify-content-end gap-2">
+                                                    <button class="btn btn-sm btn-outline-secondary cancel-reject-btn"
+                                                            aria-label="Cancel rejection for @tour.TourName">
+                                                        Cancel
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger confirm-reject-btn"
+                                                            data-assignment-id="@tour.AssignmentId"
+                                                            aria-label="Submit rejection for @tour.TourName">
+                                                        Submit
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-5 bg-light rounded no-assignments">
+                        <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                        <h3 class="h4 text-muted">No Tour Assignments</h3>
+                        <p class="text-muted">You don't have any assigned tours at the moment.</p>
+                        <button class="btn btn-primary" id="refresh-btn" aria-label="Refresh assignments">
+                            <i class="fas fa-sync-alt me-2"></i> Refresh
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </main>
+</div>
 
-            .notification__item.pending {
-                border-left-color: #ffc107;
-            }
-
-            .notification__item.confirmed {
-                border-left-color: #28a745;
-            }
-
-            .notification__item.cancelled {
-                border-left-color: #dc3545;
-            }
-
-        .notification__content {
-            flex: 1;
-        }
-
-        .notification__title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-            .notification__title i {
-                margin-right: 0.5rem;
-                font-size: 1.2rem;
-            }
-
-        .notification__meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .meta-item {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-            .meta-item i {
-                margin-right: 0.3rem;
-                color: #28a745;
-            }
-
-        .notification__time {
-            font-size: 0.85rem;
-            color: #6c757d;
-            font-style: italic;
-        }
-
-        .notification__actions {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-            .btn i {
-                margin-right: 0.3rem;
-            }
-
-        .btn-details {
-            background-color: #28a745;
-            color: #fff;
-        }
-
-            .btn-details:hover {
-                background-color: #218838;
-                transform: translateY(-2px);
-            }
-
-        .btn-view {
-            background-color: #17a2b8;
-            color: #fff;
-        }
-
-            .btn-view:hover {
-                background-color: #138496;
-                transform: translateY(-2px);
-            }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-        }
-
-            .empty-state i {
-                font-size: 3rem;
-                color: #6c757d;
-                margin-bottom: 1rem;
-            }
-
-            .empty-state h3 {
-                color: #2c3e50;
-                margin-bottom: 0.5rem;
-            }
-
-            .empty-state p {
-                color: #6c757d;
-                margin-bottom: 1.5rem;
-            }
-
-        .status-badge {
-            padding: 0.25rem 0.5rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .badge-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .badge-confirmed {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .badge-cancelled {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .deadline-countdown-container {
-            font-size: 0.9rem;
-            color: #dc3545;
-            margin-top: 0.5rem;
-        }
-
-        /* Responsive Adjustments */
-       
-
-        {
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 1.2rem;
-        }
-
-        .notification__actions {
-            margin-top: 1rem;
-            width: 100%;
-            justify-content: flex-end;
-        }
-
-        .notification__meta {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        }
-    </style>
-</head>
-
-<body class="custom-cursor">
-    <!-- Custom Cursor -->
-    <div class="custom-cursor__cursor"></div>
-    <div class="custom-cursor__cursor-two"></div>
-
-    <!-- Preloader -->
-    <div id="preloader">
-        <div class="loading-container">
-            <div class="loading"></div>
-            <div id="loading-icon">
-                <img alt="logo-sm" src="assets/images/logo.svg" width="90" />
+<!-- Assignment Details Modal -->
+<div class="modal fade" id="assignmentDetailsModal" tabindex="-1" aria-labelledby="assignmentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="assignmentDetailsModalLabel">
+                    <i class="fas fa-info-circle me-2"></i> Assignment Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="assignmentDetailsContent">
+                <!-- Content loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Close
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Back to Top Button -->
-    <a href="#" id="scroll-top" class="back-to-top-btn">
-        <i class="fa-solid fa-arrow-up"></i>
-    </a>
-
-    <!-- Main Content -->
-    <main>
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h1 class="mb-2"><i class="fas fa-bell me-2"></i> Tour Assignments</h1>
-                        <p class="mb-0">View and manage your assigned tour groups</p>
-                    </div>
-                    <div class="col-md-4 text-md-end">
-                        <div class="d-inline-flex align-items-center bg-white p-2 rounded">
-                            <img src="https://via.placeholder.com/40" alt="User" class="rounded-circle me-2" width="40" height="40">
-                            <div>
-                                <p class="mb-0 text-dark fw-bold">Tour Guide</p>
-                                <small class="text-muted">Online</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="confirmationModalBody">
+                Are you sure you want to perform this action?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmAction">Confirm</button>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Tour Guide Notifications Section -->
-        <section class="tour-guide__notifications section-padding-top-bottom">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h2 class="mb-0"><i class="fas fa-list-check me-2"></i>Current Assignments</h2>
-                            <div class="dropdown">
-                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-filter me-1"></i> Filter
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-                                    <li><a class="dropdown-item" href="#">All Assignments</a></li>
-                                    <li><a class="dropdown-item" href="#">Pending</a></li>
-                                    <li><a class="dropdown-item" href="#">Confirmed</a></li>
-                                    <li><a class="dropdown-item" href="#">Cancelled</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<style>
+    .reject-reason-container {
+        display: none;
+    }
 
-                <!-- Notifications List -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="notification__list" id="notification-list">
-                            @{
-                                var assignedTours = ViewData["AssignedTours"] as List<Tourest.TourGuide.ViewModels.TourGuideAssignmentViewModel>;
-                            }
+    .badge-pending {
+        background-color: #ffc107;
+    }
 
-                            @if (assignedTours != null && assignedTours.Any())
-                            {
-                                foreach (var tour in assignedTours)
-                                {
-                                    <div class="notification__item @tour.Status.ToLower()">
-                                        <div class="notification__content">
-                                            <div class="notification__title">
-                                                <i class="fas fa-map-marked-alt text-primary"></i>
-                                                <span class="ms-2">@tour.TourName</span>
-                                                <span class="status-badge badge-@tour.Status.ToLower() ms-2">
-                                                    <i class="fas @(tour.Status.ToLower() == "confirmed" ? "fa-check-circle" :
-                                                                                                                                                                tour.Status.ToLower() == "pending" ? "fa-clock" :
-                                                                                                                                                                "fa-times-circle") me-1"></i>
-                                            @tour.Status
-                                        </span>
-                                    </div>
+    .badge-confirmed {
+        background-color: #28a745;
+    }
 
-                                            <div class="notification__meta mt-3">
-                                                <div class="meta-item">
-                                                    <i class="fas fa-calendar-day text-info"></i>
-                                                    <span class="ms-2">@tour.DepartureDate.ToString("MMM dd, yyyy")</span>
-                                                </div>
+    .badge-rejected {
+        background-color: #dc3545;
+    }
 
-                                                <div class="meta-item">
-                                                    <i class="fas fa-users text-success"></i>
-                                                    <span class="ms-2">
-                                                        <span class="badge bg-light text-dark">
-                                                            <i class="fas fa-child me-1"></i>@tour.TotalChildren
-                                                        </span>
-                                                        <span class="badge bg-light text-dark ms-2">
-                                                            <i class="fas fa-user me-1"></i>@tour.TotalAdults
-                                                        </span>
-                                                    </span>
-                                                </div>
+    .badge-completed {
+        background-color: #17a2b8;
+    }
 
-                                                <div class="meta-item">
-                                                    <i class="fas fa-map-marker-alt text-danger"></i>
-                                                    <span class="ms-2">@tour.PickupPoint</span>
-                                                </div>
-                                            </div>
+    .assignment-details .detail-item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
 
-                                            <div class="notification__time mt-2">
-                                                <i class="far fa-clock text-muted"></i>
-                                                <small class="text-muted ms-1">
-                                                    Assigned on @tour.AssignmentDate.ToString("MMM dd, yyyy 'at' hh:mm tt")
-                                                </small>
-                                            </div>
+    .assignment-details .detail-label {
+        font-weight: 500;
+        min-width: 100px;
+    }
+</style>
 
-                                            <div class="deadline-countdown-container" id="deadline-countdown-@tour.AssignmentId">
-                                                Deadline in: <span id="countdown-@tour.AssignmentId"></span>
-                                            </div>
-                                        </div>
-
-                                        <div class="notification__actions">
-                                            <button class="btn btn-sm btn-details me-2">
-                                                <i class="fas fa-info-circle me-1"></i> Details
-                                            </button>
-                                            <button class="btn btn-sm btn-view">
-                                                <i class="fas fa-users me-1"></i> Group
-                                            </button>
-                                        </div>
-                                    </div>
-                                                        }
-                            }
-                            else
-                            {
-                                <div class="empty-state text-center py-5">
-                                    <i class="fas fa-calendar-check fa-3x text-muted mb-4"></i>
-                                    <h3 class="text-muted">No Tour Assignments</h3>
-                                    <p class="text-muted mb-4">You don't have any assigned tours at the moment.</p>
-                                    <button class="btn btn-primary">
-                                        <i class="fas fa-sync-alt me-2"></i>Check for Updates
-                                    </button>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer Section -->
-    <footer class="footer__section section-padding-top-bottom">
-        <div class="container">
-            <div class="row g-4 g-xxl-5 justify-content-between">
-                <div class="col-12 col-sm-6 col-lg-3 order-1 order-lg-0">
-                    <div class="footer-widgets footer__leftContent fade_bottom">
-                        <a href="index.html" class="logo">
-                            <img src="./assets/images/logo-2.svg" alt="logo" />
-                        </a>
-                        <div class="help-info">
-                            <span>Need any help?</span>
-                            <h6 class="text-white">
-                                Call Us:
-                                <a href="tel:+88812345678" class="text-light-minion-yellow">(888)1234 5678</a>
-                            </h6>
-                        </div>
-                        <div class="contact-addresses">
-                            <p>Love Street, Muscat, Oman</p>
-                            <a href="mailto:exaample@Touest.com">exaample@Touest.com</a>
-                        </div>
-                        <div class="social-share">
-                            <ul>
-                                <li><a href="#"><i class="fa-brands fa-facebook"></i></a></li>
-                                <li><a href="#"><i class="fa-brands fa-x-twitter"></i></a></li>
-                                <li><a href="#"><i class="fa-brands fa-linkedin-in"></i></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-12 col-lg-6 order-0 order-lg-1">
-                    <div class="footer-widgets footer__links-wrapper">
-                        <div class="footer-links item-stagger">
-                            <h6 class="footer-link-title">Company</h6>
-                            <ul>
-                                <li><a href="about-us.html">About Us</a></li>
-                                <li><a href="contact.html">Contact Us</a></li>
-                                <li><a href="#">Travel Guides</a></li>
-                                <li><a href="#">Data Policy</a></li>
-                            </ul>
-                        </div>
-                        <div class="footer-links item-stagger">
-                            <h6 class="footer-link-title">Top Destination</h6>
-                            <ul>
-                                <li><a href="destination-details.html">Las Vegas</a></li>
-                                <li><a href="destination-details.html">New York City</a></li>
-                                <li><a href="destination-details.html">San Francisco</a></li>
-                                <li><a href="destination-details.html">Hawaii</a></li>
-                            </ul>
-                        </div>
-                        <div class="footer-links item-stagger">
-                            <h6 class="footer-link-title"> </h6>
-                            <ul>
-                                <li><a href="destination-details.html">Tokyo</a></li>
-                                <li><a href="destination-details.html">Sydney</a></li>
-                                <li><a href="destination-details.html">Melbourne</a></li>
-                                <li><a href="destination-details.html">Dubai</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-lg-3 order-2 order-lg-2">
-                    <div class="footer-widgets footer__rightContent fade_bottom">
-                        <div class="news-letter">
-                            <h6>Sign up Newsletter</h6>
-                            <form action="index.html" class="mt-3" autocomplete="off">
-                                <div class="input-group">
-                                    <input type="email"
-                                           name="email"
-                                           id="email"
-                                           placeholder="Enter email..."
-                                           required />
-                                </div>
-                                <button type="submit" class="common-btn color-one">
-                                    Submit
-                                </button>
-                            </form>
-                            <p class="copyright">© 2025 Touest All Right Reserved</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- JS Files -->
-    <script src="assets/js/jquery-3.7.1.min.js"></script>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/jquery.meanmenu.js"></script>
-    <script src="assets/js/swiper-bundle.min.js"></script>
-    <script src="assets/js/jquery.magnific-popup.min.js"></script>
-    <script src="assets/js/jquery.nice-select.min.js"></script>
-    <script src="assets/js/moment.min.js"></script>
-    <script src="assets/js/daterangepicker.js"></script>
-    <script src="assets/js/odometer.min.js"></script>
-    <script src="./assets/js/gsap.min.js"></script>
-    <script src="./assets/js/ScrollTrigger.min.js"></script>
-    <script src="./assets/js/ScrollToPlugin.min.js"></script>
-    <script src="./assets/js/ScrollSmoother.min.js"></script>
-    <script src="./assets/js/SplitText.min.js"></script>
-    <script src="assets/js/main.js"></script>
-
-    <!-- Custom JavaScript -->
+@section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const notificationItems = document.querySelectorAll('.notification__item');
+        $(document).ready(function () {
+            let currentAction = null;
+            let currentAssignmentId = null;
 
-            // Animation for notification items
-            notificationItems.forEach((item, index) => {
-                item.style.opacity = '0';
-                item.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                    item.style.opacity = '1';
-                    item.style.transform = 'translateY(0)';
-                }, 100 * index);
+            // Initialize countdown timers
+            initializeCountdownTimers();
+
+            // Filter assignments
+            $('.filter-option').on('click', function (e) {
+                e.preventDefault();
+                filterAssignments($(this).data('filter'));
             });
 
-            // Add click functionality for notification items
-            notificationItems.forEach(item => {
-                item.addEventListener('click', function(e) {
-                    if (!e.target.closest('.btn')) {
-                        window.location.href = 'tour-details.html';
-                    }
-                });
+            // Details button
+            $(document).on('click', '.details-btn', function () {
+                const assignmentId = $(this).data('assignment-id');
+                showAssignmentDetails(assignmentId);
             });
 
-            // Countdown logic
-            const assignedTours = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewData["AssignedTours"]));
-            console.log("assignedTours:", assignedTours);
+            // Accept button
+            $(document).on('click', '.accept-btn', function () {
+                currentAssignmentId = $(this).data('assignment-id');
+                showConfirmation('Are you sure you want to accept this assignment?', 'accept');
+            });
 
-            if (assignedTours && assignedTours.length > 0) {
-                assignedTours.forEach(tour => {
-                    console.log("AssignmentId:", tour.AssignmentId);
-                    console.log("AssignmentDate:", tour.AssignmentDate);
+            // Reject button
+            $(document).on('click', '.reject-btn', function () {
+                const assignmentId = $(this).data('assignment-id');
+                $(this).hide().siblings('.accept-btn').hide();
+                $(`#reject-reason-${assignmentId}`).slideDown().attr('aria-hidden', 'false');
+            });
 
-                    // Parse AssignmentDate using moment.js
-                    const assignmentDate = moment(tour.AssignmentDate, "MMM DD, YYYY [at] hh:mm A").toDate();
-                    const deadlineDate = new Date(assignmentDate.getTime() + (12 * 60 * 60 * 1000)); // Add 12 hours
-                    const countdownElement = document.getElementById(`countdown-${tour.AssignmentId}`);
+            // Cancel reject
+            $(document).on('click', '.cancel-reject-btn', function () {
+                const container = $(this).closest('.reject-reason-container');
+                container.slideUp().attr('aria-hidden', 'true').find('textarea').val('');
+                container.siblings('.reject-btn, .accept-btn').show();
+                $(`#reject-error-${container.attr('id').split('-').pop()}`).addClass('d-none');
+            });
 
-                    if (!countdownElement) {
-                        console.error(`Countdown element not found for AssignmentId: ${tour.AssignmentId}`);
+            // Confirm reject
+            $(document).on('click', '.confirm-reject-btn', function () {
+                const assignmentId = $(this).data('assignment-id');
+                const reason = $(`#reject-reason-${assignmentId} textarea`).val().trim();
+
+                if (!reason) {
+                    $(`#reject-error-${assignmentId}`).removeClass('d-none');
+                    return;
+                }
+
+                currentAssignmentId = assignmentId;
+                showConfirmation('Are you sure you want to reject this assignment?', 'reject', reason);
+            });
+
+            // Complete button
+            $(document).on('click', '.complete-btn', function () {
+                currentAssignmentId = $(this).data('assignment-id');
+                showConfirmation('Mark this assignment as completed?', 'complete');
+            });
+
+            // Refresh button
+            $('#refresh-btn').on('click', () => location.reload());
+
+            // Confirm action
+            $('#confirmAction').on('click', () => performAction(currentAction, currentAssignmentId));
+
+            function initializeCountdownTimers() {
+                $('.assignment-card.pending').each(function () {
+                    const assignmentId = $(this).data('assignment-id');
+                    const deadline = new Date($(`#countdown-${assignmentId}`).data('deadline'));
+
+                    if (isNaN(deadline.getTime())) {
+                        $(`#countdown-${assignmentId}`).text('Invalid deadline');
                         return;
                     }
 
-                    console.log("Deadline Date:", deadlineDate);
-
-                    function updateCountdown() {
-                        const now = new Date();
-                        const difference = deadlineDate.getTime() - now.getTime();
-
-                        if (difference > 0) {
-                            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-                            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-                            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-                            countdownElement.textContent = `${days} ngày, ${hours} giờ, ${minutes} phút, ${seconds} giây`;
-                        } else {
-                            countdownElement.textContent = "Đã hết hạn";
-                        }
-                    }
-
-                    setInterval(updateCountdown, 1000);
-                    updateCountdown(); // Initial call
+                    updateCountdown(assignmentId, deadline);
+                    setInterval(() => updateCountdown(assignmentId, deadline), 1000);
                 });
-            } else {
-                console.log("No assigned tours found.");
+            }
+
+            function updateCountdown(assignmentId, deadline) {
+                const now = new Date();
+                const diff = deadline - now;
+
+                if (diff <= 0) {
+                    $(`#countdown-${assignmentId}`).text('Deadline passed');
+                    $(`#assignment-${assignmentId} .accept-btn, #assignment-${assignmentId} .reject-btn`)
+                        .prop('disabled', true).addClass('disabled');
+                    return;
+                }
+
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                $(`#countdown-${assignmentId}`).text(`${hours}h ${minutes}m ${seconds}s`);
+            }
+
+            function filterAssignments(filter) {
+                $('.assignment-card').toggle(filter === 'all' || $(this).data('status') === filter);
+            }
+
+            function showAssignmentDetails(assignmentId) {
+                $.ajax({
+                    url: '/TourGuide/GetAssignmentDetails',
+                    type: 'GET',
+                    data: { assignmentId: assignmentId },
+                    success: function (data) {
+                        $('#assignmentDetailsContent').html(data);
+                        $('#assignmentDetailsModal').modal('show');
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Failed to load assignment details:', {
+                            status: status,
+                            error: error,
+                            responseText: xhr.responseText,
+                            statusCode: xhr.status
+                        });
+                        alert('Failed to load assignment details. Check the console for more information.');
+                    }
+                });
+            }
+
+            function showConfirmation(message, action, additionalData = null) {
+                currentAction = { type: action, data: additionalData };
+                $('#confirmationModalBody').text(message);
+                $('#confirmationModal').modal('show');
+            }
+
+            function performAction(action, assignmentId) {
+                $('#confirmationModal').modal('hide');
+
+                const data = { AssignmentId: assignmentId };
+                let url = '';
+
+                switch (action.type) {
+                    case 'accept':
+                        url = '/TourGuide/AcceptAssignment';
+                        break;
+                    case 'reject':
+                        url = '/TourGuide/RejectAssignment';
+                        data.Reason = action.data;
+                        break;
+                    case 'complete':
+                        url = '/TourGuide/CompleteAssignment';
+                        break;
+                    default:
+                        return;
+                }
+
+                $.ajax({
+                    url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    beforeSend: () => $(`button[data-assignment-id="${assignmentId}"]`).prop('disabled', true),
+                    success: (response) => {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.message || 'Action failed.');
+                        }
+                    },
+                    error: () => alert('An error occurred while processing the request.'),
+                    complete: () => $(`button[data-assignment-id="${assignmentId}"]`).prop('disabled', false)
+                });
             }
         });
     </script>
-</body>
-</html>
+}
+
+@functions {
+    string GetStatusIcon(string status) =>
+        status.ToLower() switch
+        {
+            "confirmed" => "<i class='fas fa-check-circle me-1'></i>",
+            "pending" => "<i class='fas fa-clock me-1'></i>",
+            "rejected" => "<i class='fas fa-times-circle me-1'></i>",
+            "completed" => "<i class='fas fa-flag-checkered me-1'></i>",
+            _ => "<i class='fas fa-question-circle me-1'></i>"
+        };
+
+    string GetRatingStars(List<Tourest.Data.Entities.Rating> ratings)
+    {
+        if (ratings == null || !ratings.Any()) return "Not rated";
+
+        int averageRating = (int)Math.Round(ratings.Average(r => r.RatingValue));
+        var stars = "";
+        for (int i = 0; i < 5; i++)
+        {
+            stars += i < averageRating
+                ? "<i class='fas fa-star text-warning'></i>"
+                : "<i class='far fa-star text-warning'></i>";
+        }
+        return stars;
+    }
+}

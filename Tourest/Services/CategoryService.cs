@@ -41,6 +41,7 @@ namespace Tourest.Services
                 Name = category.Name
             };
         }
+        
         public async Task<(bool Success, string ErrorMessage)> CreateCategoryAsync(CategoryInputViewModel model)
         {
             _logger.LogInformation("Attempting to create category with name: {CategoryName}", model.Name);
@@ -138,6 +139,16 @@ namespace Tourest.Services
                 _logger.LogError(ex, "Error updating category with ID {CategoryId}", model.CategoryID);
                 return (false, "Đã có lỗi xảy ra khi cập nhật danh mục.");
             }
+        }
+            
+        public async Task<List<CategoryStatViewModel>> GetCategoryStatisticsAsync()
+        {
+            var stats = await _categoryRepository.GetCategoryStatisticsAsync();
+            // Xử lý trường hợp MinPrice là int.MaxValue (nghĩa là không có tour active nào)
+            return stats.Select(s => {
+                if (s.MinPrice == int.MaxValue) { s.MinPrice = 0; } // Gán lại là 0 nếu không có tour
+                return s;
+            }).ToList();
         }
     }
 }

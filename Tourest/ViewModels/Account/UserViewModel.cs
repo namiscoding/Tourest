@@ -17,10 +17,11 @@ namespace Tourest.ViewModels.Account
         // Navigation Properties
         public virtual AccountViewModel? Account { get; set; }
         public virtual Tourest.Data.Entities.TourGuide? TourGuide { get; set; }
-        public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+        // Sử dụng namespace đầy đủ của lớp Entity Booking
+        public virtual ICollection<Tourest.Data.Entities.Booking> Bookings { get; set; } = new List<Tourest.Data.Entities.Booking>();
         public virtual ICollection<Rating> Ratings { get; set; } = new List<Rating>();
-        public virtual ICollection<SupportRequest> SubmittedSupportRequests { get; set; } = new List<SupportRequest>();
-        public virtual ICollection<SupportRequest> HandledSupportRequests { get; set; } = new List<SupportRequest>();
+        public virtual ICollection<Tourest.Data.Entities.SupportRequest> SubmittedSupportRequests { get; set; } = new List<Tourest.Data.Entities.SupportRequest>();
+        public virtual ICollection<Tourest.Data.Entities.SupportRequest> HandledSupportRequests { get; set; } = new List<Tourest.Data.Entities.SupportRequest>();
         public virtual ICollection<TourGuideAssignment> TourGuideAssignments { get; set; } = new List<TourGuideAssignment>(); // As Guide
         public virtual ICollection<TourGuideAssignment> TourManagerAssignments { get; set; } = new List<TourGuideAssignment>(); // As Manager
         public virtual ICollection<TourGuideRating> TourGuideRatingsReceived { get; set; } = new List<TourGuideRating>();

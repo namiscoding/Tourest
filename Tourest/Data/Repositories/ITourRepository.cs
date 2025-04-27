@@ -13,7 +13,12 @@ namespace Tourest.Data.Repositories
             IEnumerable<int>? ratings = null,
             string? sortBy = null, 
             int? minPrice = null, // THÊM
-            int? maxPrice = null);
+            int? maxPrice = null,
+             // --- THÊM THAM SỐ ---
+             string? searchDestination = null,
+             string? searchCategoryName = null,
+             DateTime? searchDate = null, // Nhận nhưng chưa dùng để lọc
+             int? searchGuests = null);
         Task<Tour?> GetByIdAsync(int id);
         Task<IEnumerable<string>> GetDistinctActiveDestinationsAsync();
         Task<(IEnumerable<Tour> Tours, int TotalCount)> GetToursPagedAsync(int pageIndex, int pageSize, string? searchTerm, string? statusFilter);
@@ -25,6 +30,8 @@ namespace Tourest.Data.Repositories
         Task UpdateTourCategoriesAsync(int tourId, List<int> selectedCategoryIds); 
         Task UpdateItineraryAsync(int tourId, List<ItineraryDay> currentItinerary); 
         Task<bool> IsTourInUseAsync(int tourId); 
-
+        Task<int> GetActiveTourCountAsync();
+        Task<int> GetDistinctDestinationCountAsync();
+        Task<IEnumerable<Tour>> GetFeaturedToursAsync(int count);
     }
 }

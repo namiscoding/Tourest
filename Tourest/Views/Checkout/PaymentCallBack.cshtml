@@ -1,0 +1,13 @@
+﻿@model Tourest.Data.Entities.Momo.MomoExecuteResponseModel
+@* Các dòng code còn lại của View *@
+@{
+    ViewData["Title"] = "Payment CallBack";
+}
+<h5>Thanh toán MOMO thành công với:</h5>
+<h6>OrderId : @Model.OrderId</h6>     @* Bây giờ bạn sẽ có IntelliSense cho OrderId *@
+<h6>OrderInfo : @Model.OrderInfo</h6>   @* Và cho OrderInfo *@
+<h6>Tổng tiền: @Model.Amount</h6>     @* Và cho Amount *@
+@* Kiểm tra xem Amount có cần định dạng tiền tệ không *@
+@* Ví dụ: <h6>Tổng tiền: @Model.Amount.ToString("N0") đ</h6> *@
+<br /> @* Thêm ngắt dòng cho rõ ràng *@
+<h5>Xem <a asp-controller="BookingHistory" asp-action="Index">lịch sử đơn hàng đã đặt</a></h5>
