@@ -1,0 +1,89 @@
+﻿@* File: /Views/AdminCategories/Index.cshtml *@
+@model IEnumerable<CategoryViewModel>
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Quản lý Danh mục Tour";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary mb-3">
+        <i class="fas fa-plus me-1"></i> Tạo Danh mục Mới
+    </a>
+</p>
+
+@* Hiển thị thông báo thành công/lỗi (Giữ nguyên) *@
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@* Hiển thị dưới dạng Card *@
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    @* Grid layout, tự điều chỉnh số cột *@
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                @* h-100 để các card cao bằng nhau *@
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 card-title">
+                        @* Có thể tạo link Details ở đây nếu muốn *@
+                        @* <a asp-action="Details" asp-route-id="@item.CategoryId" class="text-decoration-none text-dark">@item.Name</a> *@
+                        @item.Name
+                    </h5>
+                    @* Nút 3 chấm và Dropdown Actions *@
+                    <div class="dropdown">
+                        <button class="btn btn-link text-secondary p-0" type="button" id="dropdownMenuButton-@item.CategoryId" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton-@item.CategoryId">
+                            <li>
+                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.CategoryId">
+                                    <i class="fas fa-edit me-2"></i>Sửa
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.CategoryId">
+                                    <i class="fas fa-trash-alt me-2"></i>Xóa
+                                </a>
+                                @* Nếu muốn xóa ngay lập tức (ít an toàn hơn): *@
+                                @*
+                                <form asp-action="Delete" asp-route-id="@item.CategoryId" method="post" onsubmit="return confirm('Bạn chắc chắn muốn xóa danh mục này?');">
+                                     @Html.AntiForgeryToken()
+                                     <button type="submit" class="dropdown-item text-danger"><i class="fas fa-trash-alt me-2"></i>Xóa (Confirm)</button>
+                                </form>
+                                *@
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                @* Hiển thị Description nếu có trong ViewModel và không rỗng *@
+                @if (!string.IsNullOrWhiteSpace(item.Description))
+                {
+                    <div class="card-body">
+                        <p class="card-text"><small>@item.Description</small></p>
+                    </div>
+                }
+                @* Có thể thêm footer cho card nếu cần *@
+                @* <div class="card-footer text-muted">
+                    <small>ID: @item.CategoryId</small>
+                </div> *@
+            </div>
+        </div>
+    }
+</div>
+
+@* Không có phân trang trong ví dụ này, nếu danh sách dài cần thêm lại logic phân trang *@

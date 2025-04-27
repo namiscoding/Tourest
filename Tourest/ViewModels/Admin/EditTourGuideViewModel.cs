@@ -2,10 +2,10 @@
 
 namespace Tourest.ViewModels.Admin
 {
-    public class EditCustomerViewModel
+    public class EditTourGuideViewModel
     {
         [Required]
-        public int UserId { get; set; } // Cần Id để biết sửa ai
+        public int UserId { get; set; }
 
         [Required]
         [Display(Name = "Full Name")]
@@ -13,7 +13,7 @@ namespace Tourest.ViewModels.Admin
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; } = string.Empty; // Cẩn thận khi cho sửa Email/Username
+        public string Email { get; set; } = string.Empty;
 
         [Phone]
         [Display(Name = "Phone Number")]
@@ -23,10 +23,26 @@ namespace Tourest.ViewModels.Admin
 
         [Display(Name = "Is Active?")]
         public bool IsActive { get; set; }
+
+        // Tour Guide Profile Fields
+        [Display(Name = "Experience Level")]
+        [StringLength(50)]
+        public string? ExperienceLevel { get; set; }
+
+        [Display(Name = "Languages Spoken (separate with ';')")]
+        [StringLength(500)]
+        public string? LanguagesSpoken { get; set; }
+
+        [Display(Name = "Specializations (separate with ';')")]
+        [StringLength(500)]
+        public string? Specializations { get; set; }
+
+        [Display(Name = "Max Group Size Capacity")]
+        [Range(1, 1000)]
+        public int? MaxGroupSizeCapacity { get; set; }
         public string? ProfilePictureUrl { get; set; }
 
         [Display(Name = "Ảnh đại diện mới (Chọn file nếu muốn thay đổi)")]
         public IFormFile? ProfilePictureFile { get; set; } // Nhận file upload mới
-
     }
 }

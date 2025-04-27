@@ -1,23 +1,25 @@
-﻿@using Tourest.Helpers 
-@inject IConfiguration Configuration 
-@model EditCustomerViewModel
+﻿@* File: /Views/AdminTourGuides/Edit.cshtml *@
+@model EditTourGuideViewModel
+@using Tourest.Helpers
+@inject IConfiguration Configuration
 
 @{
     Layout = "_AdminLayout";
-    ViewData["Title"] = "Chỉnh sửa Khách hàng";
+    ViewData["Title"] = "Chỉnh sửa Hướng dẫn viên";
     var cloudName = Configuration["CloudinarySettings:CloudName"];
     var defaultAvatar = "assets/images/default-avatar.png";
 }
+
 <h1>@ViewData["Title"]</h1>
-<h4>Khách hàng: @Model.FullName</h4>
+<h4>Hướng dẫn viên: @Model.FullName</h4>
 <hr />
 <div class="row">
     <div class="col-md-8">
-        @* QUAN TRỌNG: enctype cho upload file *@
         <form asp-action="Edit" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
             <input type="hidden" asp-for="UserId" />
 
+            <h4>Thông tin Tài khoản</h4>
             @* Hiển thị ảnh đại diện hiện tại *@
             @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
             {
@@ -36,8 +38,6 @@
             </div>
 
             <hr />
-
-            @* Các trường thông tin khác *@
             <div class="row g-3">
                 <div class="col-md-6 mb-3">
                     <label asp-for="FullName" class="form-label"></label>
@@ -48,6 +48,7 @@
                     <label asp-for="Email" class="form-label"></label>
                     <input asp-for="Email" class="form-control" type="email" />
                     <span asp-validation-for="Email" class="text-danger"></span>
+                    <small class="form-text text-muted">Thận trọng khi thay đổi Email.</small>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label asp-for="PhoneNumber" class="form-label"></label>
@@ -65,6 +66,32 @@
                 </div>
             </div>
 
+            <h4 class="mt-4">Thông tin Hồ sơ Hướng dẫn viên</h4>
+            <div class="row g-3">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ExperienceLevel" class="form-label"></label>
+                    <input asp-for="ExperienceLevel" class="form-control" />
+                    <span asp-validation-for="ExperienceLevel" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="MaxGroupSizeCapacity" class="form-label"></label>
+                    <input asp-for="MaxGroupSizeCapacity" class="form-control" type="number" />
+                    <span asp-validation-for="MaxGroupSizeCapacity" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="LanguagesSpoken" class="form-label"></label>
+                    <input asp-for="LanguagesSpoken" class="form-control" placeholder="Phân cách bằng dấu ;" />
+                    <span asp-validation-for="LanguagesSpoken" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Specializations" class="form-label"></label>
+                    <input asp-for="Specializations" class="form-control" placeholder="Phân cách bằng dấu ;" />
+                    <span asp-validation-for="Specializations" class="text-danger"></span>
+                </div>
+            </div>
+
+            @* Không có phần đổi mật khẩu ở đây *@
+
             <div class="mt-4 mb-3">
                 <input type="submit" value="Lưu thay đổi" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary ms-2">Hủy</a>
@@ -72,7 +99,6 @@
         </form>
     </div>
 </div>
-
 
 @section Scripts {
     @{

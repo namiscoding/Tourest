@@ -9,9 +9,8 @@
         public string? Address { get; set; }
         public bool IsActive { get; set; }
         public DateTime RegistrationDate { get; set; }
-        // Thêm các trường khác nếu cần
 
-        // Danh sách các assignments đã thực hiện
+        public string? ProfilePictureUrl { get; set; }
         public List<AssignmentInfoViewModel> AssignmentsMade { get; set; } = new List<AssignmentInfoViewModel>();
     }
 }

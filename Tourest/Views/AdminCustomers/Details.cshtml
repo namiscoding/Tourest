@@ -1,62 +1,80 @@
-﻿@* File: /Views/AdminCustomers/Details.cshtml *@
-@model AdminCustomerDetailsViewModel
+﻿@model AdminCustomerDetailsViewModel
+@using Tourest.Helpers 
+@inject IConfiguration Configuration 
 
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Chi tiết Khách hàng";
+    var cloudName = Configuration["CloudinarySettings:CloudName"]; 
+    var defaultAvatar = "/images/default-avatar.png"; 
 }
 
 <h1>@ViewData["Title"]: @Model.FullName</h1>
 
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.FullName)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.FullName)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Address)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.IsActive)
-        </dt>
-        <dd class="col-sm-10">
-            @(Model.IsActive ? "Hoạt động" : "Vô hiệu hóa")
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.RegistrationDate)
-        </dt>
-        <dd class="col-sm-10">
-            @Model.RegistrationDate.ToString("g")
-        </dd>
-        @* Thêm các trường chi tiết khác nếu có trong ViewModel *@
-    </dl>
+<div class="row">
+    <div class="col-md-3 text-center mb-3">
+        <h4>Ảnh đại diện</h4>
+        <img src="@CloudinaryHelper.GetThumbnailUrl(Model.ProfilePictureUrl, 200, 200, cloudName, defaultAvatar)"
+             alt="Ảnh đại diện của @Model.FullName" class="img-thumbnail rounded-circle" style="width: 200px; height: 200px; object-fit: cover;" />
+        @if (string.IsNullOrEmpty(Model.ProfilePictureUrl))
+        {
+            <small class="text-muted d-block mt-2">(Chưa có ảnh)</small>
+        }
+    </div>
+
+    @* Cột hiển thị thông tin (ví dụ: chiếm 9/12 cột) *@
+    <div class="col-md-9">
+        <h4>Thông tin chi tiết</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-3">
+                @* Điều chỉnh độ rộng cột dt/dd *@
+                @Html.DisplayNameFor(model => model.UserId)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.UserId)
+            </dd>
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.FullName)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.FullName)
+            </dd>
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Email)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Email)
+            </dd>
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.PhoneNumber)
+            </dd>
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Address)
+            </dt>
+            <dd class="col-sm-9">
+                @Html.DisplayFor(model => model.Address)
+            </dd>
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.IsActive)
+            </dt>
+            <dd class="col-sm-9">
+                @(Model.IsActive ? "Hoạt động" : "Vô hiệu hóa")
+            </dd>
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.RegistrationDate)
+            </dt>
+            <dd class="col-sm-9">
+                @Model.RegistrationDate.ToString("g")
+            </dd>
+            @* Thêm các trường chi tiết khác nếu có trong ViewModel *@
+        </dl>
+    </div>
 </div>
-<div>
+<div class="mt-3">
     <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary">Sửa</a> |
     <a asp-action="Index" class="btn btn-secondary">Quay lại Danh sách</a>
 </div>

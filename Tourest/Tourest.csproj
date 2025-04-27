@@ -4,10 +4,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>bbc90949-1f32-439b-99e6-e7cf832264e9</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="CloudinaryDotNet" Version="1.27.5" />
 
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.15" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
@@ -41,6 +43,7 @@
 
   <ItemGroup>
     <Folder Include="TourGuide\Views\" />
+    <Folder Include="ViewModels\Admin\AdminTour\" />
     <Folder Include="ViewModels\Booking\" />
     <Folder Include="wwwroot\assets\images\icons\" />
     <Folder Include="wwwroot\assets\uploads\" />

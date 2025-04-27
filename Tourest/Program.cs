@@ -12,6 +12,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 using Tourest.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Tourest.Helpers;
 
 namespace Tourest
 {
@@ -112,29 +113,19 @@ namespace Tourest
             builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-
-            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-
-
-            // Add services to the container.
-            builder.Services.AddScoped<ITourService, TourService>();
-
+            builder.Services.AddScoped<IAccountService, AccountService>();
 
             builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
             builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
 
-
-
-
-            builder.Services.AddScoped<IAccountService, AccountService>();
-      
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
 
+            builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+            builder.Services.AddScoped<IPhotoService, CloudinaryPhotoService>();
+      
             builder.Services.AddScoped<IEmailService, EmailService>();
       
-
-
             builder.Services.AddScoped<IBookingRepository, BookingRepository>();
             builder.Services.AddScoped<IBookingService, BookingService>();
 
@@ -146,7 +137,6 @@ namespace Tourest
             builder.Services.AddScoped<IRatingRepository, RatingRepository>();
             builder.Services.AddScoped<ITourRatingRepository, TourRatingRepository>();
             builder.Services.AddScoped<IRatingService, RatingService>();
-
 
             builder.Services.AddControllersWithViews();
 
