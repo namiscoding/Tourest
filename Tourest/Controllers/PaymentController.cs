@@ -5,8 +5,12 @@ using System.Text; // Required for StringBuilder
 using Tourest.Data;
 using Tourest.Data.Entities;
 using Tourest.Data.Entities.Momo;
+using Tourest.Data.Repositories;
+using Tourest.Services;
 using Tourest.Services.Momo;
-using Tourest.ViewModels.Booking; // Or the correct namespace for MomoCallbackViewModel
+using Tourest.Util;
+using Tourest.ViewModels.Booking;
+using static Tourest.Controllers.SendEmailController; // Or the correct namespace for MomoCallbackViewModel
 // Add other necessary using statements
 
 public class PaymentController : Controller
@@ -14,12 +18,23 @@ public class PaymentController : Controller
     private readonly IMomoService _momoService;
     private readonly ApplicationDbContext _dbContext;
     private readonly ILogger<PaymentController> _logger;
+    private readonly IEmailService _emailSerivce;
+    private readonly INotificationService _notificationService;
+    private readonly ITourGroupRepository _tourGroupRepository;
 
-    public PaymentController(IMomoService momoService, ApplicationDbContext dbContext, ILogger<PaymentController> logger)
+    public PaymentController(IMomoService momoService, 
+        ApplicationDbContext dbContext, 
+        ILogger<PaymentController> logger, 
+        IEmailService emailSerivce, 
+        INotificationService notificationService,
+        ITourGroupRepository tourGroupRepository)
     {
         _momoService = momoService ?? throw new ArgumentNullException(nameof(momoService));
         _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _emailSerivce = emailSerivce;
+        _notificationService = notificationService;
+        _tourGroupRepository = tourGroupRepository;
     }
 
     // --- CreatePaymentMomo (Giữ nguyên như code bạn cung cấp, đã đúng) ---
@@ -340,6 +355,8 @@ public class PaymentController : Controller
 
             // --- TÌM BOOKING BẰNG bookingId GỐC ---
             var booking = await _dbContext.Bookings
+                                            .Include(b => b.Tour)
+                                            .Include(b => b.Customer)
                                           .Include(b => b.Payment) // Include Payment để cập nhật
                                           .FirstOrDefaultAsync(b => b.BookingID == bookingId); // <<< Dùng bookingId từ extraData
 
@@ -353,10 +370,22 @@ public class PaymentController : Controller
 
             if (isSignatureValid)
             {
+                EmailRequest request = new EmailRequest();
                 _logger.LogInformation("Processing successful payment confirmation for BookingId {BookingId}", bookingId);
+
+                TourGroup? tourGroup = await _tourGroupRepository.FindByTourAndDateAsync(booking.TourID, booking.DepartureDate);
+                int totalNewGuests = booking.NumberOfAdults + booking.NumberOfChildren;
+                if (tourGroup != null)
+                {
+                    tourGroup.TotalGuests += totalNewGuests;
+                }
+                await _tourGroupRepository.UpdateAsync(tourGroup);
                 // Chỉ cập nhật nếu chưa Paid để tránh xử lý lại
                 if (booking.Status != "Paid")
-                {
+                { 
+                    request.htmlbody = MailUtil.CreateBooking(booking);
+                    _emailSerivce.SendEmail("namlin118@gmail.com", "TOUREST: Xác nhận đặt tour thành công", request.htmlbody);
+                   
                     booking.Status = "Paid";
                     var paymentTime = callbackData.ResponseTimeConvertedUtc ?? DateTime.UtcNow; // Lấy thời gian chuẩn
 

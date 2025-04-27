@@ -40,5 +40,14 @@ namespace Tourest.Services
                 // Map các thuộc tính khác
             };
         }
+        public async Task<List<CategoryStatViewModel>> GetCategoryStatisticsAsync()
+        {
+            var stats = await _categoryRepository.GetCategoryStatisticsAsync();
+            // Xử lý trường hợp MinPrice là int.MaxValue (nghĩa là không có tour active nào)
+            return stats.Select(s => {
+                if (s.MinPrice == int.MaxValue) { s.MinPrice = 0; } // Gán lại là 0 nếu không có tour
+                return s;
+            }).ToList();
+        }
     }
 }

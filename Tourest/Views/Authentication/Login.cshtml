@@ -5,7 +5,23 @@
 @{
     ViewData["Title"] = "Tourest -đăng nhập cho tao";
 }
-<body class="custom-cursor">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collapsible Chat</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css"
+          rel="stylesheet" />
+</head>
+<body>
+    <main>
+<div class="custom-cursor">
     <!-- Custom Cursor start -->
       <div class="custom-cursor__cursor"></div>
     <div class="custom-cursor__cursor-two"></div>
@@ -132,21 +148,23 @@
 
     <main>
         <!-- Breadcrumb__section start  -->
-        <section class="breadcrumb__section section-padding-top-bottom"
-                 style="
-          --bg-image: url('../images/breadcrumb-section/authentication-breadcrumb-bg.png');">
+
+
+
+                <section class="breadcrumb__section section-padding-top-bottom"
+                         style="--bg-image: url('@Url.Content("~/assets/images/breadcrumb-section/breadcrumb.png")');">
             <div class="container">
                 <div class="row">
                     <div class="col-12">
                         <div class="breadcrumb__content">
-                            <h1 class="breadcrumb-title">Authentication</h1>
+                            <h1 class="breadcrumb-title">Chào mừng bạn đến với Tourest</h1>
                             <nav>
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item">
-                                        <a href="index.html">home</a>
+                                        <a asp-controller="Home" asp-action="Index">home</a>
                                     </li>
                                     <li class="breadcrumb-item active" aria-current="page">
-                                        Authentication
+                                        Login
                                     </li>
                                 </ol>
                             </nav>
@@ -205,41 +223,49 @@
                                                 @TempData["Message"]
                                             </div>
                                         }
-                                        <div class="input-group">
-                                            <label for="signupPhone" class="form-label">FullName</label>
-                                            <input asp-for="Register.Fullname" type="text"
-                                                   class="form-control"
-                                                   id="signupPhone"
-                                                   placeholder="Enter your Fullname" />
-                                        </div>
-                                        <div class="input-group">
-                                            <label for="signupEmail" class="form-label">Email address</label>
-                                            <input asp-for="Register.Email" type="email"
-                                                   class="form-control"
-                                                   id="signupEmail"
-                                                   placeholder="Enter your email" />
-                                        </div>
-                                        <div class="input-group">
-                                            <label for="signupPhone" class="form-label">Phone Number</label>
-                                            <input asp-for="Register.PhoneNumber" type="tel"
-                                                   class="form-control"
-                                                   id="signupPhone"
-                                                   placeholder="Enter your phone number" />
-                                        </div>
-                                        <div class="input-group">
-                                            <label for="signupPassword" class="form-label">Password</label>
-                                            <input asp-for="Register.PasswordHash" type="password"
-                                                   class="form-control"
-                                                   id="signupPassword"
-                                                   placeholder="Enter your password" />
-                                        </div>
-                                        <div class="input-group">
-                                            <label for="signupConfirmPassword" class="form-label">Confirm Password</label>
-                                            <input asp-for="Register.PasswordHashConfirm" type="password"
-                                                   class="form-control"
-                                                   id="signupConfirmPassword"
-                                                   placeholder="Confirm your password" />
-                                        </div>
+                                                <div class="row mb-3 align-items-center">
+                                                    <label for="signupFullName" class="col-md-3 col-form-label text-md-end">FullName</label> <div class="col-md-9">
+                                                        <input asp-for="Register.Fullname" type="text"
+                                                               class="form-control"
+                                                               id="signupFullName" placeholder="Enter your Fullname" />
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3 align-items-center">
+                                                    <label for="signupEmail" class="col-md-3 col-form-label text-md-end">Email address</label>
+                                                    <div class="col-md-9">
+                                                        <input asp-for="Register.Email" type="email"
+                                                               class="form-control"
+                                                               id="signupEmail"
+                                                               placeholder="Enter your email" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="row mb-3 align-items-center">
+                                                    <label for="signupPhone" class="col-md-3 col-form-label text-md-end">Phone Number</label>
+                                                    <div class="col-md-9">
+                                                        <input asp-for="Register.PhoneNumber" type="tel"
+                                                               class="form-control"
+                                                               id="signupPhone" placeholder="Enter your phone number" />
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3 align-items-center">
+                                                    <label for="signupPassword" class="col-md-3 col-form-label text-md-end">Password</label>
+                                                    <div class="col-md-9">
+                                                        <input asp-for="Register.PasswordHash" type="password"
+                                                               class="form-control"
+                                                               id="signupPassword"
+                                                               placeholder="Enter your password" />
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3 align-items-center">
+                                                    <label for="signupConfirmPassword" class="col-md-3 col-form-label text-md-end">Confirm Password</label>
+                                                    <div class="col-md-9">
+                                                        <input asp-for="Register.PasswordHashConfirm" type="password"
+                                                               class="form-control"
+                                                               id="signupConfirmPassword"
+                                                               placeholder="Confirm your password" />
+                                                    </div>
+                                                </div>
                                         <button type="submit" class="common-btn color-two w-100">
                                             Sign Up
                                         </button>
@@ -274,22 +300,26 @@
                                                 @TempData["Message"]
                                             </div>
                                         }
-                                        <div class="input-group">
-                                            <label for="signinEmail" class="form-label">Email address</label>
-                                            <input asp-for="Login.Email" type="email"
-                                                   class="form-control"
-                                                   id="signinEmail"
-                                                   placeholder="Enter your email" />
-                                            <span asp-validation-for="Login.Email"></span>
-                                        </div>
-                                        <div class="input-group">
-                                            <label for="signinPassword" class="form-label">Password</label>
-                                            <input asp-for="Login.PasswordHash" type="password"
-                                                   class="form-control"
-                                                   id="signinPassword"
-                                                   placeholder="Enter your password" />
-                                            <span asp-validation-for="Login.PasswordHash"></span>
-                                        </div>
+                                                <div class="row mb-3 align-items-center">
+                                                    <label for="signinEmail" class="col-md-3 col-form-label text-md-end">Email address</label>
+                                                    <div class="col-md-9">
+                                                        <input asp-for="Login.Email" type="email"
+                                                               class="form-control"
+                                                               id="signinEmail"
+                                                               placeholder="Enter your email" />
+                                                        <span asp-validation-for="Login.Email" class="text-danger"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3 align-items-center">
+                                                    <label for="signinPassword" class="col-md-3 col-form-label text-md-end">Password</label>
+                                                    <div class="col-md-9">
+                                                        <input asp-for="Login.PasswordHash" type="password"
+                                                               class="form-control"
+                                                               id="signinPassword"
+                                                               placeholder="Enter your password" />
+                                                        <span asp-validation-for="Login.PasswordHash" class="text-danger"></span>
+                                                    </div>
+                                                </div>
                                         <div class="form-group">
                                             <div class="checkbox">
                                                 <label asp-for="Login.RememberMe">
@@ -326,8 +356,9 @@
         <!-- authentication__section end  -->
         <!-- Footer__section end  -->
     </main>
+</div>
+    </main>
 </body>
-
 <script>
     document.getElementById("signupForm").addEventListener("submit", function (e) {
         const password = document.getElementById("signupPassword").value;

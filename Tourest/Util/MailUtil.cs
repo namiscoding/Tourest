@@ -5,16 +5,16 @@ namespace Tourest.Util
     public class MailUtil
     {
 
-        public  static string CreateBooking(Tour tour)
+        public  static string CreateBooking(Booking book)
         {
             string emailContent = TourestConstant.TemplateBooking;
 
             // Thay thế các placeholder trong template
-            //emailContent = emailContent.Replace("{{CustomerName}}", tour.T?? "Khách hàng");
-            emailContent = emailContent.Replace("{{TourName}}", tour.Name ?? "Tour du lịch");
-            //emailContent = emailContent.Replace("{{Total Day}}", tour.ItineraryDays.Count());
-            //emailContent = emailContent.Replace("{{GuestCount}}", tour.GuestCount.ToString());
-            //emailContent = emailContent.Replace("{{TotalAmount}}", tour.TotalAmount.ToString("N0")); // format số tiền có dấu phẩy
+            emailContent = emailContent.Replace("{{CustomerName}}", book.Customer.FullName ?? "Quý khách hàng");
+            emailContent = emailContent.Replace("{{TourName}}", book.Tour.Name ?? "Tour du lịch");
+            emailContent = emailContent.Replace("{{StartDate}}", book.DepartureDate.ToString());
+            emailContent = emailContent.Replace("{{GuestCount}}", (book.NumberOfAdults + book.NumberOfChildren).ToString());
+            emailContent = emailContent.Replace("{{TotalAmount}}", book.TotalPrice.ToString("N0")); // format số tiền có dấu phẩy
 
             return emailContent;
         }

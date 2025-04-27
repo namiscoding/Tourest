@@ -21,5 +21,8 @@ namespace Tourest.Data.Repositories
              int? searchGuests = null);
         Task<Tour?> GetByIdAsync(int id);
         Task<IEnumerable<string>> GetDistinctActiveDestinationsAsync();
+        Task<int> GetActiveTourCountAsync();
+        Task<int> GetDistinctDestinationCountAsync();
+        Task<IEnumerable<Tour>> GetFeaturedToursAsync(int count);
     }
 }

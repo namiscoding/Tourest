@@ -85,60 +85,20 @@
                 <div class="row align-content-center">
                     <div class="col-6 col-md-9 col-xl-8">
                         <div class="header__main-left">
-                            <a href="index.html" class="logo">
+                            <a asp-controller="Home" asp-action="Index" class="logo">
                                 <img src="~/assets/images/logo.svg" alt="logo" />
                             </a>
                             <div class="header__main-menu">
                                 <nav class="header__navigation">
                                     <ul>
-                                        <li class="has-child-menu">
-                                            <a href="javascript:void(0)">Home</a>
-                                            <ul>
-                                                <li><a href="index.html">Home - 1</a></li>
-                                                <li><a href="index-2.html">Home - 2</a></li>
-                                            </ul>
+                                        <li>
+                                            <a asp-controller="Home" asp-action="Index">Home</a>
+                                            
                                         </li>
-                                        <li><a href="about-us.html">About Us</a></li>
-                                        <li class="has-child-menu">
-                                            <a href="javascript:void(0)">Blog</a>
-                                            <ul>
-                                                <li><a href="blog.html">Blog Style 1</a></li>
-                                                <li><a href="blog-2.html">Blog Style 2</a></li>
-                                                <li><a href="blog-3.html">Blog Style 3</a></li>
-                                                <li><a href="blog-details.html">Blog Details</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="has-child-menu">
-                                            <a href="javascript:void(0)">Pages</a>
-                                            <ul>
-                                                <li class="has-child-menu">
-                                                    <a href="javascript:void(0)">Destination</a>
-                                                    <ul>
-                                                        <li>
-                                                            <a href="destination.html">Destination</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="destination-details.html">Destination Details</a>
-                                                        </li>
-                                                    </ul>
-                                                </li>
-                                                <li class="has-child-menu">
-                                                    <a href="javascript:void(0)">Tour</a>
-                                                    <ul>
-                                                        <li><a href="tour.html">Tour</a></li>
-                                                        <li>
-                                                            <a href="tour-details.html">Tour Details</a>
-                                                        </li>
-                                                    </ul>
-                                                </li>
-                                                <li>
-                                                    <a href="authentication.html">Authentication</a>
-                                                </li>
-                                                <li><a href="faq.html">FAQ</a></li>
-                                                <li><a href="404.html">Error 404</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="contact.html">Contact</a></li>
+                                        <li><a asp-controller="Tours" asp-action="Index">Tours</a></li>
+                                        <li><a asp-controller="SupportRequest" asp-action="Index">Contact</a></li>
+                                        <li><a asp-controller="BookingHistory" asp-action="Index">Booking History</a></li>
+                                        
                                         <li><a href="TourManager">Tour Manager</a></li>
                                     </ul>
                                 </nav>
@@ -148,25 +108,20 @@
                     <div class="col-6 col-md-3 col-xl-4">
                         <div class="header__main-right d-flex justify-content-end">
                             <ul>
+                               
                                 <li>
-                                    <button class="search-btn"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#searchModal">
-                                        <i class="fa-solid fa-magnifying-glass"></i>
-                                    </button>
-                                </li>
-                                <li>
-                                    <a href="authentication.html" class="signin-signup d-flex">
-                                        <i class="fa-regular fa-user"></i>
+                                    
+                                        
                                         @if (currentAccount != null)
                                         {
                                             <a href="/Profile/Index/@currentAccount.UserID">Hello, @currentAccount.FullName!</a>
                                         } 
                                         else
                                         {
-                                            <a asp-controller="Authentication" asp-action="Login">Login/Signup </a>
+                                            
+                                            <a asp-controller="Authentication" asp-action="Login"><button class="btn" style="background-color: #039e9d; color: white">Login/Signup</button> </a>
                                         }
-                                    </a>
+                                    
                             </li>
                                @if (currentAccount != null)
                                         {
@@ -232,7 +187,7 @@
                 <div class="col-12 col-sm-6 col-lg-3 order-1 order-lg-0">
                     <div class="footer-widgets footer__leftContent fade_bottom">
                         <a href="index.html" class="logo">
-                            <img src="~/assets/images/logo-3.svg" alt="logo" />
+                            <img src="~/assets/images/logo-2.svg" alt="logo" />
                         </a>
                         <div class="help-info">
                             <span>Need any help?</span>

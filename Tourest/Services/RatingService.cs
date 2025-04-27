@@ -37,6 +37,8 @@ namespace Tourest.Services
             _ratingHubContext = ratingHubContext;
         }
 
+        public async Task<int> GetTotalTourRatingCountAsync() { return await _ratingRepository.GetTotalTourRatingCountAsync(); }
+
         public async Task<(bool Success, string ErrorMessage)> AddTourRatingAsync(CreateTourRatingViewModel model, int customerId)
         {
             var tourExists = await _context.Tours.AnyAsync(t => t.TourID == model.TourId);

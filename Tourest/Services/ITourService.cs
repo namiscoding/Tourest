@@ -18,5 +18,8 @@ namespace Tourest.Services
              int? searchGuests = null);
         Task<IEnumerable<string>> GetDestinationsForFilterAsync();
         Task<TourDetailsViewModel?> GetTourDetailsAsync(int id);
+        Task<int> GetActiveTourCountAsync();
+        Task<int> GetDistinctDestinationCountAsync();
+        Task<List<TourListViewModel>> GetFeaturedToursForDisplayAsync(int count);
     }
 }
