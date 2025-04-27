@@ -1,431 +1,302 @@
-﻿@model Tourest.TourGuide.ViewModels.TourGuideAssignmentViewModel
+﻿@model IEnumerable<Tourest.TourGuide.ViewModels.TourGuideAssignmentViewModel>
 @{
     ViewData["Title"] = "Tour Assignments";
-    var assignedTours = ViewData["AssignedTours"] as List<Tourest.TourGuide.ViewModels.TourGuideAssignmentViewModel>;
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Tourest</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #28a745;
-            --secondary-color: #6c757d;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-        }
-
-        .assignment-card {
-            transition: all 0.3s ease;
-            border-left: 4px solid var(--primary-color);
-            margin-bottom: 1.5rem;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-            .assignment-card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            }
-
-            .assignment-card.pending {
-                border-left-color: var(--warning-color);
-            }
-
-            .assignment-card.confirmed {
-                border-left-color: var(--primary-color);
-            }
-
-            .assignment-card.rejected {
-                border-left-color: var(--danger-color);
-            }
-
-            .assignment-card.completed {
-                border-left-color: var(--info-color);
-            }
-
-        .status-badge {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.35rem 0.65rem;
-            border-radius: 50px;
-        }
-
-        .badge-pending {
-            background-color: #fff3cd;
-            color: #856404;
-        }
-
-        .badge-confirmed {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .badge-rejected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        .badge-completed {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .action-buttons .btn {
-            min-width: 100px;
-            margin: 2px;
-        }
-
-        .reject-reason-container {
-            display: none;
-            margin-top: 1rem;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .countdown-timer {
-            font-weight: 600;
-            color: var(--danger-color);
-        }
-
-        .assignment-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-            .assignment-details .detail-item {
-                padding: 0.5rem;
-                background: #f8f9fa;
-                border-radius: 4px;
-            }
-
-        .detail-label {
-            font-weight: 600;
-            color: var(--secondary-color);
-            margin-bottom: 0.25rem;
-        }
-
-        .detail-value {
-            font-size: 1.1rem;
-        }
-
-        .no-assignments {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 8px;
-        }
-
-        @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .modal-details-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        
-
-        .action-buttons .btn {
-            width: 100%;
-            margin-bottom: 0.5rem;
-        }
-
-        }
-    </style>
-</head>
-<body>
-    <div class="container-fluid px-0">
-        <!-- Header -->
-        <header class="bg-primary text-white py-4 mb-4 shadow">
-            <div class="container">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1 class="h3 mb-0"><i class="fas fa-tasks me-2"></i> Tour Assignments</h1>
-                        <p class="mb-0">Manage your assigned tour groups</p>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <img src="https://via.placeholder.com/40" alt="Profile" class="rounded-circle me-2" width="40" height="40">
-                        <span>Tour Guide</span>
-                    </div>
+<div class="container-fluid px-0">
+    <!-- Header -->
+    <header class="bg-primary text-white py-4 mb-4 shadow">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0"><i class="fas fa-tasks me-2"></i>Tour Assignments</h1>
+                    <p class="mb-0">Manage your assigned tour groups</p>
+                </div>
+                <div class="d-flex align-items-center">
+                    <img src="https://via.placeholder.com/40" alt="Tour Guide Profile" class="rounded-circle me-2" width="40" height="40">
+                    <span>Tour Guide</span>
                 </div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- Main Content -->
-        <main class="container">
-            <!-- Filter and Status -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="h4 mb-0"><i class="fas fa-list-check me-2"></i> Current Assignments</h2>
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown">
-                        <i class="fas fa-filter me-1"></i> Filter
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item filter-option" href="#" data-filter="all">All Assignments</a></li>
-                        <li><a class="dropdown-item filter-option" href="#" data-filter="pending">Pending</a></li>
-                        <li><a class="dropdown-item filter-option" href="#" data-filter="confirmed">Confirmed</a></li>
-                        <li><a class="dropdown-item filter-option" href="#" data-filter="rejected">Rejected</a></li>
-                        <li><a class="dropdown-item filter-option" href="#" data-filter="completed">Completed</a></li>
-                    </ul>
-                </div>
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Filter and Status -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4 mb-0"><i class="fas fa-list-check me-2"></i>Current Assignments</h2>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-filter me-1"></i> Filter
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="all">All Assignments</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="pending">Pending</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="confirmed">Confirmed</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="rejected">Rejected</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="completed">Completed</a></li>
+                </ul>
             </div>
+        </div>
 
-            <!-- Assignments List -->
-            <div class="row">
-                <div class="col-12">
-                    @if (assignedTours != null && assignedTours.Any())
+        <!-- Assignments List -->
+        <div class="row">
+            <div class="col-12">
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var tour in Model)
                     {
-                        @foreach (var tour in assignedTours)
-                        {
-                            <div class="card assignment-card @tour.Status.ToLower() mb-3" id="assignment-@tour.AssignmentId" data-assignment-id="@tour.AssignmentId" data-status="@tour.Status.ToLower()">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h5 class="card-title mb-2">
+                        <div class="card assignment-card mb-3 @tour.Status.ToLower()"
+                             id="assignment-@tour.AssignmentId"
+                             data-assignment-id="@tour.AssignmentId"
+                             data-status="@tour.Status.ToLower()"
+                             aria-label="Tour Assignment @tour.TourName">
+                            <div class="card-body">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-start">
+                                    <div class="flex-grow-1 me-md-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <h5 class="card-title mb-0 me-2">
                                                 <i class="fas fa-map-marked-alt text-primary me-2"></i>
                                                 @tour.TourName
-                                                <span class="status-badge badge-@tour.Status.ToLower() ms-2">
-                                                    @switch (tour.Status.ToLower())
-                                                    {
-                                                        case "confirmed":
-                                                            <i class="fas fa-check-circle me-1"></i>
-                                                            break;
-                                                        case "pending":
-                                                            <i class="fas fa-clock me-1"></i>
-                                                            break;
-                                                        case "rejected":
-                                                            <i class="fas fa-times-circle me-1"></i>
-                                                            break;
-                                                        case "completed":
-                                                            <i class="fas fa-flag-checkered me-1"></i>
-                                                            break;
-                                                        default:
-                                                            <i class="fas fa-question-circle me-1"></i>
-                                                            break;
-                                                    }
-                                                    @tour.Status
-                                                </span>
                                             </h5>
+                                            <span class="badge badge-@tour.Status.ToLower() status-badge">
+                                                @Html.Raw(GetStatusIcon(tour.Status)) @tour.Status
+                                            </span>
+                                        </div>
 
-                                            <div class="card-text mb-2">
+                                        <div class="card-text mb-3">
+                                            <small class="text-muted">
+                                                <i class="far fa-clock me-1"></i>
+                                                Assigned on @tour.AssignmentDate.ToString("MMM dd, yyyy 'at' hh:mm tt")
+                                            </small>
+                                        </div>
+
+                                        <div class="assignment-details">
+                                            <div class="detail-item">
+                                                <span class="detail-label"><i class="fas fa-calendar-day me-1"></i> Departure</span>
+                                                <span class="detail-value">@tour.DepartureDate.ToString("MMM dd, yyyy")</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label"><i class="fas fa-users me-1"></i> Group Size</span>
+                                                <span class="detail-value">@tour.TotalAdults Adults, @tour.TotalChildren Children</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label"><i class="fas fa-map-marker-alt me-1"></i> Pickup</span>
+                                                <span class="detail-value">@tour.PickupPoint</span>
+                                            </div>
+                                            <div class="detail-item">
+                                                <span class="detail-label"><i class="fas fa-star me-1"></i> Rating</span>
+                                                <span class="detail-value">@Html.Raw(GetRatingStars(tour.TourRating))</span>
+                                            </div>
+                                        </div>
+
+                                        @if (tour.Status.ToLower() == "pending" && DateTime.Now < tour.Deadline)
+                                        {
+                                            <div class="mt-2">
                                                 <small class="text-muted">
-                                                    <i class="far fa-clock me-1"></i>
-                                                    Assigned on @tour.AssignmentDate.ToString("MMM dd, yyyy 'at' hh:mm tt")
+                                                    <i class="fas fa-hourglass-half me-1"></i>
+                                                    Response deadline: <span class="countdown-timer" id="countdown-@tour.AssignmentId" data-deadline="@tour.Deadline.ToString("o")"></span>
                                                 </small>
                                             </div>
+                                        }
+                                    </div>
 
-                                            <div class="assignment-details">
-                                                <div class="detail-item">
-                                                    <div class="detail-label"><i class="fas fa-calendar-day me-1"></i> Departure Date</div>
-                                                    <div class="detail-value">@tour.DepartureDate.ToString("MMM dd, yyyy")</div>
-                                                </div>
-                                                <div class="detail-item">
-                                                    <div class="detail-label"><i class="fas fa-users me-1"></i> Group Size</div>
-                                                    <div class="detail-value">@tour.TotalAdults Adults, @tour.TotalChildren Children</div>
-                                                </div>
-                                                <div class="detail-item">
-                                                    <div class="detail-label"><i class="fas fa-map-marker-alt me-1"></i> Pickup Point</div>
-                                                    <div class="detail-value">@tour.PickupPoint</div>
-                                                </div>
-                                                <div class="detail-item">
-                                                    <div class="detail-label"><i class="fas fa-star me-1"></i> Rating</div>
-                                                    <div class="detail-value">
-                                                        @for (int i = 0; i < 5; i++)
-                                                        {
-                                                            
-                                                                <i class="fas fa-star text-warning"></i>
-                                                           
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <div class="action-buttons mt-3 mt-md-0">
+                                        <div class="d-flex flex-column gap-2">
+                                           
 
-                                            @if (tour.Status.ToLower() == "pending")
-                                            {
-                                                <div class="mt-2">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-hourglass-half me-1"></i>
-                                                        Response deadline:
-                                                        <span class="countdown-timer" id="countdown-@tour.AssignmentId" data-deadline="@tour.Deadline.ToString("o")"></span>
-                                                    </small>
-                                                </div>
-                                            }
-                                        </div>
-
-                                        <div class="action-buttons">
-                                            <div class="d-flex flex-wrap">
-                                                <button class="btn btn-primary details-btn" data-assignment-id="@tour.AssignmentId">
-                                                    <i class="fas fa-info-circle me-1"></i> Details
-                                                </button>
-                                                @if (tour.Status.ToLower() == "pending" && DateTime.Now < tour.Deadline)
-                                                {
-                                                    <button class="btn btn-success accept-btn" data-assignment-id="@tour.AssignmentId">
-                                                        <i class="fas fa-check me-1"></i> Accept
-                                                    </button>
-                                                    <button class="btn btn-danger reject-btn" data-assignment-id="@tour.AssignmentId">
-                                                        <i class="fas fa-times me-1"></i> Reject
-                                                    </button>
-                                                }
-                                                else if (tour.Status.ToLower() == "confirmed")
-                                                {
-                                                    <button class="btn btn-info complete-btn" data-assignment-id="@tour.AssignmentId">
-                                                        <i class="fas fa-flag-checkered me-1"></i> Complete
-                                                    </button>
-                                                }
-                                            </div>
                                             @if (tour.Status.ToLower() == "pending" && DateTime.Now < tour.Deadline)
                                             {
-                                                <div class="reject-reason-container" id="reject-reason-@tour.AssignmentId">
-                                                    <textarea class="form-control mb-2" placeholder="Please provide a reason for rejection..." rows="2"></textarea>
-                                                    <div class="d-flex justify-content-end gap-2">
-                                                        <button class="btn btn-sm btn-outline-secondary cancel-reject-btn">
-                                                            Cancel
-                                                        </button>
-                                                        <button class="btn btn-sm btn-danger confirm-reject-btn" data-assignment-id="@tour.AssignmentId">
-                                                            Submit Rejection
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                <button class="btn btn-sm btn-success accept-btn"
+                                                        data-assignment-id="@tour.AssignmentId"
+                                                        aria-label="Accept assignment for @tour.TourName">
+                                                    <i class="fas fa-check me-1"></i> Accept
+                                                </button>
+                                                <button class="btn btn-sm btn-danger reject-btn"
+                                                        data-assignment-id="@tour.AssignmentId"
+                                                        aria-label="Reject assignment for @tour.TourName">
+                                                    <i class="fas fa-times me-1"></i> Reject
+                                                </button>
+                                            }
+                                            else if (tour.Status.ToLower() == "confirmed")
+                                            {
+                                                <button class="btn btn-sm btn-info complete-btn"
+                                                        data-assignment-id="@tour.AssignmentId"
+                                                        aria-label="Mark @tour.TourName as completed">
+                                                    <i class="fas fa-flag-checkered me-1"></i> Complete
+                                                </button>
                                             }
                                         </div>
+
+                                        @if (tour.Status.ToLower() == "pending" && DateTime.Now < tour.Deadline)
+                                        {
+                                            <div class="reject-reason-container mt-2" id="reject-reason-@tour.AssignmentId" aria-hidden="true">
+                                                <div class="alert alert-danger alert-dismissible fade show d-none" role="alert" id="reject-error-@tour.AssignmentId">
+                                                    Please provide a reason for rejection
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                </div>
+                                                <textarea class="form-control form-control-sm mb-2"
+                                                          placeholder="Reason for rejection..."
+                                                          rows="2"
+                                                          aria-label="Reason for rejecting @tour.TourName"></textarea>
+                                                <div class="d-flex justify-content-end gap-2">
+                                                    <button class="btn btn-sm btn-outline-secondary cancel-reject-btn"
+                                                            aria-label="Cancel rejection for @tour.TourName">
+                                                        Cancel
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger confirm-reject-btn"
+                                                            data-assignment-id="@tour.AssignmentId"
+                                                            aria-label="Submit rejection for @tour.TourName">
+                                                        Submit
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="text-center py-5 bg-light rounded no-assignments">
-                            <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
-                            <h3 class="h4 text-muted">No Tour Assignments</h3>
-                            <p class="text-muted">You don't have any assigned tours at the moment.</p>
-                            <button class="btn btn-primary" id="refresh-btn">
-                                <i class="fas fa-sync-alt me-2"></i> Refresh
-                            </button>
                         </div>
                     }
-                </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 bg-light rounded no-assignments">
+                        <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
+                        <h3 class="h4 text-muted">No Tour Assignments</h3>
+                        <p class="text-muted">You don't have any assigned tours at the moment.</p>
+                        <button class="btn btn-primary" id="refresh-btn" aria-label="Refresh assignments">
+                            <i class="fas fa-sync-alt me-2"></i> Refresh
+                        </button>
+                    </div>
+                }
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
+</div>
 
-    <!-- Assignment Details Modal -->
-    <div class="modal fade" id="assignmentDetailsModal" tabindex="-1" aria-labelledby="assignmentDetailsModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="assignmentDetailsModalLabel">
-                        <i class="fas fa-info-circle me-2"></i> Assignment Details
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="assignmentDetailsContent">
-                    <!-- Content will be loaded here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Close
-                    </button>
-                </div>
+<!-- Assignment Details Modal -->
+<div class="modal fade" id="assignmentDetailsModal" tabindex="-1" aria-labelledby="assignmentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="assignmentDetailsModalLabel">
+                    <i class="fas fa-info-circle me-2"></i> Assignment Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="assignmentDetailsContent">
+                <!-- Content loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Close
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Confirmation Modal -->
-    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="confirmationModalBody">
-                    Are you sure you want to perform this action?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="confirmAction">Confirm</button>
-                </div>
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="confirmationModalBody">
+                Are you sure you want to perform this action?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmAction">Confirm</button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Anti-Forgery Token -->
-    @Html.AntiForgeryToken()
+<style>
+    .reject-reason-container {
+        display: none;
+    }
 
-    <!-- JavaScript Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    .badge-pending {
+        background-color: #ffc107;
+    }
 
+    .badge-confirmed {
+        background-color: #28a745;
+    }
+
+    .badge-rejected {
+        background-color: #dc3545;
+    }
+
+    .badge-completed {
+        background-color: #17a2b8;
+    }
+
+    .assignment-details .detail-item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .assignment-details .detail-label {
+        font-weight: 500;
+        min-width: 100px;
+    }
+</style>
+
+@section Scripts {
     <script>
         $(document).ready(function () {
-            // Initialize variables
-            const assignedTours = @Json.Serialize(assignedTours);
             let currentAction = null;
             let currentAssignmentId = null;
 
-            // Initialize countdown timers for pending assignments
+            // Initialize countdown timers
             initializeCountdownTimers();
 
             // Filter assignments
             $('.filter-option').on('click', function (e) {
                 e.preventDefault();
-                const filter = $(this).data('filter');
-                filterAssignments(filter);
+                filterAssignments($(this).data('filter'));
             });
 
-            // Details button click handler
+            // Details button
             $(document).on('click', '.details-btn', function () {
                 const assignmentId = $(this).data('assignment-id');
                 showAssignmentDetails(assignmentId);
             });
 
-            // Accept button click handler
+            // Accept button
             $(document).on('click', '.accept-btn', function () {
                 currentAssignmentId = $(this).data('assignment-id');
                 showConfirmation('Are you sure you want to accept this assignment?', 'accept');
             });
 
-            // Reject button click handler
+            // Reject button
             $(document).on('click', '.reject-btn', function () {
                 const assignmentId = $(this).data('assignment-id');
-                $(this).hide();
-                $(this).siblings('.accept-btn').hide();
-                $(`#reject-reason-${assignmentId}`).show();
+                $(this).hide().siblings('.accept-btn').hide();
+                $(`#reject-reason-${assignmentId}`).slideDown().attr('aria-hidden', 'false');
             });
 
-            // Cancel reject button click handler
+            // Cancel reject
             $(document).on('click', '.cancel-reject-btn', function () {
                 const container = $(this).closest('.reject-reason-container');
-                container.hide();
-                container.siblings('.reject-btn').show();
-                container.siblings('.accept-btn').show();
-                container.find('textarea').val('');
+                container.slideUp().attr('aria-hidden', 'true').find('textarea').val('');
+                container.siblings('.reject-btn, .accept-btn').show();
+                $(`#reject-error-${container.attr('id').split('-').pop()}`).addClass('d-none');
             });
 
-            // Confirm reject button click handler
+            // Confirm reject
             $(document).on('click', '.confirm-reject-btn', function () {
                 const assignmentId = $(this).data('assignment-id');
                 const reason = $(`#reject-reason-${assignmentId} textarea`).val().trim();
 
                 if (!reason) {
-                    alert('Please provide a reason for rejection');
+                    $(`#reject-error-${assignmentId}`).removeClass('d-none');
                     return;
                 }
 
@@ -433,28 +304,22 @@
                 showConfirmation('Are you sure you want to reject this assignment?', 'reject', reason);
             });
 
-            // Complete button click handler
+            // Complete button
             $(document).on('click', '.complete-btn', function () {
                 currentAssignmentId = $(this).data('assignment-id');
                 showConfirmation('Mark this assignment as completed?', 'complete');
             });
 
-            // Refresh button click handler
-            $('#refresh-btn').on('click', function () {
-                location.reload();
-            });
+            // Refresh button
+            $('#refresh-btn').on('click', () => location.reload());
 
-            // Confirm action button in modal
-            $('#confirmAction').on('click', function () {
-                performAction(currentAction, currentAssignmentId);
-            });
+            // Confirm action
+            $('#confirmAction').on('click', () => performAction(currentAction, currentAssignmentId));
 
-            // Function to initialize countdown timers
             function initializeCountdownTimers() {
                 $('.assignment-card.pending').each(function () {
                     const assignmentId = $(this).data('assignment-id');
-                    const deadlineString = $(`#countdown-${assignmentId}`).data('deadline');
-                    const deadline = new Date(deadlineString);
+                    const deadline = new Date($(`#countdown-${assignmentId}`).data('deadline'));
 
                     if (isNaN(deadline.getTime())) {
                         $(`#countdown-${assignmentId}`).text('Invalid deadline');
@@ -466,206 +331,119 @@
                 });
             }
 
-            // Function to update countdown timer
             function updateCountdown(assignmentId, deadline) {
                 const now = new Date();
                 const diff = deadline - now;
 
                 if (diff <= 0) {
                     $(`#countdown-${assignmentId}`).text('Deadline passed');
-                    $(`#assignment-${assignmentId} .accept-btn, #assignment-${assignmentId} .reject-btn`).prop('disabled', true);
+                    $(`#assignment-${assignmentId} .accept-btn, #assignment-${assignmentId} .reject-btn`)
+                        .prop('disabled', true).addClass('disabled');
                     return;
                 }
 
                 const hours = Math.floor(diff / (1000 * 60 * 60));
                 const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
                 $(`#countdown-${assignmentId}`).text(`${hours}h ${minutes}m ${seconds}s`);
             }
 
-            // Function to filter assignments
             function filterAssignments(filter) {
-                if (filter === 'all') {
-                    $('.assignment-card').show();
-                } else {
-                    $('.assignment-card').each(function () {
-                        const status = $(this).data('status');
-                        $(this).toggle(status === filter);
-                    });
-                }
+                $('.assignment-card').toggle(filter === 'all' || $(this).data('status') === filter);
             }
 
-            // Function to show assignment details
             function showAssignmentDetails(assignmentId) {
-                const assignment = assignedTours.find(t => t.assignmentId == assignmentId);
-
-                if (!assignment) {
-                    alert('Assignment not found');
-                    return;
-                }
-
-                const departureDate = new Date(assignment.departureDate);
-                const assignmentDate = new Date(assignment.assignmentDate);
-                const deadline = new Date(assignment.deadline);
-
-                let detailsHtml = `
-                    <div class="modal-details-grid">
-                        <div>
-                            <h5 class="mb-3">${assignment.tourName || 'N/A'}</h5>
-                            <div class="mb-3">
-                                <h6 class="detail-label"><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
-                                <div class="detail-item">
-                                    <div class="detail-label">Tour Group</div>
-                                    <div class="detail-value">${assignment.tourGroupName || 'N/A'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Status</div>
-                                    <div class="detail-value">
-                                        <span class="status-badge badge-${assignment.status.toLowerCase()}">
-                                            ${getStatusIcon(assignment.status)} ${assignment.status}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <h6 class="detail-label"><i class="fas fa-users me-2"></i>Group Details</h6>
-                                <div class="detail-item">
-                                    <div class="detail-label">Adults</div>
-                                    <div class="detail-value">${assignment.totalAdults || 0}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Children</div>
-                                    <div class="detail-value">${assignment.totalChildren || 0}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Special Requirements</div>
-                                    <div class="detail-value">${assignment.specialRequirements || 'None'}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="mb-3">
-                                <h6 class="detail-label"><i class="fas fa-calendar-alt me-2"></i>Schedule</h6>
-                                <div class="detail-item">
-                                    <div class="detail-label">Departure Date</div>
-                                    <div class="detail-value">${departureDate.toLocaleDateString()}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Assignment Date</div>
-                                    <div class="detail-value">${assignmentDate.toLocaleString()}</div>
-                                </div>
-                                ${assignment.status.toLowerCase() === 'pending' ? `
-                                <div class="detail-item">
-                                    <div class="detail-label">Response Deadline</div>
-                                    <div class="detail-value">${deadline.toLocaleString()}</div>
-                                </div>
-                                ` : ''}
-                            </div>
-
-                            <div class="mb-3">
-                                <h6 class="detail-label"><i class="fas fa-map-marked-alt me-2"></i>Location</h6>
-                                <div class="detail-item">
-                                    <div class="detail-label">Pickup Point</div>
-                                    <div class="detail-value">${assignment.pickupPoint || 'N/A'}</div>
-                                </div>
-                                <div class="detail-item">
-                                    <div class="detail-label">Destination</div>
-                                    <div class="detail-value">${assignment.destination || 'N/A'}</div>
-                                </div>
-                            </div>
-
-                          
-                        </div>
-                    </div>
-                `;
-
-                $('#assignmentDetailsContent').html(detailsHtml);
-                $('#assignmentDetailsModal').modal('show');
-            }
-
-            // Function to show confirmation modal
-            function showConfirmation(message, action, additionalData = null) {
-                currentAction = {
-                    type: action,
-                    data: additionalData
-                };
-
-                $('#confirmationModalBody').text(message);
-                $('#confirmationModal').modal('show');
-            }
-
-            // Function to perform the action
-            function performAction(action, assignmentId) {
-                $('#confirmationModal').modal('hide');
-
-                const token = $('input[name="__RequestVerificationToken"]').val();
-                let url = '';
-                let data = { assignmentId: assignmentId };
-
-                switch (action.type) {
-                    case 'accept':
-                        url = '@Url.Action("AcceptAssignment", "TourGuide")';
-                        break;
-                    case 'reject':
-                        url = '@Url.Action("RejectAssignment", "TourGuide")';
-                        data.reason = action.data;
-                        break;
-                    case 'complete':
-                        url = '@Url.Action("CompleteAssignment", "TourGuide")';
-                        break;
-                    default:
-                        console.error('Unknown action type:', action);
-                        return;
-                }
-
                 $.ajax({
-                    url: url,
-                    type: 'POST',
-                    headers: {
-                        'RequestVerificationToken': token
-                    },
-                    data: data,
-                    success: function (response) {
-                        if (response.success) {
-                            location.reload(); // Refresh to show updated status
-                        } else {
-                            alert(response.message || 'Action failed');
-                        }
+                    url: '/TourGuide/GetAssignmentDetails',
+                    type: 'GET',
+                    data: { assignmentId: assignmentId },
+                    success: function (data) {
+                        $('#assignmentDetailsContent').html(data);
+                        $('#assignmentDetailsModal').modal('show');
                     },
                     error: function (xhr, status, error) {
-                        console.error('Error:', error);
-                        alert('An error occurred: ' + error);
+                        console.error('Failed to load assignment details:', {
+                            status: status,
+                            error: error,
+                            responseText: xhr.responseText,
+                            statusCode: xhr.status
+                        });
+                        alert('Failed to load assignment details. Check the console for more information.');
                     }
                 });
             }
 
-            // Helper function to get status icon
-            function getStatusIcon(status) {
-                switch (status.toLowerCase()) {
-                    case 'confirmed': return '<i class="fas fa-check-circle me-1"></i>';
-                    case 'pending': return '<i class="fas fa-clock me-1"></i>';
-                    case 'rejected': return '<i class="fas fa-times-circle me-1"></i>';
-                    case 'completed': return '<i class="fas fa-flag-checkered me-1"></i>';
-                    default: return '<i class="fas fa-question-circle me-1"></i>';
-                }
+            function showConfirmation(message, action, additionalData = null) {
+                currentAction = { type: action, data: additionalData };
+                $('#confirmationModalBody').text(message);
+                $('#confirmationModal').modal('show');
             }
 
-            // Helper function to get rating stars
-            function getRatingStars(rating) {
-                if (!rating) return 'Not rated yet';
+            function performAction(action, assignmentId) {
+                $('#confirmationModal').modal('hide');
 
-                let stars = '';
-                for (let i = 0; i < 5; i++) {
-                    stars += i < rating
-                        ? '<i class="fas fa-star text-warning"></i>'
-                        : '<i class="far fa-star text-warning"></i>';
+                const data = { AssignmentId: assignmentId };
+                let url = '';
+
+                switch (action.type) {
+                    case 'accept':
+                        url = '/TourGuide/AcceptAssignment';
+                        break;
+                    case 'reject':
+                        url = '/TourGuide/RejectAssignment';
+                        data.Reason = action.data;
+                        break;
+                    case 'complete':
+                        url = '/TourGuide/CompleteAssignment';
+                        break;
+                    default:
+                        return;
                 }
-                return stars;
+
+                $.ajax({
+                    url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    beforeSend: () => $(`button[data-assignment-id="${assignmentId}"]`).prop('disabled', true),
+                    success: (response) => {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.message || 'Action failed.');
+                        }
+                    },
+                    error: () => alert('An error occurred while processing the request.'),
+                    complete: () => $(`button[data-assignment-id="${assignmentId}"]`).prop('disabled', false)
+                });
             }
         });
     </script>
-</body>
-</html>
+}
+
+@functions {
+    string GetStatusIcon(string status) =>
+        status.ToLower() switch
+        {
+            "confirmed" => "<i class='fas fa-check-circle me-1'></i>",
+            "pending" => "<i class='fas fa-clock me-1'></i>",
+            "rejected" => "<i class='fas fa-times-circle me-1'></i>",
+            "completed" => "<i class='fas fa-flag-checkered me-1'></i>",
+            _ => "<i class='fas fa-question-circle me-1'></i>"
+        };
+
+    string GetRatingStars(List<Tourest.Data.Entities.Rating> ratings)
+    {
+        if (ratings == null || !ratings.Any()) return "Not rated";
+
+        int averageRating = (int)Math.Round(ratings.Average(r => r.RatingValue));
+        var stars = "";
+        for (int i = 0; i < 5; i++)
+        {
+            stars += i < averageRating
+                ? "<i class='fas fa-star text-warning'></i>"
+                : "<i class='far fa-star text-warning'></i>";
+        }
+        return stars;
+    }
+}

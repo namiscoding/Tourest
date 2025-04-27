@@ -18,8 +18,7 @@ public class TourGuideController : Controller
     public async Task<IActionResult> Index(int tourGuideId)
     {
         var assignments = await _assignmentService.GetTourAssignmentsAsync(3);
-        ViewData["AssignedTours"] = assignments;
-        return View();
+        return View(assignments);
     }
     [HttpGet("TourGuideScheduleWork")]
     public async Task<IActionResult> TourGuideScheduleWork(int tourGuideId, int tourGroupId)
@@ -31,12 +30,11 @@ public class TourGuideController : Controller
     }
 
 
-    
-  
+
+
 
     // POST: TourGuide/AcceptAssignment
     [HttpPost("AcceptAssignment")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> AcceptAssignment([FromBody] AssignmentRequest request)
     {
         try
@@ -45,22 +43,14 @@ public class TourGuideController : Controller
 
             if (request?.AssignmentId <= 0)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = "Invalid assignment ID"
-                });
+                return Json(new { success = false, message = "Invalid assignment ID" });
             }
 
             var result = await _assignmentService.AcceptAssignmentAsync(request.AssignmentId);
 
             if (!result.success)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = result.message
-                });
+                return Json(new { success = false, message = result.message });
             }
 
             return Json(new { success = true });
@@ -68,17 +58,12 @@ public class TourGuideController : Controller
         catch (Exception ex)
         {
             Console.WriteLine($"Error accepting assignment: {ex}");
-            return Json(new
-            {
-                success = false,
-                message = ex.Message
-            });
+            return Json(new { success = false, message = ex.Message });
         }
     }
 
-
+    // POST: TourGuide/RejectAssignment
     [HttpPost("RejectAssignment")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> RejectAssignment([FromBody] RejectAssignmentRequest request)
     {
         try
@@ -87,22 +72,14 @@ public class TourGuideController : Controller
 
             if (request?.AssignmentId <= 0 || string.IsNullOrEmpty(request?.Reason))
             {
-                return Json(new
-                {
-                    success = false,
-                    message = "Invalid request data"
-                });
+                return Json(new { success = false, message = "Invalid request data" });
             }
 
             var result = await _assignmentService.RejectAssignmentAsync(request.AssignmentId, request.Reason);
 
             if (!result.success)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = result.message
-                });
+                return Json(new { success = false, message = result.message });
             }
 
             return Json(new { success = true });
@@ -110,11 +87,7 @@ public class TourGuideController : Controller
         catch (Exception ex)
         {
             Console.WriteLine($"Error rejecting assignment: {ex}");
-            return Json(new
-            {
-                success = false,
-                message = ex.Message
-            });
+            return Json(new { success = false, message = ex.Message });
         }
     }
     [HttpGet("GetTourFeedback")]
@@ -140,6 +113,32 @@ public class TourGuideController : Controller
 
         
         return Json(feedback);
+    }
+    [HttpGet("GetAssignmentDetails")]
+    public async Task<IActionResult> GetAssignmentDetails(int assignmentId, int tourGuideId)
+    {
+        if (assignmentId <= 0 || tourGuideId <= 0)
+        {
+            return BadRequest("Invalid assignment ID or tour guide ID.");
+        }
+
+        try
+        {
+            var assignments = await _assignmentService.GetTourAssignmentsAsync(tourGuideId);
+            var assignment = assignments.FirstOrDefault(a => a.AssignmentId == assignmentId);
+
+            if (assignment == null)
+            {
+                return NotFound($"Assignment with ID {assignmentId} not found for tour guide ID {tourGuideId}.");
+            }
+
+            return PartialView("_AssignmentDetails", assignment);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching assignment details for ID {assignmentId}: {ex.Message}");
+            return StatusCode(500, "An error occurred while fetching assignment details. Please try again later.");
+        }
     }
 
 
