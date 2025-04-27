@@ -173,7 +173,7 @@ namespace Tourest
 
             app.MapControllerRoute(
 				name: "default",
-				pattern: "{controller=Tours}/{action=Index}/{id?}");
+				pattern: "{controller=Home}/{action=Index}/{id?}");
 
 			app.Run();
 		}

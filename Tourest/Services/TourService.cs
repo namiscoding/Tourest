@@ -18,6 +18,29 @@ namespace Tourest.Services
             // _mapper = mapper;
         }
 
+        public async Task<List<TourListViewModel>> GetFeaturedToursForDisplayAsync(int count)
+        {
+            var featuredTours = await _tourRepository.GetFeaturedToursAsync(count);
+
+            // Mapping sang TourListViewModel, tính toán rating giống hệt các phương thức khác
+            var tourViewModels = featuredTours.Select(tour => new TourListViewModel
+            {
+                TourId = tour.TourID,
+                Name = tour.Name,
+                Destination = tour.Destination,
+                DurationDays = tour.DurationDays,
+                ChildPrice = tour.ChildPrice, // Hoặc AdultPrice
+                ThumbnailImageUrl = tour.ImageUrls?.Split(';', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault(),
+                // Tính rating từ dữ liệu include
+                AverageRating = (tour.TourRatings != null && tour.TourRatings.Any())
+                              ? tour.TourRatings.Average(tr => tr.Rating.RatingValue)
+                              : (decimal?)null,
+                SumRating = (tour.TourRatings != null) ? tour.TourRatings.Count() : 0
+            }).ToList();
+
+            return tourViewModels;
+        }
+
         public async Task<IEnumerable<TourListViewModel>> GetActiveToursForDisplayAsync()
         {
             var activeTours = await _tourRepository.GetActiveToursAsync(); // Đã Include ratings
@@ -156,5 +179,8 @@ namespace Tourest.Services
         {
             return await _tourRepository.GetDistinctActiveDestinationsAsync();
         }
+
+        public async Task<int> GetActiveTourCountAsync() { return await _tourRepository.GetActiveTourCountAsync(); }
+        public async Task<int> GetDistinctDestinationCountAsync() { return await _tourRepository.GetDistinctDestinationCountAsync(); }
     }
 }

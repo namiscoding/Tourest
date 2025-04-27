@@ -22,7 +22,21 @@ namespace Tourest.Data.Repositories
                                  .AsNoTracking()                 // Tùy chọn: Tăng hiệu năng nếu chỉ đọc
                                  .ToListAsync();
         }
-
+        public async Task<IEnumerable<Tour>> GetFeaturedToursAsync(int count)
+        {
+            return await _context.Tours
+                .Where(t => t.Status == "Active") // Chỉ lấy tour active
+                                                  // Sắp xếp theo điểm trung bình giảm dần (cao nhất trước)
+                                                  // Coi điểm null là thấp nhất (-1 hoặc một giá trị rất nhỏ)
+                .OrderByDescending(t => t.AverageRating ?? -1m)
+                .Take(count) // Lấy số lượng tour theo yêu cầu
+                             // Include dữ liệu cần thiết cho việc mapping sang TourListViewModel trong Service
+                             // Quan trọng: Include TourRatings để Service tính toán rating đồng nhất
+                .Include(t => t.TourRatings)
+                    .ThenInclude(tr => tr.Rating)
+                .AsNoTracking()
+                .ToListAsync();
+        }
         public async Task<IEnumerable<Tour>> GetActiveToursAsync(
             IEnumerable<int>? categoryIds = null,
             IEnumerable<string>? destinations = null,
@@ -147,6 +161,20 @@ namespace Tourest.Data.Repositories
                         .ThenInclude(r => r.Customer) // Từ Rating gốc tải User (Customer)
                 .AsNoTracking() // Vì chỉ đọc dữ liệu
                 .FirstOrDefaultAsync(); // Lấy tour đầu tiên hoặc null
+        }
+
+        public async Task<int> GetActiveTourCountAsync()
+        {
+            return await _context.Tours.CountAsync(t => t.Status == "Active");
+        }
+
+        public async Task<int> GetDistinctDestinationCountAsync()
+        {
+            return await _context.Tours
+                             .Where(t => t.Status == "Active" && !string.IsNullOrEmpty(t.Destination))
+                             .Select(t => t.Destination)
+                             .Distinct()
+                             .CountAsync();
         }
     }
 }

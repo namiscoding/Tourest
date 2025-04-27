@@ -6,5 +6,7 @@ namespace Tourest.Services
     {
         Task<IEnumerable<CategoryViewModel>> GetAllCategoriesForDisplayAsync();
         Task<CategoryViewModel?> GetCategoryByIdAsync(int id);
+        //Task<List<CategoryViewModel>> GetAllCategoriesForDisplayAsync(); // Giả sử đã có
+        Task<List<CategoryStatViewModel>> GetCategoryStatisticsAsync();
     }
 }
