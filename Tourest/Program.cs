@@ -51,19 +51,15 @@ namespace Tourest
             builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
 
-            // Add Authentication
             builder.Services.AddAuthentication()
-                .AddCookie(options =>
-                {
-                    options.Events.OnValidatePrincipal = context =>
-                    {
-                        var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                        context.Principal.AddIdentity(new ClaimsIdentity(new[] { new Claim("userId", userId) }));
-                        return Task.CompletedTask;
-                    };
-                });
+    .AddCookie(options => {
+        options.Events.OnValidatePrincipal = context => {
+            var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            context.Principal.AddIdentity(new ClaimsIdentity(new[] { new Claim("userId", userId) }));
+            return Task.CompletedTask;
+        };
+    });
             builder.Services.AddAuthorization();
-
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 // Cookie settings
@@ -117,15 +113,14 @@ namespace Tourest
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
 			}
-            
             app.MapIdentityApi<IdentityUser>();
             app.UseHttpsRedirection();
-			app.UseStaticFiles();
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();
             app.UseAuthentication();
             app.UseSession();
-         
+
             //app.MapHub<NotificationHub>("/notificationHub");
 
             app.MapControllerRoute(
