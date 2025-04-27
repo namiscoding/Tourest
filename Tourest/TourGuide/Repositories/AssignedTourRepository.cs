@@ -43,6 +43,7 @@ namespace Tourest.TourGuide.Repositories
                     TotalChildren = a.TourGroup.Bookings.Select(b => b.NumberOfChildren).FirstOrDefault(),
                     TourName = a.TourGroup.Bookings.Select(b => b.Tour.Name).FirstOrDefault(),
                     Status = a.Status,
+                    Deadline = a.AssignmentDate.AddHours(12),
                     AssignmentDate = a.AssignmentDate,
                     TourRating = a.TourGroup.TourGuideRatings.Select(r => r.Rating).ToList(),
                   
@@ -51,11 +52,19 @@ namespace Tourest.TourGuide.Repositories
 
             return assignedTours;
         }
-        public async Task<List<Tourest.TourGuide.ViewModels.TourGuideRatingViewModel>> GetTourGuideRatingsAndComments(int tourGuideId, int? tourGroupId = null)
+       
+
+        public async Task<List<ViewModels.TourGuideRatingViewModel>> GetTourGuideRatingsAndComments(int? tourGuideId, int? tourGroupId)
         {
-            // Lấy tất cả các assignment của tour guide
+
+            // Lấy ngày hiện tại (không bao gồm giờ phút giây)
+            var today = DateTime.Today;
+
+            // Lấy tất cả các assignment của tour guide với điều kiện status là "Confirmed" và CompletedDate < today
             var assignmentsQuery = _context.TourGuideAssignments
-                .Where(tga => tga.TourGuideID == tourGuideId);
+                .Where(tga => tga.TourGuideID == tourGuideId
+                           && tga.Status == "Confirmed"
+                           && DateTime.Now.Date > tga.TourGroup.DepartureDate.AddDays(tga.TourGroup.Tour.DurationDays));
 
             // Nếu có tourGroupId, lọc theo tourGroupId
             if (tourGroupId.HasValue)
@@ -88,12 +97,10 @@ namespace Tourest.TourGuide.Repositories
 
             foreach (var assignment in assignments)
             {
-               
                 var ratings = allRatings
                     .Where(r => r.TourGroupID == assignment.Assignment.TourGroupID)
                     .ToList();
 
-                
                 var ratingDistribution = new RatingDistribution
                 {
                     FiveStar = ratings.Count(r => r.Rating.RatingValue == 5),
@@ -103,7 +110,6 @@ namespace Tourest.TourGuide.Repositories
                     OneStar = ratings.Count(r => r.Rating.RatingValue == 1)
                 };
 
-                
                 var viewModel = new Tourest.TourGuide.ViewModels.TourGuideRatingViewModel
                 {
                     AssignmentId = assignment.Assignment.AssignmentID,
@@ -123,7 +129,6 @@ namespace Tourest.TourGuide.Repositories
                     AverageRating = ratings.Any() ? (decimal)ratings.Average(r => r.Rating.RatingValue) : 0,
                     TotalRatings = ratings.Count,
                     RatingDistribution = ratingDistribution,
-
                     Ratings = ratings.Select(r => new RatingDetail
                     {
                         RatingId = r.Rating.RatingID,
@@ -132,6 +137,7 @@ namespace Tourest.TourGuide.Repositories
                         RatingDate = r.Rating.RatingDate,
                         CustomerId = r.Rating.CustomerID,
                         CustomerName = r.Rating.Customer.FullName,
+                        CustomerAvatar = r.Rating.Customer.ProfilePictureUrl
                     }).ToList()
                 };
 

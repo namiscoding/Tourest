@@ -49,7 +49,7 @@ namespace Tourest.TourGuide.Services
             return await _assignedTourRespo.GetTourAssigned(tourGuideId);
         }
 
-        public  async Task<List<Tourest.TourGuide.ViewModels.TourGuideRatingViewModel>> GetTourGuideRatingsAndComments(int tourGuideId, int tourGroupId)
+        public  async Task<List<Tourest.TourGuide.ViewModels.TourGuideRatingViewModel>> GetTourGuideRatingsAndComments(int ?tourGuideId, int ?tourGroupId)
         {
             return await _assignedTourRespo.GetTourGuideRatingsAndComments(tourGuideId, tourGroupId);
         }

@@ -117,8 +117,32 @@ public class TourGuideController : Controller
             });
         }
     }
+    [HttpGet("GetTourFeedback")]
+    public IActionResult GetTourFeedback(int tourId)
+    {
+        Console.WriteLine($"Fetching feedback for AssignmentID: {tourId}");
+        var feedback = (from tga in _context.TourGuideAssignments
+                        join tr in _context.TourGuideRatings on tga.TourGroupID equals tr.TourGroupID
+                        join r in _context.Ratings on tr.RatingID equals r.RatingID
+                        join u in _context.Users on r.CustomerID equals u.UserID
+                        where tga.AssignmentID == tourId && tga.TourGuideID == 3
+                        select new
+                        {
+                            ratingId = r.RatingID,
+                            customerName = u.FullName,
+                            //customerAvatar = u.AvatarUrl ?? "https://via.placeholder.com/40",
+                            ratingValue = r.RatingValue,
+                            comment = r.Comment,
+                            ratingDate = r.RatingDate,
+                            guideResponse = (string)null,
+                            responseDate = (DateTime?)null
+                        }).ToList();
 
-   
+        
+        return Json(feedback);
+    }
+
+
 }
 
 // Model classes
