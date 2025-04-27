@@ -119,6 +119,50 @@ namespace Tourest.Services
                 _logger.LogError("Failed to create customer by admin in repository. Email: {Email}", model.Email);
                 return (false, "Đã có lỗi xảy ra trong quá trình tạo tài khoản.");
             }
+            // --- 6. Xử lý Upload Ảnh (SAU KHI USER ĐƯỢC TẠO) ---
+            string? finalPublicId = null; // PublicId của ảnh sẽ được lưu
+            if (model.ProfilePictureFile != null && model.ProfilePictureFile.Length > 0)
+            {
+                _logger.LogInformation("Profile picture file detected for UserID: {UserId}. Uploading...", createdUser.UserID);
+                // Tạo PublicId mong muốn (ví dụ)
+                string desiredPublicId = $"users/{createdUser.UserID}/profile_{DateTime.UtcNow.Ticks}";
+                // Upload ảnh lên Cloudinary
+                var uploadResult = await _photoService.UploadPhotoAsync(model.ProfilePictureFile, "users", desiredPublicId); // Lưu vào thư mục users
+
+                if (uploadResult.Success && !string.IsNullOrEmpty(uploadResult.PublicId))
+                {
+                    finalPublicId = uploadResult.PublicId; // Lấy PublicId trả về
+                    _logger.LogInformation("Photo uploaded successfully for UserID: {UserId}. PublicId: {PublicId}", createdUser.UserID, finalPublicId);
+
+                    // *** Cập nhật lại User với PublicId ảnh ***
+                    createdUser.ProfilePictureUrl = finalPublicId; // Lưu PublicId vào trường Url
+                    bool updateSuccess = await _userRepository.UpdateUserAsync(createdUser);
+                    if (!updateSuccess)
+                    {
+                        _logger.LogWarning("User/Account created BUT failed to update user with PublicId for UserID: {UserId}", createdUser.UserID);
+                        // Có thể trả về lỗi hoặc chỉ log warning tùy yêu cầu
+                        // return (false, "Tạo tài khoản thành công nhưng lỗi khi lưu ảnh đại diện.");
+                        // Hoặc vẫn trả về thành công nhưng kèm cảnh báo
+                        return (true, "Tạo tài khoản thành công nhưng có lỗi xảy ra khi lưu ảnh đại diện.");
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("Photo upload failed for UserID: {UserId}. Error: {Error}", createdUser.UserID, uploadResult.ErrorMessage);
+                    // Quyết định trả về lỗi hay thành công kèm cảnh báo
+                    // return (false, $"Tạo tài khoản thành công nhưng lỗi upload ảnh: {uploadResult.ErrorMessage}");
+                    return (true, $"Tạo tài khoản thành công nhưng có lỗi xảy ra khi upload ảnh đại diện: {uploadResult.ErrorMessage}");
+                }
+            }
+            else
+            {
+                _logger.LogInformation("No profile picture file uploaded for UserID: {UserId}", createdUser.UserID);
+            }
+            // --- Kết thúc xử lý Upload Ảnh ---
+
+            _logger.LogInformation("Customer creation process complete for UserID: {UserId}", createdUser.UserID);
+            return (true, string.Empty); // Thành công hoàn toàn hoặc thành công kèm cảnh báo upload
+
         }
 
         public async Task<EditCustomerViewModel?> GetCustomerForEditAsync(int userId)
