@@ -1,0 +1,133 @@
+﻿@* File: Views/Authentication/ForgotPassword.cshtml *@
+
+@{
+    ViewData["Title"] = "Tourest - Quên mật khẩu";
+}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<main>
+    <div class="custom-cursor">
+        <!-- Custom Cursor start -->
+        <div class="custom-cursor__cursor"></div>
+        <div class="custom-cursor__cursor-two"></div>
+        <!-- Custom Cursor end -->
+        <!-- Preloader start -->
+        <div id="preloader">
+            <div class="loading-container">
+                <div class="loading"></div>
+                <div id="loading-icon">
+                    <img alt="logo-sm" src="~/assets/images/logo.svg" width="90" />
+                </div>
+            </div>
+        </div>
+        <!-- Preloader end -->
+        <!-- back to top button start-->
+        <a href="#" id="scroll-top" class="back-to-top-btn">
+            <i class="fa-solid fa-arrow-up"></i>
+        </a>
+        <!-- back to top button end-->
+
+        <main>
+            <!-- Breadcrumb__section start  -->
+            <section class="breadcrumb__section section-padding-top-bottom"
+                     style="--bg-image: url('@Url.Content("~/assets/images/breadcrumb-section/breadcrumb.png")');">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="breadcrumb__content">
+                                <h1 class="breadcrumb-title">Quên Mật Khẩu</h1>
+                                <nav>
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item">
+                                            <a asp-controller="Home" asp-action="Index">home</a>
+                                        </li>
+                                        <li class="breadcrumb-item">
+                                            <a asp-controller="Authentication" asp-action="Login">đăng nhập</a>
+                                        </li>
+                                        <li class="breadcrumb-item active" aria-current="page">
+                                            quên mật khẩu
+                                        </li>
+                                    </ol>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Breadcrumb__section end  -->
+            <!-- forgot_password__section start  -->
+            <div class="authentication__section section-padding-top-bottom">
+                <div class="container">
+                    <div class="row g-4 justify-content-center">
+                        <div class="col-md-10 col-lg-6">
+                            <div class="authentication__form-area">
+                                <div class="forgot-password-header text-center mb-4">
+                                    <h3>Khôi phục mật khẩu của bạn</h3>
+                                    <p class="text-muted">Vui lòng nhập địa chỉ email đã đăng ký để nhận liên kết đặt lại mật khẩu</p>
+                                </div>
+
+                                @if (TempData["Message"] != null)
+                                {
+                                    <div class="alert alert-info text-center">
+                                        @TempData["Message"]
+                                    </div>
+                                }
+
+                                @if (TempData["Error"] != null)
+                                {
+                                    <div class="alert alert-danger text-center">
+                                        @TempData["Error"]
+                                    </div>
+                                }
+
+                                <form asp-action="SendLink" asp-controller="Authentication" method="get" class="forgot-password-form">
+
+                                  
+                                    <div class="row mb-4 align-items-center">
+                                        <label for="forgotEmail" class="col-md-3 col-form-label text-md-end">Email</label>
+                                        <div class="col-md-9">
+                                            <input type="email"
+                                                name="Email"
+                                                   class="form-control"
+                                                   id="forgotEmail"
+                                                   placeholder="Enter your Email"
+                                                   required />
+                                         
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="common-btn color-two w-100">
+                                            Gửi Liên Kết Đặt Lại
+                                        </button>
+
+                                        <a asp-action="Login" asp-controller="Authentication" class="common-btn outline w-100">
+                                            Quay Lại Đăng Nhập
+                                        </a>
+                                    </div>
+                                </form>
+
+                                <div class="forgot-password-footer text-center mt-4">
+                                    <p>
+                                        Không có tài khoản? <a asp-action="Login" asp-controller="Authentication"
+                                                               onclick="document.querySelector('#signup-tab').click();">Đăng ký ngay</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- forgot_password__section end  -->
+        </main>
+    </div>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Tự động focus vào input email khi trang load xong
+        document.getElementById("forgotEmail").focus();
+    });
+</script>

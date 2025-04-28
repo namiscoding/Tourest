@@ -7,6 +7,7 @@ namespace Tourest.ViewModels.Account
         public LoginModel Login { get; set; } = new LoginModel();
         [ValidateNever]
         public RegisterModel Register { get; set; } = new RegisterModel();
+        
     }
 
 }

@@ -35,6 +35,7 @@ namespace Tourest.Data.Repositories
 
         // Lấy ratings mà Guide này nhận được
         Task<IEnumerable<Rating>> GetRatingsReceivedByGuideAsync(int guideUserId);
+        Task<bool> ChangePassword(int uid, string newPassword, string currentPass);
 
     }
 

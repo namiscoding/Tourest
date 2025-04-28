@@ -2,12 +2,12 @@
 using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using Tourest.Data.Entities;
 using Tourest.Data.Repositories;
 using Tourest.Services;
 using Tourest.Util;
 using Tourest.ViewModels.Account;
-using Tourest.ViewModels.Admin;
 
 namespace Tourest.Controllers
 {
@@ -17,8 +17,8 @@ namespace Tourest.Controllers
         private readonly IAccountService _accountService;
         private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
-
-     
+        
+    
 
         public ProfileController(IUserService userService, IAccountService accountService, IUserRepository userRepository)
         {
@@ -45,6 +45,27 @@ namespace Tourest.Controllers
             return View(userObj);
         }
 
+        [Route("/ChangePassword/{id}")]
+        [HttpGet]
+        public IActionResult ChangePassword(int id)
+        {
+            ChangePasswordModel change = new ChangePasswordModel();
+            change.UserID = id;
+            return View(change);
+        }
+        [HttpPost]   
+        
+        public async Task<IActionResult> ActionChangePassword(ChangePasswordModel model)
+        {
+            
+            Console.WriteLine(model.toString());
+            bool status = await _accountService.UpdatePassword(model.UserID, model.ConfirmNewPassword,model.CurrentPassword);
+            if (status == true)
+            {
+                 TempData["Message"] = "update successfull";
+            }
+            return RedirectToAction("Index", new { id = model.UserID });
+        }
 
         [HttpPost]
         public async Task<IActionResult> Edit(UserViewModel userViewModel, string ConfirmPassword, string emailCurrent)
@@ -52,11 +73,6 @@ namespace Tourest.Controllers
             User? result = await _accountService.CheckEmailAsync(emailCurrent);
             Console.WriteLine(result);
 
-            if (!BCrypt.Net.BCrypt.Verify(ConfirmPassword, result.Account.PasswordHash))
-            {
-                TempData["Message"] = "Wrong Password";
-                return RedirectToAction("Index", new { id = userViewModel.UserID });
-            }
             
             var updateResult = await _userService.UpdateCustomerByAdminAsync(AccountMapper.ConvertoEdit(userViewModel));
             if (!updateResult.Success)
