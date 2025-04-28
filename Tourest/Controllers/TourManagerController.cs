@@ -404,6 +404,80 @@ namespace Tourest.Controllers
                 return Json(new { success = false, message = $"Error assigning guide: {ex.Message}" });
             }
         }
+        [HttpPost("ReassignGuide")]
+        public async Task<IActionResult> ReassignGuide([FromBody] ReassignGuideRequest request)
+        {
+            try
+            {
+                Console.WriteLine($"Reassigning guide ID: {request.GuideId} to TourGroup ID: {request.TourGroupId}");
+
+                if (request.TourGroupId <= 0 || request.GuideId <= 0)
+                {
+                    return Json(new { success = false, message = "Invalid tour group ID or guide ID" });
+                }
+
+                // Fetch the tour group
+                var tourGroup = await _context.TourGroups
+                    .FirstOrDefaultAsync(tg => tg.TourGroupID == request.TourGroupId);
+                if (tourGroup == null)
+                {
+                    return Json(new { success = false, message = "Tour group not found" });
+                }
+
+                // Check if there’s a rejected assignment for this tour group
+                var existingAssignment = await _context.TourGuideAssignments
+                    .FirstOrDefaultAsync(tga => tga.TourGroupID == request.TourGroupId && tga.Status == "Rejected");
+                if (existingAssignment == null)
+                {
+                    return Json(new { success = false, message = "No rejected assignment found for this tour group" });
+                }
+
+                // Validate the guide
+                var guide = await _context.TourGuides
+                    .FirstOrDefaultAsync(g => g.TourGuideUserID == request.GuideId);
+                if (guide == null)
+                {
+                    return Json(new { success = false, message = "Tour guide not found" });
+                }
+
+                // Check for conflicting assignments
+                var conflictingAssignment = await _context.TourGuideAssignments
+                    .Join(_context.TourGroups,
+                          tga => tga.TourGroupID,
+                          tg => tg.TourGroupID,
+                          (tga, tg) => new { tga, tg })
+                    .Where(x => x.tga.TourGuideID == request.GuideId
+                                && x.tga.Status == "Confirmed"
+                                && x.tg.DepartureDate.Date == tourGroup.DepartureDate.Date)
+                    .AnyAsync();
+                if (conflictingAssignment)
+                {
+                    return Json(new { success = false, message = "Guide is already assigned to another tour on the same date" });
+                }
+
+                // Update the existing assignment or create a new one
+                existingAssignment.TourGuideID = request.GuideId;
+                existingAssignment.TourManagerID = 2; // Replace with logged-in manager ID (e.g., User.Identity)
+                existingAssignment.AssignmentDate = DateTime.Now;
+                existingAssignment.Status = "Pending";
+                existingAssignment.RejectionReason = null;
+
+                // Update the tour group
+                tourGroup.Status = "Assigned";
+                tourGroup.AssignedTourGuideID = request.GuideId;
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Guide reassigned successfully" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reassigning guide: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                    Console.WriteLine($"InnerException: {ex.InnerException.Message}");
+                return Json(new { success = false, message = $"Error reassigning guide: {ex.Message}" });
+            }
+        }
     }
 
 }
@@ -411,5 +485,10 @@ namespace Tourest.Controllers
 public class AssignGuideRequest
 {
     public int BookingId { get; set; }
+    public int GuideId { get; set; }
+}
+public class ReassignGuideRequest
+{
+    public int TourGroupId { get; set; }
     public int GuideId { get; set; }
 }
