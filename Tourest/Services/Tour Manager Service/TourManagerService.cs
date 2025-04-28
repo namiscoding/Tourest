@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Core.Types;
 using Tourest.Data;
 using Tourest.Data.Repositories;
 using Tourest.ViewModels.Tour;
@@ -67,6 +68,16 @@ namespace Tourest.Services
         public Task<List<TourGuideAssignmentViewModel>> GetTourGuideScheduleAsync(int tourGuideId)
         {
             return tourManagerRepository.GetTourGuideScheduleAsync(tourGuideId);
+        }
+
+        public Task<IEnumerable<UserViewModel>> GetUsersAsync()
+        {
+            return tourManagerRepository.GetUsers();
+        }
+
+        public Task<UserViewModel> GetUserByIdAsync(int id)
+        {
+            return tourManagerRepository.GetUserByIdAsync(id);
         }
     }
 }

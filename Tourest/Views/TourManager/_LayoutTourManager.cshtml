@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: #f9fafc;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+            .sidebar h2 {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+                color: #fff;
+            }
+
+            .sidebar a {
+                display: block;
+                color: #adb5bd;
+                padding: 0.5rem 1rem;
+                text-decoration: none;
+                border-radius: 5px;
+                margin-bottom: 0.5rem;
+                transition: background-color 0.2s ease;
+            }
+
+                .sidebar a:hover {
+                    background-color: #495057;
+                    color: #fff;
+                }
+
+        .content {
+            margin-left: 250px;
+            padding: 2rem;
+        }
+
+            .content h2 {
+                font-size: 1.8rem;
+                color: #333;
+                margin-bottom: 1rem;
+            }
+    </style>
+</head>
+<body>
+    <div class="header">
+        🛠️ Tour Manager Dashboard
+    </div>
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <a asp-controller="TourManager" asp-action="TourGuide">📋 View Tour Guides List</a>
+        <a asp-controller="TourManager" asp-action="ListTour">🗺️ View Tour List</a>
+    </div>
+    <div class="content">
+        @RenderBody()
+    </div>
+</body>
+</html>

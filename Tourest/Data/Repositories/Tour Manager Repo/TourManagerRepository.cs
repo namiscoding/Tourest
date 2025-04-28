@@ -250,5 +250,29 @@ namespace Tourest.Data.Repositories
                 })
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<UserViewModel>> GetUsers()
+        {
+            return await _context.Users.Select(u => new UserViewModel
+            {
+                FullName = u.FullName,
+                Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
+                ProfilePictureUrl = u.ProfilePictureUrl
+            }).ToListAsync();
+
+        }
+
+        public async Task<UserViewModel> GetUserByIdAsync(int id)
+        {
+            return await _context.Users.Where(u => u.UserID == id).Select(u => new UserViewModel
+            {
+                FullName = u.FullName,
+                Email = u.Email,
+                PhoneNumber = u.PhoneNumber,
+                ProfilePictureUrl = u.ProfilePictureUrl
+            }).FirstOrDefaultAsync();
+        }
+
     }
 }
