@@ -37,18 +37,18 @@ public class PaymentController : Controller
         _tourGroupRepository = tourGroupRepository;
     }
 
-    // --- CreatePaymentMomo (Giữ nguyên như code bạn cung cấp, đã đúng) ---
+    
     [HttpPost]
     public async Task<IActionResult> CreatePaymentMomo(MomoFormDataModel formData)
     {
         _logger.LogInformation("Received request to create MoMo payment link for existing BookingId (as OrderId): {OrderId}, Amount from form: {Amount}", formData.OrderId, formData.Amount);
 
-        // --- KIỂM TRA DỮ LIỆU ĐẦU VÀO TỪ FORM ---
+        
         if (formData == null || string.IsNullOrEmpty(formData.OrderId) || formData.Amount <= 0)
         {
             _logger.LogWarning("Invalid form data received for MoMo payment creation.");
             TempData["PaymentError"] = "Dữ liệu gửi đi không hợp lệ.";
-            return RedirectToAction("Index", "BookingHistory"); // <<< THAY THẾ
+            return RedirectToAction("Index", "BookingHistory"); 
         }
 
         // --- PARSE BOOKING ID ---
@@ -56,7 +56,7 @@ public class PaymentController : Controller
         {
             _logger.LogWarning("Could not parse OrderId '{MomoOrderId}' from form data to long.", formData.OrderId);
             TempData["PaymentError"] = "Mã đơn hàng không hợp lệ.";
-            return RedirectToAction("Index", "BookingHistory"); // <<< THAY THẾ
+            return RedirectToAction("Index", "BookingHistory"); 
         }
 
         try
@@ -73,29 +73,29 @@ public class PaymentController : Controller
             {
                 _logger.LogWarning("Booking with ID {BookingId} not found.", bookingId);
                 TempData["PaymentError"] = "Không tìm thấy đơn hàng để thanh toán.";
-                return RedirectToAction("Index", "BookingHistory"); // <<< THAY THẾ
+                return RedirectToAction("Index", "BookingHistory"); 
             }
 
             if (booking.Customer == null)
             {
                 _logger.LogError("Customer information not found for Booking {BookingId}.", bookingId);
                 TempData["PaymentError"] = "Thiếu thông tin khách hàng của đơn hàng.";
-                return RedirectToAction("Index", "BookingHistory"); // <<< THAY THẾ
+                return RedirectToAction("Index", "BookingHistory"); 
             }
 
-            // Kiểm tra trạng thái booking
+            
             if (booking.Status != "PendingPayment")
             {
                 _logger.LogWarning("Booking {BookingId} is not in 'PendingPayment' status. Current status: {Status}", bookingId, booking.Status);
                 TempData["PaymentError"] = $"Đơn hàng đang ở trạng thái '{booking.Status}', không thể thanh toán.";
                 if (booking.Status == "Paid")
                 {
-                    return RedirectToAction("Details", "BookingHistory", new { id = booking.BookingID }); // <<< THAY THẾ
+                    return RedirectToAction("Details", "BookingHistory", new { id = booking.BookingID }); 
                 }
-                return RedirectToAction("Index", "BookingHistory"); // <<< THAY THẾ
+                return RedirectToAction("Index", "BookingHistory"); 
             }
 
-            // Kiểm tra giá trị Amount từ form với giá trị trong DB
+           
             if (Math.Abs(booking.TotalPrice - formData.Amount) > 0.01m)
             {
                 _logger.LogWarning("Amount mismatch for Booking {BookingId}. DB TotalPrice: {DbPrice}, Form Amount: {FormAmount}",
@@ -105,12 +105,12 @@ public class PaymentController : Controller
             }
 
             // --- TẠO ĐỊNH DANH DUY NHẤT CHO LẦN THANH TOÁN NÀY ---
-            string uniqueAttemptId = $"{booking.BookingID}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}"; // Ví dụ: "21_1721986487"
+            string uniqueAttemptId = $"{booking.BookingID}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
             _logger.LogInformation("Generating unique MoMo attempt ID: {UniqueAttemptId} for BookingID: {BookingId}", uniqueAttemptId, booking.BookingID);
 
             // --- CHUẨN BỊ extraData ---
-            var extraDataObject = new { bookingId = booking.BookingID }; // Chỉ cần bookingId là đủ để tìm lại
-            string extraDataJson = System.Text.Json.JsonSerializer.Serialize(extraDataObject); // Hoặc dùng Newtonsoft.Json
+            var extraDataObject = new { bookingId = booking.BookingID }; // Chỉ cần bookingId 
+            string extraDataJson = System.Text.Json.JsonSerializer.Serialize(extraDataObject); 
             string extraDataBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(extraDataJson));
             _logger.LogInformation("Encoded extraData: {ExtraDataBase64}", extraDataBase64);
 
