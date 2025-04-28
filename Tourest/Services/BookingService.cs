@@ -48,6 +48,20 @@ namespace Tourest.Services
                                   .Where(b => b.Tour != null && b.Tour.Destination.Equals(destinationFilter, StringComparison.OrdinalIgnoreCase)); // Lọc không phân biệt hoa thường
             }
 
+            // === LẤY THÔNG TIN ĐÃ ĐÁNH GIÁ ===
+            // Lấy danh sách các TourID mà user này đã đánh giá
+            var ratedTourIds = await _context.TourRatings
+                .Where(tr => tr.Rating.CustomerID == customerId)
+                .Select(tr => tr.TourID)
+                .Distinct()
+                .ToListAsync();
+
+            // Lấy danh sách các TourGroupID mà user này đã đánh giá hướng dẫn viên
+            var ratedTourGroupIds = await _context.TourGuideRatings
+                .Where(tgr => tgr.Rating.CustomerID == customerId)
+                .Select(tgr => tgr.TourGroupID)
+                .Distinct()
+                .ToListAsync();
 
             // === TÍNH TOÁN DỮ LIỆU BIỂU ĐỒ ===
             var completedStatuses = new[] { "Paid", "Completed" }; // Các trạng thái tính chi tiêu
@@ -99,7 +113,11 @@ namespace Tourest.Services
                     NumberOfChildren = b.NumberOfChildren,
                     Status = b.Status,
                     CancellationDate = b.CancellationDate,
-                    RefundAmount = b.RefundAmount
+                    RefundAmount = b.RefundAmount,
+                    TourGroup = b.TourGroup,
+                    HasRatedTour = ratedTourIds.Contains(b.TourID),
+                    HasRatedTourGuide = b.TourGroupID.HasValue && ratedTourGroupIds.Contains(b.TourGroupID.Value)
+                    
                 }).ToList();
 
             // 5. Tạo ViewModel chính

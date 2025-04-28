@@ -18,16 +18,20 @@ namespace Tourest.Controllers
             _bookingService = bookingService;
             _tourService = tourService;
         }
-
+        [Authorize(Roles = "Customer")]
         // POST: Booking/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CreateBookingViewModel model) 
+        public async Task<IActionResult> Create(CreateBookingViewModel model)
         {
-            
-            int customerId = 4;
+            //var customerId = 4;
 
-            
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int customerId))
+            {
+                return Challenge();
+            }
+
 
             if (ModelState.IsValid)
             {
