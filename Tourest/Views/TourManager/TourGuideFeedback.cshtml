@@ -11,6 +11,30 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
+        .actions {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .btn-back {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background-color: #007bff; /* Updated to blue */
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3); /* blue shadow */
+        }
+
+            .btn-back:hover {
+                background-color: #0056b3; /* Darker blue on hover */
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
+            }
+
         h2 {
             text-align: center;
             margin-bottom: 1.5rem;
@@ -67,4 +91,7 @@
             }
         </tbody>
     </table>
+    <div class="actions">
+        <a class="btn-back" asp-controller="TourManager" asp-action="TourGuide">← View Tour Guides List</a>
+    </div>
 </div>

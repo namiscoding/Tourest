@@ -9,7 +9,7 @@ using Tourest.ViewModels.Tour;
 
 namespace Tourest.Controllers
 {
-    [Authorize(Roles = "Admin,Manager")]
+    //[Authorize(Roles = "Admin,Manager")]
     public class TourManagerController : Controller
     {
         private readonly ITourManagerService _tourManagerService;

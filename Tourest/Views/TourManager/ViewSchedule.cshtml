@@ -5,49 +5,86 @@
     var tourGuideId = ViewBag.TourGuideId as int?;
 }
 
-<style>
-    .dashboard {
-        max-width: 600px;
-        margin: 2rem auto;
-        background-color: #fff;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        text-align: center;
-    }
-
-    h2 {
-        font-size: 1.8rem;
-        margin-bottom: 2rem;
-        color: #343a40;
-    }
-
-    .dashboard-links {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-        .dashboard-links a {
-            display: inline-block;
-            background-color: #007bff;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 500;
-            text-decoration: none;
-            transition: background-color 0.2s ease;
+@section Style {
+    <style>
+        .container-centered {
+            max-width: 1000px;
+            margin: 2rem auto;
+            background-color: #fff;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.6s ease;
         }
 
-            .dashboard-links a:hover {
+        h2 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            font-size: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 15px 18px;
+            border-bottom: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+            transition: background-color 0.3s ease;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .btn-custom {
+            display: inline-block;
+            padding: 0.75rem 1.75rem;
+            background-color: #007bff;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+            .btn-custom:hover {
                 background-color: #0056b3;
+                transform: translateY(-3px);
             }
-</style>
+    </style>
+}
 
-<div class="dashboard">
-    <h2>Schedule</h2>
+<div class="container-centered">
+    <h2>Tour Guide Schedule</h2>
 
-    <table class="table table-bordered">
+    <table>
         <thead>
             <tr>
                 <th>Assignment Date</th>
@@ -68,4 +105,8 @@
             }
         </tbody>
     </table>
+
+    <div class="actions">
+        <a asp-controller="TourManager" asp-action="TourGuide" class="btn-custom">← View Tour Guides List</a>
+    </div>
 </div>

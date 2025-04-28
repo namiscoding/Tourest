@@ -2,8 +2,33 @@
 
 @section Style {
     <style>
+        .btn-custom {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: #007bff;
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+            .btn-custom:hover {
+                background-color: #0056b3;
+                transform: translateY(-2px);
+            }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+            .btn-danger:hover {
+                background-color: #c82333;
+            }
+
         .container-centered {
-            max-width: 1000px;
+            max-width: 800px;
             margin: 2rem auto;
             background-color: #fff;
             padding: 2rem;
@@ -11,15 +36,10 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            color: #343a40;
-        }
-
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 1rem;
             background-color: white;
             border-radius: 8px;
             overflow: hidden;
@@ -40,13 +60,36 @@
         tr:nth-child(even) {
             background-color: #f8f9fa;
         }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #343a40;
+        }
     </style>
+
 }
 
 <h2>Tour Guide Detail</h2>
 
 <div class="container-centered">
     <table>
+        <tr>
+            <th>FullName</th>
+            <td>@Model.FullName</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>@Model.Email</td>
+        </tr>
+        <tr>
+            <th>Phone Number</th>
+            <td>@Model.PhoneNumber</td>
+        </tr>
+        <tr>
+            <th>Address</th>
+            <td>@Model.Address</td>
+        </tr>
         <tr>
             <th>Experience</th>
             <td>@Model.Experience</td>
@@ -70,8 +113,11 @@
         <tr>
             <th>Profile Picture</th>
             <td>
-                <img src="@Model.ProfilePictureUri" alt="Profile Picture" />
+                <img src="@Model.ProfilePictureUri" alt="Profile Picture" style="max-width: 150px; border-radius: 8px;" />
             </td>
         </tr>
     </table>
+    <div class="actions" style="margin-top: 1.5rem;">
+        <a asp-controller="TourManager" asp-action="TourGuide" class="btn-custom">← View Tour Guides List</a>
+    </div>
 </div>

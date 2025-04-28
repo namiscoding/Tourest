@@ -42,7 +42,11 @@ namespace Tourest.Data.Repositories
                               Specializations = tg.Specializations,
                               MaxGroupSizeCapacity = tg.MaxGroupSizeCapacity ?? 0,
                               Rating = tg.AverageRating ?? 0,
-                              ProfilePictureUri = u.ProfilePictureUrl
+                              ProfilePictureUri = u.ProfilePictureUrl,
+                              FullName = u.FullName,
+                              Address = u.Address,
+                              PhoneNumber = u.PhoneNumber,
+                              Email = u.Email
                           }).FirstOrDefault();
 
             return result;
