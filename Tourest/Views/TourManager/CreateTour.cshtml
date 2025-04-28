@@ -1,7 +1,8 @@
-﻿@model Tourest.ViewModels.Tour.TourListViewModel
+﻿
+@model Tourest.ViewModels.Tour.TourListViewModel
 
 @{
-    ViewData["Title"] = "Create Tour";
+    Layout = "/Views/TourManager/_LayoutTourManager.cshtml";
 }
 
 <style>
@@ -142,7 +143,7 @@
     document.querySelectorAll('input[type="number"]').forEach(input => {
         input.addEventListener('input', (e) => {
             if (isNaN(e.target.value)) {
-                e.target.value = ''; // Clear invalid input
+                e.target.value = '';
             }
         });
     });

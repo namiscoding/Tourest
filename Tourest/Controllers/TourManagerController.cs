@@ -26,11 +26,22 @@ namespace Tourest.Controllers
 
         public List<TourGuideListViewModel> TourGuides { get; set; }
 
-        // GET: /TourManager
-        [HttpGet("TourManager")]
+        /*// GET: /TourManager
+        [HttpGet("")]
         public IActionResult Index()
         {
             return View();
+        }*/
+
+        // GET: /TourManager
+        [HttpGet("")]
+        public async Task<IActionResult> Index()
+        {
+            var userId = 2;  
+            var user = await _tourManagerService.GetUserByIdAsync(userId); 
+            if (user == null) return NotFound();  
+
+            return View(user);  
         }
 
         // GET: /TourManager/TourGuide
@@ -99,6 +110,18 @@ namespace Tourest.Controllers
             }
             return View(tour); 
         }
+        [HttpGet("CreateTour")]
+        public IActionResult CreateTour(TourListViewModel tourViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(tourViewModel);
+            }
+
+            return View(tourViewModel);
+        }
+
+
         [HttpPost("CreateTour")]
         public async Task<IActionResult> CreateTour(TourListViewModel tourViewModel, IFormFile? imageFile)
         {
