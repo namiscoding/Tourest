@@ -90,42 +90,51 @@ namespace Tourest.Controllers
 
         // GET: /TourManager/GetUnassignedBookings
         [HttpGet("GetUnassignedBookings")]
-        public async Task<IActionResult> GetUnassignedBookings()
+        public async Task<IActionResult> GetUnassignedTourGroups()
         {
             try
             {
-                var bookings = await _context.Bookings
-                    .Where(b => b.TourGroupID != null)
-                    .Include(b => b.Tour)
-                    .Include(b => b.Customer)
-                    .Join(_context.TourGroups,
-                        booking => booking.TourGroupID,
-                        tourGroup => tourGroup.TourGroupID,
-                        (booking, tourGroup) => new { Booking = booking, TourGroup = tourGroup })
-                    .Where(joined => joined.TourGroup.AssignedTourGuideID == null)
-                    .Select(joined => new UnassignedBookingViewModel
+                var tourGroups = await _context.TourGroups
+                    .Where(tg => tg.Status == "PendingAssignment")
+                    .Join(_context.Tours,
+                          tg => tg.TourID,
+                          t => t.TourID,
+                          (tg, t) => new { TourGroup = tg, Tour = t })
+                    .GroupJoin(_context.Bookings,
+                               tg => tg.TourGroup.TourGroupID,
+                               b => b.TourGroupID,
+                               (tg, bookings) => new { tg.TourGroup, tg.Tour, Bookings = bookings })
+                    .Select(tg => new
                     {
-                        BookingId = joined.Booking.BookingID,
-                        TourGroupId = joined.TourGroup.TourGroupID,
-                        TourName = joined.Booking.Tour.Name,
-                        BookingDate = joined.Booking.BookingDate,
-                        DepartureDate = joined.Booking.DepartureDate,
-                        NumberOfAdults = joined.Booking.NumberOfAdults,
-                        NumberOfChildren = joined.Booking.NumberOfChildren,
-                        PickupPoint = joined.Booking.PickupPoint,
-                        TotalPrice = joined.Booking.TotalPrice,
-                        Status = joined.Booking.Status,
-                        TourId = joined.Booking.TourID
+                        ViewModel = new UnassignedBookingViewModel
+                        {
+                            TourGroupId = tg.TourGroup.TourGroupID,
+                            TourId = tg.Tour.TourID,
+                            TourName = tg.Tour.Name,
+                            DepartureDate = tg.TourGroup.DepartureDate,
+                          
+                            NumberOfAdults = tg.Bookings.Sum(b => b.NumberOfAdults),
+                            NumberOfChildren = tg.Bookings.Sum(b => b.NumberOfChildren),
+                            PickupPoint = tg.Bookings.Select(b => b.PickupPoint).FirstOrDefault(p => p != null) ?? "N/A",
+                            TotalPrice = tg.Bookings.Sum(b => b.TotalPrice),
+                            Status = tg.TourGroup.Status,
+                          
+                        },
+                        BookingCount = tg.Bookings.Count(),
+                        BookingDetails = tg.Bookings.Select(b => new { b.BookingID, b.NumberOfAdults, b.NumberOfChildren, b.PickupPoint, b.TotalPrice })
                     })
                     .AsNoTracking()
                     .ToListAsync();
 
+                // Log the data for debugging
+               
 
-
-                return View("GetUnassignedBookings", bookings);
+                var result = tourGroups.Select(tg => tg.ViewModel).ToList();
+                return View("GetUnassignedBookings", result);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
