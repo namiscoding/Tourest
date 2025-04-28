@@ -9,7 +9,7 @@ namespace Tourest.Services
         Task<UserViewModel> RegisterAsync(RegisterModel AccountRegister);
         Task<User?> CheckEmailAsync(string email);
         Task<UserViewModel> UpdateProfile(UserViewModel userViewModel);
-
-        
+        Task<bool> UpdatePassword(int uid, string newP, string currenPass);
+        Task<bool> AddtokenForgot(string token, string email);
     }
 }
