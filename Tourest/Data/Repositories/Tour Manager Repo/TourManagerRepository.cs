@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tourest.Data.Entities;
 using Tourest.ViewModels.Tour;
-
+using Tourest.ViewModels.TourManager;
 namespace Tourest.Data.Repositories
 {
     public class TourManagerRepository : ITourManagerRepository
@@ -42,7 +42,11 @@ namespace Tourest.Data.Repositories
                               Specializations = tg.Specializations,
                               MaxGroupSizeCapacity = tg.MaxGroupSizeCapacity ?? 0,
                               Rating = tg.AverageRating ?? 0,
-                              ProfilePictureUri = u.ProfilePictureUrl
+                              ProfilePictureUri = u.ProfilePictureUrl,
+                              FullName = u.FullName,
+                              Address = u.Address,
+                              PhoneNumber = u.PhoneNumber,
+                              Email = u.Email
                           }).FirstOrDefault();
 
             return result;
@@ -91,10 +95,160 @@ namespace Tourest.Data.Repositories
     {
         TourID = t.TourID,
         Name = t.Name,
-        // Bỏ comment các dòng nếu cần thêm dữ liệu khác từ Tour entity
     })
     .ToList();
 
+        }
+
+        public async Task<TourListViewModel?> GetTourByIdAsync(int id)
+        {
+            var tour = await _context.Tours
+                .Where(t => t.TourID == id)
+                .Select(t => new TourListViewModel
+                {
+                    TourId = t.TourID,
+                    Name = t.Name,
+                    Destination = t.Destination,
+                    DurationDays = t.DurationDays,
+                    DurationNights = t.DurationNights,
+                    ChildPrice = t.ChildPrice,
+                    AdultPrice = t.AdultPrice,
+                    Status = t.Status,
+                    AverageRating = t.AverageRating,
+                    MinGroupSize = t.MinGroupSize,
+                    MaxGroupSize = t.MaxGroupSize,
+                    DeparturePoints = t.DeparturePoints,
+                    IncludedServices = t.IncludedServices,
+                    ExcludedServices = t.ExcludedServices,
+                    ImageUrls = t.ImageUrls, 
+                    Description = t.Description,
+                    IsCancellable = t.IsCancellable,
+                    CancellationPolicyDescription = t.CancellationPolicyDescription
+                })
+                .FirstOrDefaultAsync();
+
+            if (tour != null && string.IsNullOrEmpty(tour.ImageUrls))
+            {
+                var defaultImagePath = Path.Combine("wwwroot/images/tours", $"{tour.TourId}.png");
+                if (System.IO.File.Exists(defaultImagePath))
+                {
+                    tour.ImageUrls = $"/images/tours/{tour.TourId}.png";
+                }
+                else
+                {
+                    tour.ImageUrls = "/images/default.png"; 
+                }
+            }
+
+            return tour;
+        }
+
+        public async Task AddTourAsync(TourListViewModel tourViewModel)
+        {
+            var entity = new Tour
+            {
+                Name = tourViewModel.Name,
+                Destination = tourViewModel.Destination,
+                DurationDays = tourViewModel.DurationDays,
+                ChildPrice = tourViewModel.ChildPrice,
+                ImageUrls = tourViewModel.ImageUrls,
+                AverageRating = tourViewModel.AverageRating,
+                Description = tourViewModel.Description,
+                DurationNights = tourViewModel.DurationNights,
+                AdultPrice = tourViewModel.AdultPrice,
+                Status = tourViewModel.Status,
+                IncludedServices = tourViewModel.IncludedServices,
+                ExcludedServices = tourViewModel.ExcludedServices,
+                DeparturePoints = tourViewModel.DeparturePoints,
+                MinGroupSize = tourViewModel.MinGroupSize,
+                MaxGroupSize = tourViewModel.MaxGroupSize,
+                CancellationPolicyDescription = tourViewModel.CancellationPolicyDescription,
+                IsCancellable = tourViewModel.IsCancellable
+            };
+            _context.Add(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateTourAsync(TourListViewModel tourViewModel)
+        {
+            var entity = await _context.Tours.FindAsync(tourViewModel.TourId);
+            if (entity != null)
+            {
+                entity.Name = tourViewModel.Name;
+                entity.Destination = tourViewModel.Destination;
+                entity.DurationDays = tourViewModel.DurationDays;
+                entity.ChildPrice = tourViewModel.ChildPrice;
+                entity.ImageUrls = tourViewModel.ImageUrls;
+                entity.AverageRating = tourViewModel.AverageRating;
+                entity.Description = tourViewModel.Description;
+                entity.DurationNights = tourViewModel.DurationNights;
+                entity.AdultPrice = tourViewModel.AdultPrice;
+                entity.Status = tourViewModel.Status;
+                entity.IncludedServices = tourViewModel.IncludedServices;
+                entity.ExcludedServices = tourViewModel.ExcludedServices;
+                entity.DeparturePoints = tourViewModel.DeparturePoints;
+                entity.MinGroupSize = tourViewModel.MinGroupSize;
+                entity.MaxGroupSize = tourViewModel.MaxGroupSize;
+                entity.CancellationPolicyDescription = tourViewModel.CancellationPolicyDescription;
+                entity.IsCancellable = tourViewModel.IsCancellable;
+                await _context.SaveChangesAsync();
+            }
+        }
+        public async Task DeleteTourAsync(int TourID)
+        {
+            var tour = await _context.Tours.FindAsync(TourID); 
+            if (tour != null)
+            {
+                _context.Tours.Remove(tour);   
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new Exception("Tour not found.");
+            }
+        }
+
+        public async Task<TourListViewModel?> GetTourByIDAsync(int tourId)
+        {
+            var tour = await _context.Tours
+                .Where(t => t.TourID == tourId)
+                .Select(t => new TourListViewModel
+                {
+                    TourId = t.TourID,
+                    Name = t.Name,
+                    Destination = t.Destination,
+                    DurationDays = t.DurationDays,
+                    DurationNights = t.DurationNights,
+                    ChildPrice = t.ChildPrice,
+                    AdultPrice = t.AdultPrice,
+                    Description = t.Description,
+                    Status = t.Status,
+                    MinGroupSize = t.MinGroupSize,
+                    MaxGroupSize = t.MaxGroupSize,
+                    DeparturePoints = t.DeparturePoints,
+                    ExcludedServices = t.ExcludedServices,
+                    IncludedServices = t.IncludedServices,
+                    ImageUrls = t.ImageUrls,
+                    IsCancellable = t.IsCancellable,
+                    CancellationPolicyDescription = t.CancellationPolicyDescription
+                })
+                .FirstOrDefaultAsync();
+
+            return tour;
+        }
+
+        public async Task<List<TourGuideAssignmentViewModel>> GetTourGuideScheduleAsync(int tourGuideId)
+        {
+            return await _context.TourGuideAssignments
+                .Where(t => t.TourGuideID == tourGuideId)
+                .Select(t => new TourGuideAssignmentViewModel
+                {
+                    AssignmentDate = t.AssignmentDate,
+                    ConfirmationDate = t.ConfirmationDate,
+                    Status = t.Status,
+                    RejectionReason = t.RejectionReason
+                })
+                .ToListAsync();
         }
     }
 }

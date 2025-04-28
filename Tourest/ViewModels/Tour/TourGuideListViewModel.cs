@@ -13,11 +13,9 @@ namespace Tourest.ViewModels.Tour
 
         // Thuộc tính từ bảng TourGuides
         public string? ExperienceLevel { get; set; }
-        //public string? LanguagesSpoken { get; set; }
         public string? Specializations { get; set; }
-        //public int? MaxGroupSizeCapacity { get; set; }
-        // decimal? AverageRating { get; set; }
-        public string? ActiveStatus { get; set; }  // Thêm dòng này
+        public string? ActiveStatus { get; set; }  
+
     }
 
 }

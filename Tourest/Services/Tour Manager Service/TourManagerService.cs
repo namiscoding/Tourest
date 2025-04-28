@@ -2,6 +2,7 @@
 using Tourest.Data;
 using Tourest.Data.Repositories;
 using Tourest.ViewModels.Tour;
+using Tourest.ViewModels.TourManager;
 
 namespace Tourest.Services
 {
@@ -36,6 +37,36 @@ namespace Tourest.Services
         public IEnumerable<TourListAllViewModel> GetAllTours()
         {
             return tourManagerRepository.GetAllTours();
+        }
+
+        public Task<TourListViewModel?> GetTourDetailsAsync(int id)
+        {
+            return tourManagerRepository.GetTourByIdAsync(id);
+        }
+
+        public Task CreateTourAsync(TourListViewModel tourViewModel)
+        {
+            return tourManagerRepository.AddTourAsync(tourViewModel);
+        }
+
+        public Task EditTourAsync(TourListViewModel tourViewModel)
+        {
+            return tourManagerRepository.UpdateTourAsync(tourViewModel);
+        }
+
+        public Task RemoveTourAsync(int id)
+        {
+            return tourManagerRepository.DeleteTourAsync(id);
+        }
+
+        public Task<TourListViewModel?> GetTourByIdAsync(int id)
+        {
+            return tourManagerRepository.GetTourByIDAsync(id);
+        }
+
+        public Task<List<TourGuideAssignmentViewModel>> GetTourGuideScheduleAsync(int tourGuideId)
+        {
+            return tourManagerRepository.GetTourGuideScheduleAsync(tourGuideId);
         }
     }
 }

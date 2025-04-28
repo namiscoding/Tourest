@@ -1,0 +1,112 @@
+﻿@model List<Tourest.ViewModels.TourManager.TourGuideAssignmentViewModel>
+
+@{
+    ViewBag.Title = "Tour Guide Schedule";
+    var tourGuideId = ViewBag.TourGuideId as int?;
+}
+
+@section Style {
+    <style>
+        .container-centered {
+            max-width: 1000px;
+            margin: 2rem auto;
+            background-color: #fff;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.6s ease;
+        }
+
+        h2 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            font-size: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 15px 18px;
+            border-bottom: 1px solid #dee2e6;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+            transition: background-color 0.3s ease;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .btn-custom {
+            display: inline-block;
+            padding: 0.75rem 1.75rem;
+            background-color: #007bff;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+            .btn-custom:hover {
+                background-color: #0056b3;
+                transform: translateY(-3px);
+            }
+    </style>
+}
+
+<div class="container-centered">
+    <h2>Tour Guide Schedule</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Assignment Date</th>
+                <th>Confirmation Date</th>
+                <th>Status</th>
+                <th>Rejection Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.AssignmentDate.ToString("yyyy-MM-dd")</td>
+                    <td>@(item.ConfirmationDate?.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                    <td>@item.Status</td>
+                    <td>@(string.IsNullOrEmpty(item.RejectionReason) ? "N/A" : item.RejectionReason)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="actions">
+        <a asp-controller="TourManager" asp-action="TourGuide" class="btn-custom">← View Tour Guides List</a>
+    </div>
+</div>
