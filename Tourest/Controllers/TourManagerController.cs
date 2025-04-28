@@ -27,7 +27,7 @@ namespace Tourest.Controllers
         public List<TourGuideListViewModel> TourGuides { get; set; }
 
         // GET: /TourManager
-        [HttpGet("")]
+        [HttpGet("TourManager")]
         public IActionResult Index()
         {
             return View();
@@ -89,7 +89,7 @@ namespace Tourest.Controllers
             var tours = _tourManagerService.GetAllTours();
             return View(tours);
         }
-
+        [HttpGet("GetTourDetails")]
         public async Task<IActionResult> GetTourDetails(int id)
         {
             var tour = await _tourManagerService.GetTourDetailsAsync(id);
@@ -99,6 +99,7 @@ namespace Tourest.Controllers
             }
             return View(tour); 
         }
+        [HttpPost("CreateTour")]
         public async Task<IActionResult> CreateTour(TourListViewModel tourViewModel, IFormFile? imageFile)
         {
             if (!ModelState.IsValid)
@@ -139,7 +140,7 @@ namespace Tourest.Controllers
                 return View(tourViewModel);
             }
         }
-        [HttpGet]
+        [HttpGet("EditTour")]
         public async Task<IActionResult> EditTour(int id)
         {
             var tour = await _tourManagerService.GetTourDetailsAsync(id);
@@ -171,7 +172,7 @@ namespace Tourest.Controllers
 
             return View(tourViewModel);  
         }
-        [HttpPost]
+        [HttpPost("EditTour")]
         public async Task<IActionResult> EditTour(int id, TourListViewModel tourViewModel, IFormFile? imageFile)
         {
             if (!ModelState.IsValid)
@@ -220,7 +221,7 @@ namespace Tourest.Controllers
                 return View(tourViewModel);
             }
         }
-
+        [HttpPost("DeleteTour")]
         public async Task<IActionResult> DeleteTour(int TourID)
         {
             Console.WriteLine($"Received TourID: {TourID}"); 
@@ -243,6 +244,7 @@ namespace Tourest.Controllers
                 return RedirectToAction(nameof(ListTour));  
             }
         }
+        [HttpGet("ViewSchedule")]
         public async Task<IActionResult> ViewSchedule(int id)
         {
             var schedule = await _tourManagerService.GetTourGuideScheduleAsync(id);

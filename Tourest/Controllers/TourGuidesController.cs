@@ -17,7 +17,7 @@ namespace Tourest.Controllers
         // GET: TourGuides/Details/5 (với 5 là UserID của TourGuide)
         public async Task<IActionResult> Details(int id)
         {
-            id = 3; // Chỉ để test, bạn có thể xóa dòng này đi
+            //id = 3; // Chỉ để test, bạn có thể xóa dòng này đi
             if (id <= 0)
             {
                 return BadRequest();
