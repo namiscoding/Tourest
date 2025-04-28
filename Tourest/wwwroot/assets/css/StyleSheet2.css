@@ -27009,7 +27009,9 @@ body:not(.modal-open) .layout-content-navbar .layout-navbar {
     display: none;
     overflow: hidden;
 }
-
+#notificationModal {
+    display: none; /* Ẩn ngay từ đầu */
+}
 .notification-header {
     background-color: #f8f9fa;
     padding: 10px 15px;
@@ -27050,3 +27052,6 @@ body:not(.modal-open) .layout-content-navbar .layout-navbar {
     #notificationButton:hover {
         color: #ff4838; /* Matches your site's orange-red color */
     }
+#notificationModal {
+    display: none; /* Ẩn ngay từ đầu */
+}

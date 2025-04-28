@@ -368,21 +368,25 @@
     @RenderSection("Style", required: false)
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        const notificationButton = document.getElementById('notificationButton');
+<script>
+    const notificationButton = document.getElementById('notificationButton');
         const notificationModal = document.getElementById('notificationModal');
+        notificationModal.style.display = 'none'; // Đảm bảo ẩn ban đầu
 
-        notificationButton.addEventListener('click', function (event) {
-            event.stopPropagation();
-            notificationModal.style.display = (notificationModal.style.display === 'block') ? 'none' : 'block';
-        });
+    
 
-        document.addEventListener('click', function (event) {
-            if (!notificationModal.contains(event.target) && event.target !== notificationButton) {
-                notificationModal.style.display = 'none';
-            }
-        });
-    </script>
+    notificationButton.addEventListener('click', function (event) {
+        event.stopPropagation();
+        notificationModal.style.display = (notificationModal.style.display === 'block') ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!notificationModal.contains(event.target) && event.target !== notificationButton) {
+            notificationModal.style.display = 'none';
+        }
+    });
+</script>
+
 
 </body>
 </html>

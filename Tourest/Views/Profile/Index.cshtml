@@ -138,6 +138,21 @@
             }
           })();
         });
+                <script>
+        function validatePhoneNumber() {
+            var phoneNumber = document.getElementById('phoneNumber').value.trim();
+
+            // Regex đơn giản: bắt đầu bằng số 0, theo sau là 9–10 chữ số
+            var phoneRegex = /^0\d{9,10}$/;
+
+            if (!phoneRegex.test(phoneNumber)) {
+                alert("Số điện thoại không hợp lệ. Vui lòng nhập đúng định dạng!");
+                return false; // không cho submit
+            }
+
+            return true; // hợp lệ
+        }
+    </script>
 
     </script>
 

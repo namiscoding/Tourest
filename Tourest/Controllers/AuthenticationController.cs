@@ -9,6 +9,10 @@ using Tourest.Data.Entities;
 using Tourest.Services;
 using Tourest.Util;
 using Tourest.ViewModels.Account;
+using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Tourest.Controllers
 {
@@ -30,7 +34,7 @@ namespace Tourest.Controllers
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
-    
+
             var model = new AuthenticationViewModel();
             return View(model);
         }
@@ -42,7 +46,7 @@ namespace Tourest.Controllers
             Console.WriteLine(model.Register.ToString());
             ViewData["ReturnUrl"] = model.Register.ReturnUrl;
             User? result = await _accountService.CheckEmailAsync(model.Login.Email);
-            if (result == null)     
+            if (result == null)
             {
                 // Xử lý khi email đã tồn tại (hoặc có thông báo lỗi)
                 TempData["Message"] = "Email  is wrong";
@@ -56,7 +60,7 @@ namespace Tourest.Controllers
                 return RedirectToAction("Login", "Authentication");
             }
 
-                UserViewModel CurrentAccount = AccountMapper.UserToUserViewModel(result);
+            UserViewModel CurrentAccount = AccountMapper.UserToUserViewModel(result);
             Console.WriteLine(CurrentAccount.ToString());
             if (CurrentAccount != null)
             {
@@ -74,7 +78,7 @@ namespace Tourest.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             }
             return RedirectToAction("Index", "Tours"); }
-    
+
 
 
         [HttpPost]
@@ -83,20 +87,17 @@ namespace Tourest.Controllers
             Console.WriteLine(model.Register.ToString());
             ViewData["ReturnUrl"] = model.Register.ReturnUrl;
             User? result = await _accountService.CheckEmailAsync(model.Register.Email);
-          
-            Console.WriteLine(result);
-
             if (result != null)
             {
                 // Xử lý khi email đã tồn tại (hoặc có thông báo lỗi)
-                TempData["Message"] ="Email exist";
+                TempData["Message"] = "Email exist";
                 TempData["ActiveTab"] = "signup";
                 return RedirectToAction("Login", "Authentication"); // hoặc return RedirectToAction, tùy bạn
             }
 
             // Nếu null → tức là email chưa tồn tại → tiếp tục xử lý đăng ký
 
-            UserViewModel CurrentAccount =await _accountService.RegisterAsync(model.Register);
+            UserViewModel CurrentAccount = await _accountService.RegisterAsync(model.Register);
             if (CurrentAccount != null)
             {
                 HttpContext.Session.SetObject("CurrentAccount", CurrentAccount);
@@ -112,9 +113,66 @@ namespace Tourest.Controllers
                 var principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             }
-            return RedirectToAction("Index","Tours"); }
+            return RedirectToAction("Index", "Tours"); }
 
 
 
-    }
-}
+        public bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            // Kiểm tra định dạng email cơ bản
+            string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            if (!Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase))
+                return false;
+
+            // Kiểm tra email phải kết thúc bằng .com
+            return email.EndsWith(".com", StringComparison.OrdinalIgnoreCase);
+        }
+        public bool IsValidPhoneNumber(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+                return false;
+
+            foreach (char c in phoneNumber)
+            {
+                if (!char.IsDigit(c))
+                {
+                    return false; // Nếu gặp ký tự không phải số thì sai
+                }
+            }
+            return true;
+        }
+
+        public List<string> GetNullPropertyNames(object obj)
+        {
+            var nullProperties = new List<string>();
+
+            if (obj == null)
+                return nullProperties;
+
+            var properties = obj.GetType().GetProperties();
+
+            foreach (var prop in properties)
+            {
+                // Bỏ qua các trường không cần validate
+                if (prop.Name == "ReturnUrl")
+                    continue;
+
+                var value = prop.GetValue(obj);
+                if (value == null)
+                {
+                    // Lấy Display Name nếu có, không thì lấy prop.Name
+                    var displayAttr = prop.GetCustomAttributes(typeof(DisplayAttribute), true)
+                                          .FirstOrDefault() as DisplayAttribute;
+                    var fieldName = displayAttr != null ? displayAttr.Name : prop.Name;
+
+                    nullProperties.Add(fieldName);
+                }
+            }
+
+            return nullProperties;
+        }
+
+    } }

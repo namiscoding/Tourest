@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using Tourest.Data;
@@ -73,6 +74,8 @@ namespace Tourest.Controllers
 
         // GET: /TourManager/ViewCustomers/10
         [HttpGet("ViewCustomers/{tourId}")]
+       
+
         public async Task<IActionResult> ViewCustomers(int tourId)
         {
             var customers = await _tourManagerService.GetCustomersForTourAsync(tourId);
@@ -81,6 +84,7 @@ namespace Tourest.Controllers
 
         // GET: /TourManager/ListTour
         [HttpGet("ListTour")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ListTour()
         {
             var tours = _tourManagerService.GetAllTours();
