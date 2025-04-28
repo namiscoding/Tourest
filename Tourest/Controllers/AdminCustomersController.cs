@@ -88,7 +88,7 @@ namespace Tourest.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _userService.UpdateCustomerByAdminAsync(model);
-                if (result.Success)
+                if (result.Success) 
                 {
                     TempData["SuccessMessage"] = "Đã cập nhật thông tin khách hàng thành công!";
                     return RedirectToAction(nameof(Index));
@@ -98,7 +98,12 @@ namespace Tourest.Controllers
                     ModelState.AddModelError(string.Empty, result.ErrorMessage);
                 }
             }
-            // Nếu ModelState lỗi hoặc cập nhật thất bại
+
+            if (string.IsNullOrEmpty(model.ProfilePictureUrl)) // Lấy lại PublicId nếu update lỗi và model bị mất
+            {
+                var existingData = await _userService.GetCustomerForEditAsync(id);
+                model.ProfilePictureUrl = existingData?.ProfilePictureUrl;
+            }
             return View(model);
         }
 

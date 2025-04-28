@@ -1,4 +1,6 @@
-﻿namespace Tourest.TourGuide.ViewModels
+﻿using Tourest.Data.Entities;
+
+namespace Tourest.TourGuide.ViewModels
 {
     public class TourGuideAssignmentViewModel
     {
@@ -12,6 +14,10 @@
         public string TourName { get; set; }
         public string Status { get; set; }
         public DateTime AssignmentDate { get; set; }
-        
+        public List<Rating> TourRating { get; set; }
+        public double TourGuideRating { get; set; }
+        public double Destination {  get; set; }
+        public DateTime Deadline { get; set; }
+
     }
 }
