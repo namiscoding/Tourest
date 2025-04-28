@@ -166,10 +166,30 @@
                                                     }
                                                     else if (booking.Status != null && booking.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase))
                                                     {
-                                                        <a asp-controller="Rating" asp-action="CreateTourRating" asp-route-tourId="@booking.TourId" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-outline-warning" title="Đánh giá tour này">
-                                                            <i class="fa-regular fa-star me-1"></i> Rate Tour
-                                                        </a>
-                                                    }
+                                                                @if (!booking.HasRatedTour)
+                                                                {
+                                                                    <a asp-controller="Rating" asp-action="CreateTourRating" asp-route-tourId="@booking.TourId" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-outline-primary mb-1" title="Đánh giá tour này">
+                                                                        <i class="fa-regular fa-star me-1"></i> Rate Tour
+                                                                    </a>
+                                                                }
+                                                                @if (booking.TourGroup.TourGroupID != null && booking.TourGroup?.AssignedTourGuideID.HasValue == true && !booking.HasRatedTourGuide)
+                                                                {
+                                                                    <a asp-controller="Rating" asp-action="CreateTourGuideRating"
+                                                                    asp-route-tourGroupId="@booking.TourGroup.TourGroupID"
+                                                                    asp-route-tourGuideId="@booking.TourGroup.AssignedTourGuideID"
+                                                                    asp-route-bookingId="@booking.BookingId"
+                                                                    class="btn btn-sm btn-outline-info" title="Đánh giá hướng dẫn viên">
+                                                                        <i class="fa-regular fa-user me-1"></i> Rate Guide
+                                                                    </a>
+                                                                }
+                                                            }
+                                                            else if (booking.Status != null && booking.Status.Equals("Paid", StringComparison.OrdinalIgnoreCase))
+                                                            {
+
+                                                                <a asp-controller="TourGuides" asp-action="Details" asp-route-tourId="" asp-route-bookingId="" class="btn btn-sm btn-outline-primary" title="Đánh giá tour guide này">
+                                                                    <i class="fa-regular fa-star me-1"></i> View Tour Guide Infor 
+                                                                </a>
+                                                            }
                                                     @* Thêm nút xem chi tiết booking nếu bạn có trang chi tiết booking *@
                                                     @*
                                         <a asp-action="Details" asp-controller="Booking" asp-route-id="@booking.BookingId" class="btn btn-sm btn-outline-info ms-1" title="Xem chi tiết">

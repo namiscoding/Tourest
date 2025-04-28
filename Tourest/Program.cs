@@ -148,6 +148,12 @@ namespace Tourest
             builder.Services.AddScoped<ITourRatingRepository, TourRatingRepository>();
             builder.Services.AddScoped<IRatingService, RatingService>();
 
+         
+            builder.Services.AddScoped<ITourGuideRatingRepository, TourGuideRatingRepository>();
+            builder.Services.AddScoped<IRatingService, RatingService>(); 
+            builder.Services.AddScoped<IUserRepository, UserRepository>(); 
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>(); 
+
             builder.Services.AddScoped<IBookingProcessingService, BookingProcessingService>();
             builder.Services.AddHostedService<BookingStatusUpdaterService>();
 
@@ -164,12 +170,12 @@ namespace Tourest
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
 			}
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapIdentityApi<IdentityUser>();
             app.UseHttpsRedirection();
 			app.UseStaticFiles();
-            app.UseRouting();
             app.UseSession();
             //app.MapHub<NotificationHub>("/notificationHub");
             app.MapHub<RatingHub>("/ratingHub"); 

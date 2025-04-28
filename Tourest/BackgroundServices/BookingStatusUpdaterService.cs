@@ -62,15 +62,15 @@ namespace Tourest.BackgroundServices
                         // Tìm các booking cần cập nhật:
                         // - DepartureDate đã qua (nhỏ hơn ngày hôm nay)
                         // - Trạng thái là Confirmed hoặc PendingPayment
-                        //var bookingsToUpdate = await dbContext.Bookings
-                        //    .Where(b => b.DepartureDate < today &&
-                        //                (b.Status == StatusConfirmed || b.Status == StatusPendingPayment))
-                        //    .ToListAsync(stoppingToken); // Truyền stoppingToken
-
                         var bookingsToUpdate = await dbContext.Bookings
-                            .Where(b => b.DepartureDate >= today && // <<< Đổi thành >= để test ngày chưa qua
-                            (b.Status == StatusConfirmed || b.Status == StatusPendingPayment))
-                            .ToListAsync(stoppingToken);
+                            .Where(b => b.DepartureDate < today &&
+                                        (b.Status == StatusConfirmed || b.Status == StatusPendingPayment))
+                            .ToListAsync(stoppingToken); // Truyền stoppingToken
+
+                        //var bookingsToUpdate = await dbContext.Bookings
+                        //    .Where(b => b.DepartureDate >= today && // <<< Đổi thành >= để test ngày chưa qua
+                        //    (b.Status == StatusConfirmed || b.Status == StatusPendingPayment))
+                        //    .ToListAsync(stoppingToken);
 
                         if (bookingsToUpdate.Any())
                         {

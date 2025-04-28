@@ -1,9 +1,5 @@
 ﻿@* File: Views/AdminDashboard/Index.cshtml (Hoặc trang Admin phù hợp) *@
 
-@{
-    ViewData["Title"] = "Admin Dashboard";
-}
-
 <h1>@ViewData["Title"]</h1>
 <hr />
 
@@ -25,16 +21,13 @@
 
 
 <section class="admin-actions mt-4">
-    <h2>Công cụ quản trị</h2>
+    
     <div class="card mt-3">
         <div class="card-header">
             Cập nhật trạng thái Booking
         </div>
         <div class="card-body">
-            <p class="card-text">Nhấn nút dưới đây để chạy quy trình cập nhật trạng thái cho các booking có ngày khởi hành đã qua (từ Confirmed sang Completed, từ PendingPayment sang Cancelled).</p>
-            <p><small class="text-muted">Lưu ý: Tác vụ này thường chạy tự động mỗi ngày. Chỉ chạy thủ công khi cần kiểm tra hoặc xử lý gấp.</small></p>
-
-          
+           
             <form asp-action="TriggerBookingUpdate" asp-controller="AdminDashboard" method="post">
                 @* <<< Sửa lại asp-controller nếu cần *@
                 @Html.AntiForgeryToken()
@@ -44,9 +37,7 @@
             </form>
             
         </div>
-        <div class="card-footer text-muted">
-            Tác vụ này có thể mất vài giây để hoàn thành tùy thuộc vào số lượng booking.
-        </div>
+    
     </div>
 
     @* Thêm các công cụ quản trị khác ở đây *@

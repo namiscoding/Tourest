@@ -13,12 +13,15 @@ namespace Tourest.Controllers
         private readonly ISupportRequestService _supportRequestService;
         public SupportRequestController(ISupportRequestService supportRequestService) { _supportRequestService = supportRequestService; }
 
-        
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> Index() 
         {
-            //var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //if (!int.TryParse(userIdString, out int customerId)) return Challenge();
-            var customerId =4; // Gán cứng customerId là 4 để test
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int customerId))
+            {
+                return Challenge();
+            }
+            //var customerId =4; // Gán cứng customerId là 4 để test
             var viewModel = await _supportRequestService.GetMyRequestsViewModelAsync(customerId);
             // Đảm bảo NewRequest không null nếu View cần nó để render form
             if (viewModel.NewRequest == null)
@@ -28,15 +31,19 @@ namespace Tourest.Controllers
             return View(viewModel); 
         }
 
+        [Authorize(Roles = "Customer")]
         // POST: /SupportRequest/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         // Nhận model con để validation chỉ áp dụng cho các trường của form Create
         public async Task<IActionResult> Create([Bind(Prefix = "NewRequest")] CreateSupportRequestViewModel model)
         {
-            //var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            //if (!int.TryParse(userIdString, out int customerId)) return Challenge();
-            var customerId = 4;
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int customerId))
+            {
+                return Challenge();
+            }
+            //var customerId = 4;
             // Chỉ kiểm tra ModelState của model con được bind
             if (ModelState.IsValid)
             {

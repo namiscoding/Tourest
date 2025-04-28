@@ -111,7 +111,8 @@
                                             <div class="slide-content">
                                                 <p class="tour-location">@tour.Destination</p>
                                                 <h4 class="tour-title">
-                                                    <a href="tour-details.html" class="line-clamp-2">@tour.Name</a>
+                                                        <a asp-controller="Tours" asp-action="Details" asp-route-id="@tour.TourId" class="line-clamp-2">@tour.Name</a>
+                                                    
                                                 </h4>
                                                 <div class="featured-tours__meta">
                                                     <div class="revew">
@@ -201,8 +202,8 @@
                             </ul>
                         </div>
                         <div class="btn-trigger btn-bounce">
-                                <a asp-controller="SupportRequest" asp-action="Index"
-                               class="common-btn common-btn--transparent color-one">Contact Us</a>
+                                <a asp-controller="Home" asp-action="Privacy"
+                                   class="common-btn common-btn--transparent color-one">Contact</a>
                         </div>
                     </div>
                 </div>
@@ -423,131 +424,7 @@
                 </div>
             </div>
         </div>
-        <div class="row g-4 section-mini-margin-top fade_bottom">
-            <div class="col-12">
-                <div class="swiper destination__slider">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <div class="destination__slide">
-                                <figure class="slide-thumb">
-                                    <img src="~/assets/images/destination-section/destination-slide-1.png"
-                                         alt="destination-slide-fig" />
-                                </figure>
-                                <div class="slide-content">
-                                    <h6 class="slide-title">
-                                        <a href="destination-details.html">United Kingdom</a>
-                                    </h6>
-                                    <p>174,688 Travelers</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="destination__slide">
-                                <figure class="slide-thumb">
-                                    <img src="~/assets/images/destination-section/destination-slide-2.png"
-                                         alt="destination-slide-fig" />
-                                </figure>
-                                <div class="slide-content">
-                                    <h6 class="slide-title">
-                                        <a href="destination-details.html">Turkey</a>
-                                    </h6>
-                                    <p>174,688 Travelers</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="destination__slide">
-                                <figure class="slide-thumb">
-                                    <img src="~/assets/images/destination-section/destination-slide-3.png"
-                                         alt="destination-slide-fig" />
-                                </figure>
-                                <div class="slide-content">
-                                    <h6 class="slide-title">
-                                        <a href="destination-details.html">Thailand</a>
-                                    </h6>
-                                    <p>174,688 Travelers</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="destination__slide">
-                                <figure class="slide-thumb">
-                                    <img src="~/assets/images/destination-section/destination-slide-1.png"
-                                         alt="destination-slide-fig" />
-                                </figure>
-                                <div class="slide-content">
-                                    <h6 class="slide-title">
-                                        <a href="destination-details.html">France</a>
-                                    </h6>
-                                    <p>174,688 Travelers</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="destination__slide">
-                                <figure class="slide-thumb">
-                                    <img src="~/assets/images/destination-section/destination-slide-1.png"
-                                         alt="destination-slide-fig" />
-                                </figure>
-                                <div class="slide-content">
-                                    <h6 class="slide-title">
-                                        <a href="destination-details.html">United Kingdom</a>
-                                    </h6>
-                                    <p>174,688 Travelers</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="destination__slide">
-                                <figure class="slide-thumb">
-                                    <img src="~/assets/images/destination-section/destination-slide-2.png"
-                                         alt="destination-slide-fig" />
-                                </figure>
-                                <div class="slide-content">
-                                    <h6 class="slide-title">
-                                        <a href="destination-details.html">Turkey</a>
-                                    </h6>
-                                    <p>174,688 Travelers</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="destination__slide">
-                                <figure class="slide-thumb">
-                                    <img src="~/assets/images/destination-section/destination-slide-3.png"
-                                         alt="destination-slide-fig" />
-                                </figure>
-                                <div class="slide-content">
-                                    <h6 class="slide-title">
-                                        <a href="destination-details.html">Thailand</a>
-                                    </h6>
-                                    <p>174,688 Travelers</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="destination__slide">
-                                <figure class="slide-thumb">
-                                    <img src="~/assets/images/destination-section/destination-slide-1.png"
-                                         alt="destination-slide-fig" />
-                                </figure>
-                                <div class="slide-content">
-                                    <h6 class="slide-title">
-                                        <a href="destination-details.html">France</a>
-                                    </h6>
-                                    <p>174,688 Travelers</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Pagination -->
-                    <div class="destination__pagination"></div>
-                    <!-- Navigation -->
-                    <div class="destination__button-next"></div>
-                    <div class="destination__button-prev"></div>
-                </div>
-            </div>
-        </div>
+        
     </div>
 </section>
 

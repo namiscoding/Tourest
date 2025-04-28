@@ -85,21 +85,34 @@
                 <div class="row align-content-center">
                     <div class="col-6 col-md-9 col-xl-8">
                         <div class="header__main-left">
+
                             <a asp-controller="Home" asp-action="Index" class="logo">
                                 <img src="~/assets/images/logo.svg" alt="logo" />
                             </a>
                             <div class="header__main-menu">
                                 <nav class="header__navigation">
                                     <ul>
-                                        <li>
-                                            <a asp-controller="Home" asp-action="Index">Home</a>
-                                            
-                                        </li>
-                                        <li><a asp-controller="Tours" asp-action="Index">Tours</a></li>
-                                        <li><a asp-controller="SupportRequest" asp-action="Index">Contact</a></li>
-                                        <li><a asp-controller="BookingHistory" asp-action="Index">Booking History</a></li>
+                                        @if (currentAccount != null)
+                                        {
+                                            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                                            <li><a asp-controller="Tours" asp-action="Index">Tours</a></li>
+                                            <li><a asp-controller="SupportRequest" asp-action="Index">Support</a></li>
+                                            <li><a asp-controller="BookingHistory" asp-action="Index">BookingHistory</a></li>
+                                        }
+                                        else
+                                        {
+                                            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                                            <li><a asp-controller="Tours" asp-action="Index">Tours</a></li>
+                                            <li><a asp-controller="Home" asp-action="Privacy">Contact</a></li>
+
+                                        }
+                                        <!--else if (currentAccount.Account.Role == "Manager")
+                                        {
+                                            <li><a href="TourManager">Tour Manager</a></li>
+
+                                        }-->
                                         
-                                        <li><a href="TourManager">Tour Manager</a></li>
+
                                     </ul>
                                 </nav>
                             </div>
