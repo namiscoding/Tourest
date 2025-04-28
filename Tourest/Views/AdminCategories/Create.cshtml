@@ -1,0 +1,40 @@
+﻿@* File: /Views/AdminCategories/Create.cshtml *@
+@model CategoryInputViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Tạo Danh mục Mới";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            @* Hiển thị lỗi validation tổng hợp *@
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span> @* Hiển thị lỗi cho từng trường *@
+            </div>
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <input type="submit" value="Tạo mới" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-secondary ms-2">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

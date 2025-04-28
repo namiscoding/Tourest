@@ -1,0 +1,40 @@
+﻿@* File: /Views/AdminTours/Delete.cshtml *@
+@model DeleteTourConfirmationViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Xác nhận Xóa Tour";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model.IsInUse)
+{
+    <div class="alert alert-danger">
+        <strong>Không thể xóa!</strong> Tour này đang có Đơn đặt hoặc Đoàn đi liên quan. Bạn cần xử lý các dữ liệu liên quan trước khi xóa Tour.
+    </div>
+    <div>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại Danh sách</a>
+    </div>
+}
+else
+{
+    <h3 class="text-danger">Bạn có chắc chắn muốn xóa Tour này không?</h3>
+    <div>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">ID Tour</dt>
+            <dd class="col-sm-10">@Model.TourId</dd>
+            <dt class="col-sm-2">Tên Tour</dt>
+            <dd class="col-sm-10">@Html.DisplayFor(model => model.TourName)</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post">
+            @* Input ẩn chứa ID cần xóa *@
+            <input type="hidden" asp-for="TourId" />
+            @Html.AntiForgeryToken()
+            <input type="submit" value="Xóa Tour" class="btn btn-danger" /> |
+            <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+        </form>
+    </div>
+}

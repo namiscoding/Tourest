@@ -1,0 +1,28 @@
+@Người Điện
+"EmailSettings": {
+   "SMTPServer": "smtp.gmail.com",
+   "Port": 587,
+   "EnableSSL": true,
+   "Username": "ducanhqbz@gmail.com",
+   "Password": "fwui tjkn vjys tzve",
+   "FromEmail": "ducanhqbz@gmail.com"
+ }
+
+@Cu Trang
+"MomoAPI": {
+  "MomoApiUrl": "https://test-payment.momo.vn/v2/gateway/api/create",
+  "SecretKey": "6dQ9aJc64QhbQShyQLb8SdH4J40fGUsD",
+  "AccessKey": "1g6Szra6vCWHPprK",
+  "ReturnUrl": "https://localhost:7227/Payment/PaymentCallBack",
+  "NotifyUrl": "https://localhost:7227/Payment/MomoNotify",
+  "PartnerCode": "MOMOIB6F20250426_TEST",
+  "RequestType": "captureWallet"
+}
+
+@tnam
+"CloudinarySettings": {
+    "CloudName": "dmz5js5hh",
+    "ApiKey": "586771756471872",
+    "ApiSecret": "tGxRi9MOZ7hlu_QSne15ppCedBo"
+  }
+

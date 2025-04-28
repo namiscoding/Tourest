@@ -1,0 +1,242 @@
+﻿@* File: /Views/AdminTourManagers/Details.cshtml *@
+@model AdminTourManagerDetailsViewModel
+@using Tourest.Helpers
+@inject IConfiguration Configuration
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Chi tiết Quản lý Tour";
+    var cloudName = Configuration["CloudinarySettings:CloudName"];
+    var defaultAvatar = "/images/default-avatar.png";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-sm-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-user-tie me-2"></i>@Model.FullName
+        </h2>
+        <div>
+            <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary">
+                <i class="fas fa-edit me-1"></i>Sửa thông tin
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-arrow-left me-1"></i>Quay lại
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-light">
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin cá nhân</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow animated--fade-in"
+                             aria-labelledby="dropdownMenuLink">
+                            <a class="dropdown-item" href="#"><i class="fas fa-envelope me-2"></i>Gửi email</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-phone me-2"></i>Gọi điện</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="#"><i class="fas fa-user-slash me-2"></i>Vô hiệu hóa tài khoản</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <div class="position-relative mb-3">
+                        <img src="@CloudinaryHelper.GetThumbnailUrl(Model.ProfilePictureUrl, 200, 200, cloudName, defaultAvatar)"
+                             alt="Ảnh đại diện của @Model.FullName"
+                             class="img-profile rounded-circle img-fluid mx-auto border shadow"
+                             style="width: 180px; height: 180px; object-fit: cover;" />
+                        @if (Model.IsActive)
+                        {
+                            <div class="position-absolute bottom-0 end-0 p-1">
+                                <span class="badge bg-success rounded-pill"><i class="fas fa-check me-1"></i>Hoạt động</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="position-absolute bottom-0 end-0 p-1">
+                                <span class="badge bg-danger rounded-pill"><i class="fas fa-ban me-1"></i>Vô hiệu hóa</span>
+                            </div>
+                        }
+                    </div>
+                    <h4 class="mb-1">@Model.FullName</h4>
+                    <p class="text-muted mb-3">Quản lý Tour</p>
+                    <div class="d-flex justify-content-center mb-2">
+                        <a href="mailto:@Model.Email" class="btn btn-outline-primary btn-sm me-2">
+                            <i class="fas fa-envelope me-1"></i>Email
+                        </a>
+                        <a href="tel:@Model.PhoneNumber" class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-phone me-1"></i>Gọi
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="row text-center">
+                        <div class="col">
+                            <h5 class="mb-0">@Model.AssignmentsMade.Count</h5>
+                            <small class="text-muted">Phân công</small>
+                        </div>
+                        <div class="col">
+                            <h5 class="mb-0">@Model.RegistrationDate.ToString("MM/yyyy")</h5>
+                            <small class="text-muted">Ngày đăng ký</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Column -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-light">
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin chi tiết</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="border-start border-primary border-3 ps-3 mb-3">
+                                <label class="text-muted mb-1 small">ID Quản lý</label>
+                                <p class="mb-0 fw-bold">@Model.UserId</p>
+                            </div>
+                            <div class="border-start border-primary border-3 ps-3 mb-3">
+                                <label class="text-muted mb-1 small">Họ Tên</label>
+                                <p class="mb-0 fw-bold">@Model.FullName</p>
+                            </div>
+                            <div class="border-start border-primary border-3 ps-3">
+                                <label class="text-muted mb-1 small">Email</label>
+                                <p class="mb-0 fw-bold">@Model.Email</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border-start border-primary border-3 ps-3 mb-3">
+                                <label class="text-muted mb-1 small">Số điện thoại</label>
+                                <p class="mb-0 fw-bold">@Model.PhoneNumber</p>
+                            </div>
+                            <div class="border-start border-primary border-3 ps-3 mb-3">
+                                <label class="text-muted mb-1 small">Địa chỉ</label>
+                                <p class="mb-0 fw-bold">@(string.IsNullOrEmpty(Model.Address) ? "Chưa cập nhật" : Model.Address)</p>
+                            </div>
+                            <div class="border-start border-primary border-3 ps-3">
+                                <label class="text-muted mb-1 small">Ngày đăng ký</label>
+                                <p class="mb-0 fw-bold">@Model.RegistrationDate.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignments Card -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-light">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-tasks me-2"></i>Phân công Hướng dẫn viên
+                    </h6>
+                    <button class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-download me-1"></i>Xuất Excel
+                    </button>
+                </div>
+                <div class="card-body">
+                    @if (Model.AssignmentsMade.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="assignmentsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">Tour</th>
+                                        <th scope="col">Ngày khởi hành</th>
+                                        <th scope="col">Hướng dẫn viên</th>
+                                        <th scope="col">Trạng thái</th>
+                                        <th scope="col">Ngày phân công</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var assignment in Model.AssignmentsMade)
+                                    {
+                                        <tr>
+                                            <td>@assignment.AssignmentId</td>
+                                            <td class="fw-bold">@assignment.TourName</td>
+                                            <td>@(assignment.DepartureDate?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                                            <td>
+                                                @assignment.TourGuideName
+                                            </td>
+                                            <td>
+                                                @{
+                                                    string badgeClass = "bg-info";
+                                                    string icon = "fas fa-info-circle";
+
+                                                    if (assignment.AssignmentStatus == "Hoàn thành")
+                                                    {
+                                                        badgeClass = "bg-success";
+                                                        icon = "fas fa-check-circle";
+                                                    }
+                                                    else if (assignment.AssignmentStatus == "Đã hủy")
+                                                    {
+                                                        badgeClass = "bg-danger";
+                                                        icon = "fas fa-times-circle";
+                                                    }
+                                                    else if (assignment.AssignmentStatus == "Đang thực hiện")
+                                                    {
+                                                        badgeClass = "bg-warning";
+                                                        icon = "fas fa-clock";
+                                                    }
+                                                }
+                                                <span class="badge @badgeClass"><i class="@icon me-1"></i>@assignment.AssignmentStatus</span>
+                                            </td>
+                                            <td>@assignment.AssignmentDate.ToString("dd/MM/yyyy")</td>
+                                            <td class="text-end">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-sm btn-light border-0" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>Xem chi tiết</a></li>
+                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Chỉnh sửa</a></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash-alt me-2"></i>Xóa phân công</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                            <h5>Chưa có phân công nào</h5>
+                            <p class="text-muted">Quản lý tour này chưa thực hiện phân công hướng dẫn viên nào.</p>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Tạo phân công mới
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#assignmentsTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
+                },
+                pageLength: 5,
+                lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "Tất cả"]]
+            });
+        });
+    </script>
+}

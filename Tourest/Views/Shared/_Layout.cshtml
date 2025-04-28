@@ -10,14 +10,25 @@
     @using Tourest.ViewModels.Account;
     <link rel="stylesheet" href="~/assets/css/style.css" />
     <link rel="stylesheet" href="~/assets/css/plugins.css" />
+    <link rel="stylesheet" href="~/assets/css/StyleSheet.css" />
+    <link rel="stylesheet" href="~/assets/css/StyleSheet1.css" />
+    <link rel="stylesheet" href="~/assets/css/StyleSheet2.css" />
     <link rel="icon" href="assets/images/favicon.png" type="image/x-icon" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css"
+          rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 </head>
 @{
     var session = HttpContextAccessor.HttpContext.Session;
     var accountJson = session.GetString("CurrentAccount");
     var currentAccount = accountJson == null ? null : JsonConvert.DeserializeObject<UserViewModel>(accountJson);
 }
-<body>
+<body class="custom-cursor">
     <header class="header__section">
         <div class="header__top">
             <div class="container container--max-width">
@@ -53,7 +64,7 @@
                                             <i class="fa-brands fa-linkedin-in"></i>
                                         </a>
                                     </li>
-                                    <li>
+                                    <li> 
                                         <a href="#">
                                             <i class="fa-brands fa-pinterest-p"></i>
                                         </a>
@@ -79,61 +90,32 @@
                 <div class="row align-content-center">
                     <div class="col-6 col-md-9 col-xl-8">
                         <div class="header__main-left">
-                            <a href="index.html" class="logo">
+
+                            <a asp-controller="Home" asp-action="Index" class="logo">
                                 <img src="~/assets/images/logo.svg" alt="logo" />
                             </a>
                             <div class="header__main-menu">
                                 <nav class="header__navigation">
                                     <ul>
-                                        <li class="has-child-menu">
-                                            <a href="javascript:void(0)">Home</a>
-                                            <ul>
-                                                <li><a href="index.html">Home - 1</a></li>
-                                                <li><a href="index-2.html">Home - 2</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="about-us.html">About Us</a></li>
-                                        <li class="has-child-menu">
-                                            <a href="javascript:void(0)">Blog</a>
-                                            <ul>
-                                                <li><a href="blog.html">Blog Style 1</a></li>
-                                                <li><a href="blog-2.html">Blog Style 2</a></li>
-                                                <li><a href="blog-3.html">Blog Style 3</a></li>
-                                                <li><a href="blog-details.html">Blog Details</a></li>
-                                            </ul>
-                                        </li>
-                                        <li class="has-child-menu">
-                                            <a href="javascript:void(0)">Pages</a>
-                                            <ul>
-                                                <li class="has-child-menu">
-                                                    <a href="javascript:void(0)">Destination</a>
-                                                    <ul>
-                                                        <li>
-                                                            <a href="destination.html">Destination</a>
-                                                        </li>
-                                                        <li>
-                                                            <a href="destination-details.html">Destination Details</a>
-                                                        </li>
-                                                    </ul>
-                                                </li>
-                                                <li class="has-child-menu">
-                                                    <a href="javascript:void(0)">Tour</a>
-                                                    <ul>
-                                                        <li><a href="tour.html">Tour</a></li>
-                                                        <li>
-                                                            <a href="tour-details.html">Tour Details</a>
-                                                        </li>
-                                                    </ul>
-                                                </li>
-                                                <li>
-                                                    <a href="authentication.html">Authentication</a>
-                                                </li>
-                                                <li><a href="faq.html">FAQ</a></li>
-                                                <li><a href="404.html">Error 404</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="contact.html">Contact</a></li>
-                                        <li><a href="/TourManager">Tour Manager</a></li>
+                                        @if (currentAccount != null)
+                                        {
+                                            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                                            <li><a asp-controller="Tours" asp-action="Index">Tours</a></li>
+                                            <li><a asp-controller="SupportRequest" asp-action="Index">Support</a></li>
+                                            <li><a asp-controller="BookingHistory" asp-action="Index">BookingHistory</a></li>
+                                        }
+                                        else
+                                        {
+                                            <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                                            <li><a asp-controller="Tours" asp-action="Index">Tours</a></li>
+                                            <li><a asp-controller="Home" asp-action="Privacy">Contact</a></li>
+
+                                        }
+                                        <!--else if (currentAccount.Account.Role == "Manager")
+                                        {
+                                            <li><a href="TourManager">Tour Manager</a></li>
+
+                                        }-->
                                     </ul>
                                 </nav>
                             </div>
@@ -142,35 +124,65 @@
                     <div class="col-6 col-md-3 col-xl-4">
                         <div class="header__main-right d-flex justify-content-end">
                             <ul>
+                               
                                 <li>
-                                    <button class="search-btn"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#searchModal">
-                                        <i class="fa-solid fa-magnifying-glass"></i>
-                                    </button>
-                                </li>
-                                <li>
-                                    <a href="authentication.html" class="signin-signup d-flex">
-                                        <i class="fa-regular fa-user"></i>
+                                    
+                                        
                                         @if (currentAccount != null)
                                         {
-                                            <a href="#">Hello, @currentAccount.FullName!</a>
+                                            <a href="/Profile/Index/@currentAccount.UserID">Hello, @currentAccount.FullName!</a>
                                         } 
                                         else
                                         {
-                                            <a asp-controller="Authentication" asp-action="Login">Login/Signup </a>
+                                            
+                                            <a asp-controller="Authentication" asp-action="Login"><button class="btn" style="background-color: #039e9d; color: white">Login/Signup</button> </a>
                                         }
-                                    </a>
+                                    
                             </li>
-                            <li class="d-md-none">
-                                <button class="offcanvas-hamburger btn-link p-1 lh-1"
-                                        type="button"
-                                        data-bs-toggle="offcanvas"
-                                        data-bs-target="#offcanvasTop"
-                                        aria-controls="offcanvasTop">
-                                    <i class="fa-solid fa-bars"></i>
-                                </button>
-                            </li>
+                               @if (currentAccount != null)
+                                        {
+                                <li class="position-relative">
+                                    <button class="btn btn-link p-1 lh-1" type="button" id="notificationButton">
+                                        <i class="fa-solid fa-bell"></i>
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            3
+                                        </span>
+                                    </button>
+
+                                    <div class="position-absolute bg-white shadow rounded p-3" id="notificationModal" style="width: 300px; right: 0; top: 120%;">
+                                        <div class="fw-bold mb-2">Thông báo</div>
+
+                                        <div class="d-flex align-items-start mb-2">
+                                            <i class="fa-solid fa-circle-info text-primary me-2 mt-1"></i>
+                                            <div>
+                                                <div>Chào mừng bạn đến với hệ thống của chúng tôi!</div>
+                                                <small class="text-muted">1 giờ trước</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-start mb-2">
+                                            <i class="fa-solid fa-check-circle text-success me-2 mt-1"></i>
+                                            <div>
+                                                <div>Đơn hàng #12345 đã được xác nhận</div>
+                                                <small class="text-muted">3 giờ trước</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-start mb-3">
+                                            <i class="fa-solid fa-exclamation-circle text-warning me-2 mt-1"></i>
+                                            <div>
+                                                <div>Bạn có thông báo mới từ hệ thống</div>
+                                                <small class="text-muted">12 giờ trước</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <a href="#" class="text-decoration-none">Xem tất cả thông báo</a>
+                                        </div>
+                                    </div>
+                                    </li>
+                                }
+
                         </ul>
                     </div>
                 </div>
@@ -191,7 +203,7 @@
                 <div class="col-12 col-sm-6 col-lg-3 order-1 order-lg-0">
                     <div class="footer-widgets footer__leftContent fade_bottom">
                         <a href="index.html" class="logo">
-                            <img src="~/assets/images/logo-3.svg" alt="logo" />
+                            <img src="~/assets/images/logo-2.svg" alt="logo" />
                         </a>
                         <div class="help-info">
                             <span>Need any help?</span>
@@ -278,16 +290,12 @@
             </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
 
+    <script src="~/js/site.js" asp-append-version="true"></script>
     <!-- JS Files -->
     <!-- jQuery MeanMe -->
     <script src="~/assets/js/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <!-- Bootstrap -->
@@ -316,10 +324,36 @@
     <script src="~/assets/js/ScrollSmoother.min.js"></script>
     <script src="~/assets/js/SplitText.min.js"></script>
 
+    <!-- Chart  -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/Chart.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/Chart.min.css" rel="stylesheet">
     <!-- Main JavaScript File -->
-    <script src="~/assets/js/main.js"></script>
+    <script src="~/assets/js/main.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
     @RenderSection("Style", required: false)
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const notificationButton = document.getElementById('notificationButton');
+        const notificationModal = document.getElementById('notificationModal');
+
+        if (notificationButton && notificationModal) {
+            notificationModal.style.display = 'none';
+
+            notificationButton.addEventListener('click', function (event) {
+                event.stopPropagation(); 
+                notificationModal.style.display = (notificationModal.style.display === 'block') ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', function (event) {
+                if (notificationModal.style.display === 'block' && !notificationModal.contains(event.target) && event.target !== notificationButton) {
+                    notificationModal.style.display = 'none'; // Ẩn modal
+                }
+            });
+        }
+    </script>
 
 </body>
 </html>

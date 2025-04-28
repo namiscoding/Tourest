@@ -1,0 +1,302 @@
+﻿@* File: Views/BookingHistory/Index.cshtml *@
+@using System.Globalization
+@using System.Text.Json; 
+@model Tourest.ViewModels.BookingHistoryViewModel
+
+@{
+    ViewData["Title"] = "Lịch sử đặt tour";
+
+    // Helper function để lấy class badge Bootstrap dựa trên Status
+    string GetStatusBadgeClass(string status)
+    {
+        return status?.ToLowerInvariant() switch
+        {
+            "paid" => "bg-success text-white", // Thêm text-white nếu nền tối
+            "completed" => "bg-primary text-white",
+            "cancelled" => "bg-danger text-white",
+            "pending" => "bg-warning text-dark", // Nền vàng chữ tối
+            "pendingpayment" => "bg-info text-dark", // Thêm trạng thái chờ thanh toán
+            _ => "bg-secondary text-white",
+        };
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collapsible Chat</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css"
+          rel="stylesheet" />
+</head>
+<body>
+    <main>
+<div class="container-fluid mt-6">
+    @* Thêm container bao ngoài *@
+
+    <h1>@ViewData["Title"]</h1>
+    <hr />
+
+    @* --- KHU VỰC BIỂU ĐỒ --- *@
+    <div class="row mb-4 g-4">
+        @* Thêm g-4 để có khoảng cách *@
+        <div class="col-md-3">
+            <div class="card text-center h-100 shadow-sm">
+                @* Thêm shadow *@
+                <div class="card-body d-flex flex-column justify-content-center">
+                    @* Căn giữa nội dung *@
+                    <h5 class="card-title mb-3">Tổng chi tiêu</h5>
+                    <p style="color: #039e9d;" class="display-6 fw-bold mb-1">
+                        @Model.TotalSpentConfirmedCompleted.ToString("N0", CultureInfo.GetCultureInfo("vi-VN"))
+                        <span class="fs-6 align-baseline"> VND</span>
+                    </p>
+                    <small class="text-muted">(Đơn Xác nhận & Hoàn thành)</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            @* --- Phần Filter theo Destination --- *@
+            <div class="row mb-3">
+                <div class="col-md-6 col-lg-4">
+                    @* Điều chỉnh độ rộng cột filter *@
+                    <form asp-action="Index" asp-controller="BookingHistory" method="get" id="destinationFilterForm">
+                        <div class="input-group input-group-sm">
+                            <label style="font-weight: bolder; font-size: 1rem; background-color: #039e9d; color: white; border-color: #039e9d;"
+                                   class="input-group-text" for="destinationFilterSelect">Lọc theo điểm đến:</label>
+                            <select class="form-select" id="destinationFilterSelect" name="destinationFilter" onchange="document.getElementById('destinationFilterForm').submit();">
+                                <option value="">Tất cả điểm đến </option>
+                                @foreach (var destination in Model.AvailableDestinations)
+                                {
+                                    <option value="@destination" selected="@(Model.SelectedDestinationFilter == destination)">@destination</option>
+                                }
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            @* --- Hiển thị danh sách Booking (Nhiều bảng) --- *@
+            @if (!Model.Bookings.Any())
+            {
+                <div class="alert alert-info">Bạn chưa có lịch sử đặt tour nào @(string.IsNullOrEmpty(Model.SelectedDestinationFilter) ? "" : $"cho điểm đến \"{Model.SelectedDestinationFilter}\"").</div>
+            }
+            else
+            {
+                @foreach (var destinationGroup in Model.Bookings.GroupBy(b => b.Destination))
+                {
+                    <h4 class="mt-4 mb-3 destination-group-title" style="color: #039e9d;">@destinationGroup.Key</h4>
+
+                    <div class="card widget-card border-light shadow-sm mb-4">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover bsb-table-xl text-nowrap align-middle m-0">
+                                    @* Bỏ table-borderless, thêm table-hover *@
+                                    <thead class="table-light">
+                                        @* Thêm nền cho thead *@
+                                        <tr>
+                                            <th scope="col">Tour</th>
+                                            <th scope="col">Đặt ngày</th>
+                                            <th scope="col">Khởi hành</th>
+                                            <th scope="col">Số người</th>
+                                            <th scope="col">Tổng tiền</th>
+                                            <th scope="col">Trạng thái</th>
+                                            <th scope="col"></th> @* Action Column *@
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var booking in destinationGroup.OrderByDescending(b => b.BookingDate))
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <a asp-controller="Tours" asp-action="Details" asp-route-id="@booking.TourId" class="text-decoration-none fw-semibold" style="color: #039e9d;">@booking.TourName</a>
+
+                                                    @if (!string.IsNullOrEmpty(booking.PickupPoint))
+                                                    {
+                                                        <span class="d-block text-secondary fs-7" title="Điểm đón"><i class="fa-solid fa-map-pin me-1"></i>Điểm đón: @booking.PickupPoint</span>
+                                                    }
+                                                </td>
+                                                <td>@booking.BookingDate.ToString("dd/MM/yyyy")</td>
+                                                <td>@booking.DepartureDate.ToString("dd/MM/yyyy")</td>
+                                                <td class="text-center">
+                                                    @* Căn giữa *@
+                                                    @booking.NumberOfAdults <i class="fa-solid fa-user" title="Người lớn"></i>
+                                                    @if (booking.NumberOfChildren > 0)
+                                                    {
+                                                        <span class="mx-1">|</span> @booking.NumberOfChildren <i class="fa-solid fa-child" title="Trẻ em"></i>
+                                                    }
+                                                </td>
+                                                <td class="text-end">
+                                                    @* Căn phải *@
+                                                    <span class="fw-bold text-danger">@booking.TotalPrice.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) đ</span> @* Bỏ VND cho gọn *@
+                                                </td>
+                                                <td>
+                                                    <span class="badge rounded-pill @GetStatusBadgeClass(booking.Status)">@booking.Status</span>
+                                                    
+                                                </td>
+                                                <td>
+                                                    @* Cột Action *@
+                                                    @if (booking.Status != null && booking.Status.Equals("PendingPayment", StringComparison.OrdinalIgnoreCase))
+                                                    {
+                                                        @*<a asp-controller="Payment" asp-action="Create" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-warning" title="Hoàn tất thanh toán">
+                                                             <i class="fa-solid fa-credit-card me-1"></i> Thanh toán
+                                                        </a>*@
+
+                                                        <form method="POST" asp-action="CreatePaymentMomo" asp-controller="Payment" class="needs-validation" novalidate id="momoPaymentForm">
+                                                            @* Thêm id và validation *@
+                                                            @* Các input ẩn này sẽ được cập nhật bằng JS *@
+                                                            <input type="hidden" name="Amount" id="momoAmountInput" value="@booking.TotalPrice" />      @* <<< THÊM ID *@
+                                                            <input type="hidden" name="OrderInfo" id="momoOrderInfoInput" value="Thanh toán Momo cho Tour @booking.TourName" /> @* <<< THÊM ID *@
+                                                            <input type="hidden" name="OrderId" id="momoOrderIdInput" value="@booking.BookingId" />    @* <<< THÊM ID *@
+                                                            <input type="hidden" name="FullName" id="momoFullNameInput" value="Tourest" />
+                                                            @* Gửi TourId cùng form MoMo nếu Controller cần *@
+                                                            <input type="hidden" name="TourId" value="@booking.TourId" />
+
+                                                            @* Nút Submit cho Form MoMo *@
+                                                            <button type="submit" class="common-btn  mt-1" style="background-color: #a60067; color: white;" id="book-momo-button">
+                                                                @* Style cơ bản cho MoMo *@
+                                                                <img src="~/assets/images/momo-icon.png" alt="MoMo" height="20" style="vertical-align: middle; margin-right: 5px; border-radius: 4px;"> @* <<< Thêm logo MoMo (điều chỉnh đường dẫn nếu cần) *@
+                                                                Thanh toán ngay bằng MoMo
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else if (booking.Status != null && booking.Status.Equals("Completed", StringComparison.OrdinalIgnoreCase))
+                                                    {
+                                                                @if (!booking.HasRatedTour)
+                                                                {
+                                                                    <a asp-controller="Rating" asp-action="CreateTourRating" asp-route-tourId="@booking.TourId" asp-route-bookingId="@booking.BookingId" class="btn btn-sm btn-outline-primary mb-1" title="Đánh giá tour này">
+                                                                        <i class="fa-regular fa-star me-1"></i> Rate Tour
+                                                                    </a>
+                                                                }
+                                                                @if (booking.TourGroup.TourGroupID != null && booking.TourGroup?.AssignedTourGuideID.HasValue == true && !booking.HasRatedTourGuide)
+                                                                {
+                                                                    <a asp-controller="Rating" asp-action="CreateTourGuideRating"
+                                                                    asp-route-tourGroupId="@booking.TourGroup.TourGroupID"
+                                                                    asp-route-tourGuideId="@booking.TourGroup.AssignedTourGuideID"
+                                                                    asp-route-bookingId="@booking.BookingId"
+                                                                    class="btn btn-sm btn-outline-info" title="Đánh giá hướng dẫn viên">
+                                                                        <i class="fa-regular fa-user me-1"></i> Rate Guide
+                                                                    </a>
+                                                                }
+                                                            }
+                                                            else if (booking.Status != null && booking.Status.Equals("Paid", StringComparison.OrdinalIgnoreCase))
+                                                            {
+
+                                                                <a asp-controller="TourGuides" asp-action="Details" asp-route-tourId="" asp-route-bookingId="" class="btn btn-sm btn-outline-primary" title="Đánh giá tour guide này">
+                                                                    <i class="fa-regular fa-star me-1"></i> View Tour Guide Infor 
+                                                                </a>
+                                                            }
+                                                    @* Thêm nút xem chi tiết booking nếu bạn có trang chi tiết booking *@
+                                                    @*
+                                        <a asp-action="Details" asp-controller="Booking" asp-route-id="@booking.BookingId" class="btn btn-sm btn-outline-info ms-1" title="Xem chi tiết">
+                                        <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        *@
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+
+        </div> @* End container *@
+        </div>
+    </div>
+    @* --- KẾT THÚC KHU VỰC BIỂU ĐỒ --- *@
+    </main>
+</body>
+    
+
+@section Scripts {
+    @* ĐẢM BẢO Chart.js đã được thêm vào _Layout.cshtml hoặc ở đây *@
+    @* <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script> *@
+    @* <link href="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/Chart.min.css" rel="stylesheet"> *@
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Dữ liệu cho biểu đồ cột ---
+            try { // Thêm try...catch để bắt lỗi JSON hoặc Chart
+                const monthlySpendingData = @Html.Raw(Json.Serialize(Model.MonthlySpendingData ?? new List<Tourest.ViewModels.Booking.MonthlySpendingViewModel>()));
+                console.log("Monthly Spending Data:", monthlySpendingData); // Log dữ liệu ra để kiểm tra
+
+                // Chuẩn bị labels và data
+                const monthLabels = monthlySpendingData.map(item => item.MonthYearLabel);
+                const amountData = monthlySpendingData.map(item => item.TotalAmount);
+                console.log("Chart Labels:", monthLabels);
+                console.log("Chart Amounts:", amountData);
+
+                // --- Vẽ Biểu Đồ Cột (Bar Chart) ---
+                const monthlyCtx = document.getElementById('monthlySpendingChart');
+                if (monthlyCtx && typeof Chart !== 'undefined') {
+                    console.log("Canvas and Chart.js found, initializing chart...");
+                    // Hủy biểu đồ cũ nếu tồn tại (tránh vẽ chồng khi filter) - Cần lưu trữ instance nếu làm AJAX
+                    // if (window.myMonthlyChart instanceof Chart) {
+                    //     window.myMonthlyChart.destroy();
+                    // }
+                    // window.myMonthlyChart = new Chart(monthlyCtx, { ... }); // Lưu instance vào biến toàn cục
+
+                    new Chart(monthlyCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: monthLabels,
+                            datasets: [{
+                                label: 'Tổng chi tiêu (VND)',
+                                data: amountData,
+                                backgroundColor: '#039e9d', // Màu giống theme
+                                borderColor: '#027a79',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false, // Cho phép điều chỉnh chiều cao canvas
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function (value, index, values) {
+                                            // Rút gọn đơn vị tiền (Triệu, Tỷ)
+                                            if (value >= 1000000000) { return (value / 1000000000).toFixed(1) + ' Tỷ'; }
+                                            if (value >= 1000000) { return (value / 1000000).toFixed(1) + ' Tr'; }
+                                            if (value >= 1000) { return (value / 1000).toFixed(0) + ' K'; }
+                                            return value.toLocaleString('vi-VN') + ' đ';
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) { label += ': '; }
+                                            if (context.parsed.y !== null) {
+                                                label += context.parsed.y.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                },
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                } else if (!monthlyCtx) {
+                    console.error("Canvas element with id 'monthlySpendingChart' not found.");
+                } else {
+                    console.warn("Chart.js library not loaded. Cannot render chart.");
+                }
+            } catch (error) {
+                console.error("Error initializing chart:", error);
+            }
+        });
+    </script>
+}

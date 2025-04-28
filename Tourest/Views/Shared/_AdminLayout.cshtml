@@ -1,257 +1,214 @@
 ﻿@* File: /Views/Shared/_AdminLayout.cshtml *@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Tourest Admin</title>
 
-    @* Sử dụng các file CSS mặc định hoặc tạo file riêng cho Admin *@
+    <!-- CSS Libraries -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    @* Optional: Thêm link tới Font Awesome nếu muốn dùng icon *@
+    <link rel="stylesheet" href="~/css/admin_layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-
-    <style>
-        /* CSS đơn giản cho sidebar */
-        body {
-            display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-        }
-
-        .wrapper {
-            display: flex;
-            width: 100%;
-            align-items: stretch;
-            flex-grow: 1; /* Make wrapper grow to fill space */
-        }
-
-        #sidebar {
-            min-width: 250px;
-            max-width: 250px;
-            background: #343a40; /* Dark background */
-            color: #fff;
-            transition: all 0.3s;
-            min-height: 100vh; /* Make sidebar full height */
-        }
-
-            /* Optional: Sidebar Toggle Styles */
-            #sidebar.active {
-                margin-left: -250px;
-            }
-
-            #sidebar .sidebar-header {
-                padding: 20px;
-                background: #212529;
-            }
-
-            #sidebar ul.components {
-                padding: 20px 0;
-                border-bottom: 1px solid #47748b;
-            }
-
-            #sidebar ul p {
-                color: #fff;
-                padding: 10px;
-            }
-
-            #sidebar ul li a {
-                padding: 10px;
-                font-size: 1.1em;
-                display: block;
-                color: rgba(255, 255, 255, 0.8); /* Lighter text */
-                text-decoration: none;
-                transition: all 0.3s;
-            }
-
-                #sidebar ul li a:hover {
-                    color: #fff;
-                    background: #495057; /* Slightly lighter dark on hover */
-                }
-
-            #sidebar ul li.active > a, a[aria-expanded="true"] {
-                color: #fff;
-                background: #007bff; /* Bootstrap primary color for active */
-            }
-
-        #content {
-            width: 100%;
-            padding: 20px;
-            min-height: 100vh;
-            transition: all 0.3s;
-            background-color: #f8f9fa; /* Light background for content */
-        }
-
-        /* Style for top navbar */
-        .navbar {
-            padding: 15px 10px;
-            background: #fff;
-            border: none;
-            border-radius: 0;
-            margin-bottom: 20px; /* Space below navbar */
-            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-btn {
-            box-shadow: none;
-            outline: none !important;
-            border: none;
-        }
-
-        /* Footer basic style */
-        .footer {
-            background-color: #e9ecef; /* Light gray footer */
-            padding: 1rem 0;
-            margin-top: auto; /* Push footer down */
-            font-size: 0.9em;
-            text-align: center;
-        }
-
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+   
 </head>
 <body>
     <div class="wrapper">
+        <!-- Sidebar -->
         <nav id="sidebar">
             <div class="sidebar-header">
+                <img src="/assets/images/logo-2.svg" alt="Tourest Logo" />
                 <h3>Tourest Admin</h3>
-                <strong>TA</strong> @* Chữ viết tắt khi thu gọn (nếu có chức năng thu gọn) *@
+                <strong>TA</strong> 
             </div>
 
             <ul class="list-unstyled components">
-                @* Lấy thông tin User đang đăng nhập (nếu cần) *@
-                @*
-                @if (User.Identity?.IsAuthenticated ?? false) {
-                     <li class="p-3">
-                         <small>Xin chào, @User.Identity.Name!</small>
-                     </li>
-                }
-                *@
                 <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
-                    @* Link đến Dashboard Controller (cần tạo sau) *@
                     <a asp-controller="Dashboard" asp-action="Index">
-                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
                     </a>
                 </li>
                 <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCustomers" ? "active" : "")">
-                    @* Link đến Controller quản lý Khách hàng *@
                     <a asp-controller="AdminCustomers" asp-action="Index">
-                        <i class="fas fa-users me-2"></i> Quản lý Khách hàng
+                        <i class="fas fa-users"></i> Khách hàng
                     </a>
                 </li>
                 <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminTourGuides" ? "active" : "")">
-                    @* Link đến Controller quản lý HDV (cần tạo sau) *@
                     <a asp-controller="AdminTourGuides" asp-action="Index">
-                        <i class="fas fa-user-tie me-2"></i> Quản lý HDV
+                        <i class="fas fa-user-tie"></i> Hướng dẫn viên
                     </a>
                 </li>
                 <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminTourManagers" ? "active" : "")">
-                    @* Link đến Controller quản lý Quản lý Tour (cần tạo sau) *@
                     <a asp-controller="AdminTourManagers" asp-action="Index">
-                        <i class="fas fa-user-shield me-2"></i> Quản lý Quản lý Tour
+                        <i class="fas fa-user-shield"></i> Quản lý Tour
                     </a>
                 </li>
-                <li class="nav-item @(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminTours" ? "active" : "")">
-                    @* Link đến Controller quản lý Tour (cần tạo sau) *@
+                <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminTours" ? "active" : "")">
                     <a asp-controller="AdminTours" asp-action="Index">
-                        <i class="fas fa-map-signs me-2"></i> Quản lý Tour
+                        <i class="fas fa-map-signs"></i> Tours
                     </a>
                 </li>
                 <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCategories" ? "active" : "")">
                     <a asp-controller="AdminCategories" asp-action="Index">
-                        <i class="fas fa-tags me-2"></i> Quản lý Danh mục
+                        <i class="fas fa-tags"></i> Danh mục
                     </a>
                 </li>
                 <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminBookings" ? "active" : "")">
-                    @* Link đến Controller quản lý Đặt Tour (cần tạo sau) *@
                     <a asp-controller="AdminBookings" asp-action="Index">
-                        <i class="fas fa-calendar-check me-2"></i> Quản lý Đặt Tour
+                        <i class="fas fa-calendar-check"></i> Đặt Tour
                     </a>
                 </li>
                 <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminPayments" ? "active" : "")">
-                    @* Link đến Controller quản lý Thanh toán (cần tạo sau) *@
                     <a asp-controller="AdminPayments" asp-action="Index">
-                        <i class="fas fa-credit-card me-2"></i> Quản lý Thanh toán
+                        <i class="fas fa-credit-card"></i> Thanh toán
                     </a>
                 </li>
-                @* Thêm các link quản lý khác: Notifications, SupportRequests, AuditLogs... *@
-                <li>
-                    <hr class="dropdown-divider" style="border-top: 1px solid rgba(255,255,255,.15);" />
-                </li>
-                <li>
-                    @* Link Quay lại trang chủ (nếu cần) *@
-                    <a asp-controller="Home" asp-action="Index" asp-area="">
-                        <i class="fas fa-home me-2"></i> Về Trang Chủ
-                    </a>
-                </li>
-                @* Form Đăng xuất 
-                @if (User.Identity?.IsAuthenticated ?? false)
-                {
-                    <li>
-                        <form class="d-inline p-2" asp-controller="Account" asp-action="Logout" method="post">
-                            @* Đặt đúng Controller/Action Logout 
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="nav-link btn btn-link text-white-50" style="padding: 10px;"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</button>
-                        </form>
-                    </li>
-                }*@
-            </ul>
 
+                <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminReviews" ? "active" : "")">
+                    <a asp-controller="AdminReviews" asp-action="Index">
+                        <i class="fas fa-star"></i> Đánh giá
+                    </a>
+                </li>
+
+                <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminReports" ? "active" : "")">
+                    <a asp-controller="AdminReports" asp-action="Index">
+                        <i class="fas fa-chart-bar"></i> Báo cáo
+                    </a>
+                </li>
+
+                <hr />
+
+                <li class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSettings" ? "active" : "")">
+                    <a asp-controller="AdminSettings" asp-action="Index">
+                        <i class="fas fa-cog"></i> Cài đặt
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Home" asp-action="Index" asp-area="">
+                        <i class="fas fa-home"></i> Về Trang Chủ
+                    </a>
+                </li>
+            </ul>
         </nav>
 
+        <!-- Page Content -->
         <div id="content">
+            <!-- Top Navbar -->
+            <nav class="admin-navbar">
+                <div class="d-flex align-items-center">
+                    <!-- Sidebar toggle button -->
+                    <button type="button" id="sidebarCollapse" class="navbar-toggler me-3">
+                        <i class="fas fa-bars"></i>
+                    </button>
 
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <div class="container-fluid">
+                    <h4 class="navbar-brand mb-0">
+                        <i class="fas fa-chart-line"></i>
+                        @ViewData["Title"]
+                    </h4>
+                </div>
 
-                    @* Nút ẩn hiện sidebar (nếu muốn thêm JS để làm) *@
-                    @* <button type="button" id="sidebarCollapse" class="btn btn-info">
-                        <i class="fas fa-align-left"></i>
-                        <span>Toggle Sidebar</span>
-                    </button> *@
-                    @*
-                    <span class="navbar-text ms-auto">
-                         Hiển thị thông tin người dùng đăng nhập 
-                        @if (User.Identity?.IsAuthenticated ?? false)
-                        {
-                            <text>Xin chào, @User.Identity.Name!</text>
-                        }
-                    </span>*@
+                <div class="navbar-actions">
+                    <!-- Notifications -->
+                    <button class="navbar-action-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+
+                    <!-- Messages -->
+                    <button class="navbar-action-btn">
+                        <i class="fas fa-envelope"></i>
+                        <span class="notification-badge">5</span>
+                    </button>
+
+                    <!-- User dropdown -->
+                    <div class="dropdown">
+                        <div class="user-dropdown" data-bs-toggle="dropdown">
+                            <img src="https://randomuser.me/api/portraits/men/85.jpg" alt="Admin User">
+                            <div class="user-info d-none d-md-block">
+                                <div class="user-name">Admin User</div>
+                                <div class="user-role">Administrator</div>
+                            </div>
+                            <i class="fas fa-chevron-down ms-2"></i>
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
                 </div>
             </nav>
 
-            @* Phần nội dung chính của từng View sẽ được render ở đây *@
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
+            <!-- Main Content Area with subtle background -->
+            <div class="content-wrapper">
+                <!-- Optional Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">@ViewData["Title"]</li>
+                    </ol>
+                </nav>
+
+                <!-- Main content render -->
+                <main role="main">
+                    @RenderBody()
+                </main>
+            </div>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>&copy; @DateTime.Now.Year - Tourest Admin Panel</div>
+                        <div>Phiên bản 1.0.0</div>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
 
-    @* Footer đơn giản *@
-    <footer class="footer border-top text-muted">
-        <div class="container-fluid text-center">
-            &copy; @DateTime.Now.Year - Tourest Admin Panel
-        </div>
-    </footer>
+    <!-- Overlay for sidebar (mobile) -->
+    <div class="overlay"></div>
 
-    @* Script mặc định *@
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    @* Optional: JS cho sidebar toggle (nếu có nút) *@
-    @*
+    <!-- Sidebar Toggle Script -->
     <script type="text/javascript">
         $(document).ready(function () {
+            // Sidebar toggle - mobile
             $('#sidebarCollapse').on('click', function () {
                 $('#sidebar').toggleClass('active');
+                $('#content').toggleClass('active');
+                $('.overlay').toggleClass('active');
+            });
+
+            // Close sidebar when clicking on overlay
+            $('.overlay').on('click', function () {
+                $('#sidebar').removeClass('active');
+                $('#content').removeClass('active');
+                $('.overlay').removeClass('active');
+            });
+
+            // Toggle compact sidebar (desktop)
+            $('.compact-toggle').on('click', function() {
+                $('#sidebar').toggleClass('compact');
+                $('#content').toggleClass('compact-content');
+            });
+
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+              return new bootstrap.Tooltip(tooltipTriggerEl)
             });
         });
     </script>
-     *@
 
-    @* Section để các View cụ thể có thể thêm script riêng *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

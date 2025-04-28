@@ -3,29 +3,52 @@ using Microsoft.EntityFrameworkCore;
 using Tourest.Data;
 using Tourest.Data.Repositories;
 using Tourest.Services;
-
+using Tourest.Data.Entities.Momo;
 using Tourest.TourGuide.Repositories;
 using Tourest.TourGuide.Services;
+using Tourest.Services.Momo;
 using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
+using Tourest.Hubs;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Tourest.BackgroundServices;
+using Tourest.Helpers;
+using BCrypt.Net; // Thêm import này
+using Microsoft.Extensions.Logging; // Add this
+
+
 namespace Tourest
 {
-	public class Program
-	{
-		public static void Main(string[] args)
-		{
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
 
-			var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(args);
 
-			// Lấy connection string từ appsettings.json
-			var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            // connect momo API
+            builder.Services.Configure<Tourest.Services.Momo.MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
+            builder.Services.AddScoped<IMomoService, MomoService>();
 
-			// Đăng ký ApplicationDbContext với DI Container và chỉ định dùng SQL Server
-			builder.Services.AddDbContext<ApplicationDbContext>(options =>
-				options.UseSqlServer(connectionString));
+            // In program.cs or Startup.cs, add debug-level logging for MoMo-related services
+            builder.Services.AddLogging(logging =>
+            {
+                logging.AddFilter("Tourest.Services.Momo", LogLevel.Debug);
+                logging.AddFilter("Tourest.Controllers.PaymentController", LogLevel.Debug);
+                // Add console for development environment
+                logging.AddConsole();
+                logging.AddDebug();
+            });
+
+            // Lấy connection string từ appsettings.json
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            // Đăng ký ApplicationDbContext với DI Container và chỉ định dùng SQL Server
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
             builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-      .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddDistributedMemoryCache();
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -51,14 +74,12 @@ namespace Tourest
             builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
 
-            builder.Services.AddAuthentication()
-    .AddCookie(options => {
-        options.Events.OnValidatePrincipal = context => {
-            var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            context.Principal.AddIdentity(new ClaimsIdentity(new[] { new Claim("userId", userId) }));
-            return Task.CompletedTask;
-        };
-    });
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+              .AddCookie(options =>
+              {
+                  options.LoginPath = "/Authentication/Login";
+                  options.AccessDeniedPath = "/Authentication/AccessDenied";
+              });
             builder.Services.AddAuthorization();
             builder.Services.ConfigureApplicationCookie(options =>
             {
@@ -67,7 +88,7 @@ namespace Tourest
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
 
                 options.LoginPath = "/Authentication/Login";
-                
+
                 options.SlidingExpiration = true;
             });
             builder.Services.AddSession(options =>
@@ -76,7 +97,7 @@ namespace Tourest
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-          
+
             builder.Services.AddScoped<ITourRepository, TourRepository>();
             builder.Services.AddScoped<ITourService, TourService>();
 
@@ -87,23 +108,50 @@ namespace Tourest
             builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
             builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
 
-            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); 
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
-      
+
             builder.Services.AddScoped<ITourGuideService, TourGuideService>();
-      
+
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddScoped<IAccountRepository, AccountRepository>();
             builder.Services.AddScoped<IAccountService, AccountService>();
-      
+
+            builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
+            builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
+
             builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
 
-      
+            builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+            builder.Services.AddScoped<IPhotoService, CloudinaryPhotoService>();
+
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+            builder.Services.AddScoped<IBookingService, BookingService>();
+
+            builder.Services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
+            builder.Services.AddScoped<ISupportRequestService, SupportRequestService>();
+
+            builder.Services.AddScoped<ITourGroupRepository, TourGroupRepository>();
+
+            builder.Services.AddScoped<IRatingRepository, RatingRepository>();
+            builder.Services.AddScoped<ITourRatingRepository, TourRatingRepository>();
+            builder.Services.AddScoped<IRatingService, RatingService>();
+         
+            builder.Services.AddScoped<ITourGuideRatingRepository, TourGuideRatingRepository>();
+
+            builder.Services.AddScoped<IBookingProcessingService, BookingProcessingService>();
+            builder.Services.AddHostedService<BookingStatusUpdaterService>();
+
+
             builder.Services.AddControllersWithViews();
-            
+
+            builder.Services.AddSignalR();
+
             var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
@@ -113,21 +161,38 @@ namespace Tourest
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
 			}
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.MapIdentityApi<IdentityUser>();
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseRouting();
-            app.UseAuthorization();
-            app.UseAuthentication();
+			      app.UseStaticFiles();
             app.UseSession();
-
             //app.MapHub<NotificationHub>("/notificationHub");
+            app.MapHub<RatingHub>("/ratingHub");
 
             app.MapControllerRoute(
-				name: "default",
-				pattern: "{controller=Tours}/{action=Index}/{id?}");
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
-			app.Run();
-		}
-	}
+            // Gọi SeedData.Initialize trong Program.cs
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    await SeedData.Initialize(services);
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while seeding the database.");
+                }
+            }
+
+            app.Run();
+        }
+
+    }
 }
+

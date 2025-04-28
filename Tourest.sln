@@ -5,6 +5,10 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tourest", "Tourest\Tourest.csproj", "{5C946428-774A-46FC-8A00-91897151F3DB}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TourestTests", "TourestTests\TourestTests.csproj", "{8D64C877-694F-4817-A747-31D1B331FAFA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{9D91E15A-C4E6-45A5-B604-447CA747C7C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{5C946428-774A-46FC-8A00-91897151F3DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C946428-774A-46FC-8A00-91897151F3DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C946428-774A-46FC-8A00-91897151F3DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D64C877-694F-4817-A747-31D1B331FAFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D64C877-694F-4817-A747-31D1B331FAFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D64C877-694F-4817-A747-31D1B331FAFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D64C877-694F-4817-A747-31D1B331FAFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D91E15A-C4E6-45A5-B604-447CA747C7C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D91E15A-C4E6-45A5-B604-447CA747C7C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D91E15A-C4E6-45A5-B604-447CA747C7C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D91E15A-C4E6-45A5-B604-447CA747C7C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

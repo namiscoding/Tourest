@@ -39,6 +39,22 @@
         return $"dest_{safeString}_{hashCode}"; // Kết hợp tiền tố + chuỗi an toàn + hash
     };
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collapsible Chat</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css"
+          rel="stylesheet" />
+</head>
+<body>
+    <main>
     <div class="custom-cursor__cursor"></div>
     <div class="custom-cursor__cursor-two"></div>
     <!-- Custom Cursor end -->
@@ -186,63 +202,48 @@
         </section>
         <!-- Breadcrumb__section end  -->
         <!-- Search__section start  -->
-        <div class="search__section fade_bottom">
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="search__area search__area--extend">
-                            <form action="index.html" class="search-form">
-                                <div class="input-group">
-                                    <span>Destination</span>
-                                    <div class="input-container">
-                                        <input type="text"
-                                               class="form-control"
-                                               id="destination2"
-                                               placeholder="Where to go?"
-                                               autocomplete="off"
-                                               required />
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <span>Type</span>
-                                    <div class="input-container">
-                                        <input type="text"
-                                               class="form-control"
-                                               id="type2"
-                                               placeholder="Activity"
-                                               autocomplete="off"
-                                               required />
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <span>When</span>
-                                    <div class="input-container">
-                                        <input type="date"
-                                               class="form-control"
-                                               id="daterange2"
-                                               name="daterange" />
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <span>Guests</span>
-                                    <div class="input-container">
-                                        <input type="number"
-                                               class="form-control"
-                                               id="guests2"
-                                               placeholder="0"
-                                               autocomplete="off"
-                                               required />
-                                    </div>
-                                </div>
-                                <div class="input-group">
-                                    <button class="common-btn color-two">search</button>
-                                </div>
-                            </form>
+<div class="search__section fade_bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="search__area search__area--extend">
+                    @* --- SỬA FORM NÀY --- *@
+                    <form asp-controller="Tours" asp-action="Index" method="get" class="search-form">
+                        <div class="input-group">
+                            <span>Destination</span>
+                            <div class="input-container">
+                                <input type="text" class="form-control" id="destination2" name="SearchDestination" placeholder="Where to go?" value="@Model.CurrentSearchDestination" autocomplete="off" />
+                            </div>
                         </div>
-                    </div>
+                        <div class="input-group">
+                            <span>Type</span>
+                            <div class="input-container">
+                                <input type="text" class="form-control" id="type2" name="SearchCategoryName" placeholder="Activity (e.g., Adventure)" value="@Model.CurrentSearchCategoryName" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <span>When</span>
+                            <div class="input-container">
+                                @* Dùng type="date" chuẩn HTML5 *@
+                                <input type="date" class="form-control" id="daterange2" name="SearchDate" value="@Model.CurrentSearchDate?.ToString("yyyy-MM-dd")" />
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <span>Guests</span>
+                            <div class="input-container">
+                                <input type="number" class="form-control" id="guests2" name="SearchGuests" placeholder="0" value="@Model.CurrentSearchGuests" autocomplete="off" min="1" /> @* Thêm min=1 *@
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <button type="submit" class="common-btn color-two">Search</button> @* Đổi thành type="submit" *@
+                        </div>
+                    </form>
+                    @* --- KẾT THÚC SỬA FORM --- *@
                 </div>
             </div>
         </div>
+    </div>
+</div>
         <!-- Search__section end  -->
         <!-- Tour-package__section start  -->
         <section class="tour-package__section section-padding-top-bottom">
@@ -250,34 +251,7 @@
                 <div class="row g-4">
                     <div class="col-lg-4 col-xl-3">
                         <div class="destination-dtls__sidebar sidebar">
-                            <div class="widget__item item-stagger search-widget">
-                                <h6 class="widget-title">Search</h6>
-                                <form action="index.html" class="search-widget__search-form">
-                                    <div class="input-group">
-                                        <input type="search"
-                                               name="filter-search"
-                                               id="filter-search"
-                                               placeholder="Type anything..." />
-                                        <button class="search-btn">
-                                            <i class="fa-solid fa-magnifying-glass"></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="widget__item item-stagger range-widget">
-                                <h6 class="widget-title">Filter By</h6>
-                                <div class="range-widget__content">
-                                    <form action="index.html" class="range-form">
-                                        <div id="slider-range"></div>
-                                        <div class="price-input">
-                                            <input type="text" id="amount" />
-                                            <input type="text" id="amount2" />
-                                        </div>
-
-                                        <button class="common-btn color-two">submit</button>
-                                    </form>
-                                </div>
-                            </div>
+                            
                             <form id="filterForm" asp-controller="Tours" asp-action="Index" method="get">
                             <div class="widget__item item-stagger categories-widget">
                                 <h6 class="widget-title">Categories</h6>
@@ -405,33 +379,70 @@
                         </div>
                     </div>
                     <div class="col-lg-8 col-xl-9">
-                        <div class="row g-4 align-items-center g-4 mb-3">
-                            <div class="col-md-8 pe-md-0">
-                                <div class="tour-package__filter d-flex justify-content-start">
-                                    @* Hiển thị số lượng tour đã lọc *@
-                                    <span class="filter-total-item me-3">@Model.Tours.Count() Tours Found</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="filter-short-by d-flex justify-content-end">
-                                    @{
-                                        var currentSort = ViewBag.CurrentSortBy as string;
-                                    }
-                                    @* Sử dụng lại thẻ SELECT đã hoạt động, cập nhật options *@
-                                    <select class="form-select form-select-sm" name="sortBy" onchange="document.getElementById('filterForm').submit();" style="max-width: 200px;">
-                                        @* Tăng width nếu cần *@
-                                        <option value="" selected="@(string.IsNullOrEmpty(currentSort))">Sắp xếp mặc định</option>
-                                        <option value="price_asc" selected="@(currentSort == "price_asc")">Giá: Thấp đến Cao</option>
-                                        <option value="price_desc" selected="@(currentSort == "price_desc")">Giá: Cao đến Thấp</option>
-                                        <option value="name_asc" selected="@(currentSort == "name_asc")">Tên: A-Z</option>
-                                        <option value="name_desc" selected="@(currentSort == "name_desc")">Tên: Z-A</option>
-                                        <option value="rating_desc" selected="@(currentSort == "rating_desc")">Đánh giá: Cao nhất</option>
-                                        <option value="duration_asc" selected="@(currentSort == "duration_asc")">Thời lượng: Ngắn nhất</option>
-                                        @* Thêm/bỏ các tùy chọn khác nếu muốn *@
-                                    </select>
-                                </div>
-                            </div>
+                @* --- Thanh thông tin và Sắp xếp --- *@
+                <div class="row g-3 align-items-center mb-3">
+                    @* Giảm g-4 thành g-3 *@
+                    <div class="col-md-7 col-lg-8 pe-md-0">
+                        <div class="tour-package__filter d-flex justify-content-start align-items-center">
+                            <span class="filter-total-item me-3 fw-bold">@Model.Tours.Count() Tour phù hợp với bạn</span>
                         </div>
+                    </div>
+                    <div class="col-md-5 col-lg-4">
+                        <div class="filter-short-by d-flex justify-content-end">
+                            @{
+                                var currentSort = ViewBag.CurrentSortBy as string;
+                            }
+                            <form id="sortForm" asp-controller="Tours" asp-action="Index" method="get" class="d-flex align-items-center w-100">
+                                @* Thêm các input ẩn để giữ lại filter hiện tại khi sắp xếp *@
+                                @if (Model.SelectedCategoryIds != null)
+                                {
+                                    foreach (var id in Model.SelectedCategoryIds)
+                                    {
+                                        <input type="hidden" name="categoryIds" value="@id" />
+                                    }
+                                }
+                                @if (Model.SelectedDestinations != null)
+                                {
+                                    foreach (var dest in Model.SelectedDestinations)
+                                    {
+                                        <input type="hidden" name="destinations" value="@dest" />
+                                    }
+                                }
+                                @if (Model.SelectedRatings != null)
+                                {
+                                    foreach (var rating in Model.SelectedRatings)
+                                    {
+                                        <input type="hidden" name="ratings" value="@rating" />
+                                    }
+                                }
+                                @if (Model.SelectedMinPrice != null)
+                                {
+                                    <input type="hidden" name="minPrice" value="@Model.SelectedMinPrice" />
+                                }
+                                @if (Model.SelectedMaxPrice != null)
+                                {
+                                    <input type="hidden" name="maxPrice" value="@Model.SelectedMaxPrice" />
+                                }
+                                @if (!string.IsNullOrEmpty(Context.Request.Query["searchTerm"]))
+                                {
+                                    <input type="hidden" name="searchTerm" value="@Context.Request.Query["searchTerm"]" />
+                                }
+
+                                <label for="sortBySelect" class="form-label me-2 mb-0 small text-nowrap">Sắp xếp tour:</label>
+                                <select class="form-select form-select-sm" id="sortBySelect" name="sortBy" onchange="document.getElementById('sortForm').submit();">
+                                    <option value="" selected="@(string.IsNullOrEmpty(currentSort))">Sắp xếp mặc định</option>
+                                    <option value="price_asc" selected="@(currentSort == "price_asc")">Ưu tiên giá thấp</option>
+                                    <option value="price_desc" selected="@(currentSort == "price_desc")">Ưu tiên giá cao</option>
+                                    <option value="rating_desc" selected="@(currentSort == "rating_desc")">Ưu tiên đánh giá cao</option>
+                                    <option value="duration_asc" selected="@(currentSort == "duration_asc")">Ưu tiên tour ngắn ngày</option>
+                                    <option value="name_asc" selected="@(currentSort == "name_asc")">Tour: A-Z</option>
+                                    <option value="name_desc" selected="@(currentSort == "name_desc")">Tour: Z-A</option>
+                                    
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                </div>
                         <div class="row g-4 pt-4">
                             @if (!Model.Tours.Any())
                             {
@@ -527,6 +538,9 @@
                 </div>
             </div>
         </section>
+</main>
+</body>
+
         <!-- Tour-package____section end  -->
       
         <!-- Footer__section end  -->

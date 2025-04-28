@@ -8,6 +8,7 @@ namespace Tourest.Controllers
     {
         private readonly ITourService _tourService;
         private readonly ICategoryService _categoryService;
+        // Inject thêm các service khác nếu cần
 
         public ToursController(ITourService tourService, ICategoryService categoryService)
         {
@@ -15,41 +16,44 @@ namespace Tourest.Controllers
             _categoryService = categoryService;
         }
 
-        // GET: /Tours hoặc /Tours/Index?categoryIds=1&categoryIds=3...
-        // Thay đổi tham số thành mảng hoặc list int
+        // GET: /Tours hoặc /Tours/Index?categoryIds=1&destinations=Hanoi&ratings=4&minPrice=1000000&sortBy=price_asc
         public async Task<IActionResult> Index(
             List<int>? categoryIds,
             List<string>? destinations,
             List<int>? ratings,
             string? sortBy,
-            int? minPrice, // THÊM
-            int? maxPrice)
+            int? minPrice, // Tham số lọc giá min
+            int? maxPrice,
+            string? searchDestination,
+            string? searchCategoryName,
+            DateTime? searchDate,
+            int? searchGuests) // Tham số lọc giá max
         {
             var categories = await _categoryService.GetAllCategoriesForDisplayAsync();
             var availableDestinations = await _tourService.GetDestinationsForFilterAsync();
 
-            // Gọi service không có tham số phân trang
+            // === SỬA LỖI: Truyền minPrice và maxPrice xuống Service ===
             var toursResult = await _tourService.GetActiveToursForDisplayAsync(
-                categoryIds,
-                destinations,
-                ratings,
-                sortBy);
+                categoryIds, destinations, ratings, sortBy, minPrice, maxPrice,
+                // --- TRUYỀN THAM SỐ TÌM KIẾM ---
+                searchDestination, searchCategoryName, searchDate, searchGuests
+            );
+
+            // === KẾT THÚC SỬA LỖI ===
 
             var viewModel = new TourIndexViewModel
             {
-                // Gán kết quả vào Tours
                 Tours = toursResult,
-
                 Categories = categories,
                 AvailableDestinations = availableDestinations,
                 SelectedCategoryIds = categoryIds ?? new List<int>(),
                 SelectedDestinations = destinations ?? new List<string>(),
-                SelectedRatings = ratings ?? new List<int>()
+                SelectedRatings = ratings ?? new List<int>(),
+                SelectedMinPrice = minPrice, // Gán giá trị để giữ trạng thái slider
+                SelectedMaxPrice = maxPrice  // Gán giá trị để giữ trạng thái slider
             };
 
-            // Giữ lại ViewBag cho sort nếu cần
-            ViewBag.CurrentSortBy = sortBy;
-            // Bỏ các ViewBag cho pagination
+            ViewBag.CurrentSortBy = sortBy; // Giữ lại để set selected cho dropdown
 
             return View(viewModel);
         }
@@ -59,22 +63,19 @@ namespace Tourest.Controllers
         {
             if (id <= 0)
             {
-                // Có thể trả về trang lỗi hoặc trang NotFound chung
                 return BadRequest("Invalid Tour ID.");
             }
 
-            // Gọi service để lấy ViewModel chi tiết
             var tourDetailsViewModel = await _tourService.GetTourDetailsAsync(id);
 
-            // Nếu không tìm thấy tour (service trả về null)
             if (tourDetailsViewModel == null)
             {
-                // Trả về trang NotFound chuẩn của ASP.NET Core
                 return NotFound();
             }
 
-            // Truyền ViewModel sang View "Details"
-            return View(tourDetailsViewModel);
+            // Truyền TourDetailsViewModel sang View "Details"
+            // Đảm bảo bạn đã tạo Views/Tours/Details.cshtml và model của nó là TourDetailsViewModel
+            return View("Details", tourDetailsViewModel); // Chỉ định rõ tên View nếu cần
         }
 
     }

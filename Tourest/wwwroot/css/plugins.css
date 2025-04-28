@@ -1,0 +1,26 @@
+/* == Bootstrap == */
+@import url(../plugins/bootstrap.min.css);
+
+/* == Jquery UI == */
+@import url(../plugins/jquery-ui.css);
+
+/* == Fontawesome icon == */
+@import url(../plugins/all.min.css);
+
+/* == MeanMenu == */
+@import url(../plugins/meanmenu.css);
+
+/* == Magnific-Popup == */
+@import url(../plugins/magnific-popup.css);
+
+/* == Swiper Slide == */
+@import url(../plugins/swiper-bundle.min.css);
+
+/* == Nice Select == */
+@import url(../plugins/nice-select.css);
+
+/* == Daterangepicker == */
+@import url(../plugins/daterangepicker.css);
+
+/* == Odometer == */
+@import url(../plugins/odometer.css);
