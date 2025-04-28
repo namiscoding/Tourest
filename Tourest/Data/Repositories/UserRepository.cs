@@ -170,6 +170,101 @@ namespace Tourest.Data.Repositories
                 .AsNoTracking()
                 .ToListAsync();
         }
+
+        // --- Các phương thức MỚI/SỬA ĐỔI cho TourGuide ---
+
+        public async Task<User?> GetUserWithAccountAndGuideProfileByIdAsync(int userId)
+        {
+            return await _context.Users
+                                 .Include(u => u.Account)
+                                 .Include(u => u.TourGuide) // Include profile TourGuide
+                                 .FirstOrDefaultAsync(u => u.UserID == userId);
+        }
+        public async Task<(bool Success, User? CreatedUser)> AddUserAccountAndGuideProfileAsync(User user, Account account, Tourest.Data.Entities.TourGuide guideProfile)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Thêm User
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+
+                // Gán UserID cho Account và GuideProfile
+                account.UserID = user.UserID;
+                guideProfile.TourGuideUserID = user.UserID; // PK và FK của TourGuide là UserID
+
+                // Thêm Account
+                await _context.Accounts.AddAsync(account);
+                // Thêm TourGuide Profile
+                await _context.TourGuides.AddAsync(guideProfile);
+
+                await _context.SaveChangesAsync(); // Lưu Account và TourGuide
+
+                await transaction.CommitAsync();
+                _logger.LogInformation("Successfully added User {UserId}, Account {AccountId}, and TourGuide profile", user.UserID, account.AccountID);
+                return (true, user);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                _logger.LogError(ex, "Error adding User, Account, and TourGuide profile for User {Username}", account.Username);
+                return (false, null);
+            }
+        }
+
+        public async Task<bool> UpdateTourGuideAsync(Tourest.Data.Entities.TourGuide guideProfile)
+        {
+            try
+            {
+                _context.TourGuides.Update(guideProfile);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                _logger.LogError(ex, "Concurrency error updating TourGuide profile for User {UserId}", guideProfile.TourGuideUserID);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating TourGuide profile for User {UserId}", guideProfile.TourGuideUserID);
+                return false;
+            }
+        }
+
+        public async Task<IEnumerable<TourGuideAssignment>> GetAssignmentsLedByGuideAsync(int guideUserId)
+        {
+            return await _context.TourGuideAssignments
+                .Where(a => a.TourGuideID == guideUserId)
+                .Include(a => a.TourGroup)
+                    .ThenInclude(tg => tg.Tour) // Lấy Tour Name
+                .OrderByDescending(a => a.AssignmentDate)
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Rating>> GetRatingsReceivedByGuideAsync(int guideUserId)
+        {
+            // Lấy RatingID từ TourGuideRatings trước
+            var ratingIds = await _context.TourGuideRatings
+                                .Where(tgr => tgr.TourGuideID == guideUserId)
+                                .Select(tgr => tgr.RatingID)
+                                .ToListAsync();
+
+            if (!ratingIds.Any())
+            {
+                return Enumerable.Empty<Rating>();
+            }
+
+            // Lấy thông tin chi tiết Rating và Customer đã đánh giá
+            return await _context.Ratings
+                                .Include(r => r.Customer) // Lấy thông tin người đánh giá
+                                .Where(r => ratingIds.Contains(r.RatingID))
+                                .OrderByDescending(r => r.RatingDate)
+                                .AsNoTracking()
+                                .ToListAsync();
+        }
+    
         public async Task<(bool Success, string? ErrorMessage)> UpdateFullNameAndAddressAsync(int userId, string fullName, string address)
         {
             var user = await _context.Users.FindAsync(userId);
@@ -198,6 +293,7 @@ namespace Tourest.Data.Repositories
             }
         }
 
+
         public async Task UpdateTourGuideRatingAsync(int tourGuideId, decimal newAverageRating)
         {
             var tourGuideUser = await _context.Users
@@ -212,5 +308,6 @@ namespace Tourest.Data.Repositories
             }
             // Có thể log warning nếu không tìm thấy TourGuide
         }
+
     }
 }

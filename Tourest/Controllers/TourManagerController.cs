@@ -332,5 +332,84 @@ namespace Tourest.Controllers
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
+        [HttpPost("AssignGuide")]
+        public async Task<IActionResult> AssignGuide([FromBody] AssignGuideRequest request)
+        {
+            try
+            {
+                Console.WriteLine($"Assigning guide ID: {request.GuideId} to Booking ID: {request.BookingId}");
+
+                if (request.BookingId <= 0 || request.GuideId <= 0)
+                {
+                    return Json(new { success = false, message = "Invalid booking ID or guide ID" });
+                }
+
+                var booking = await _context.Bookings
+                    .FirstOrDefaultAsync(b => b.BookingID == request.BookingId && b.Status == "PendingAssignment");
+                if (booking == null)
+                {
+                    return Json(new { success = false, message = "Booking not found or already assigned" });
+                }
+
+                var tourGroup = await _context.TourGroups
+                    .FirstOrDefaultAsync(tg => tg.TourGroupID == booking.TourGroupID);
+                if (tourGroup == null)
+                {
+                    return Json(new { success = false, message = "Tour group not found" });
+                }
+
+                var guide = await _context.TourGuides
+                    .FirstOrDefaultAsync(g => g.TourGuideUserID == request.GuideId);
+                if (guide == null)
+                {
+                    return Json(new { success = false, message = "Tour guide not found" });
+                }
+
+                var conflictingAssignment = await _context.TourGuideAssignments
+                    .Join(_context.TourGroups,
+                          tga => tga.TourGroupID,
+                          tg => tg.TourGroupID,
+                          (tga, tg) => new { tga, tg })
+                    .Where(x => x.tga.TourGuideID == request.GuideId
+                                && x.tga.Status == "Confirmed"
+                                && x.tg.DepartureDate.Date == tourGroup.DepartureDate.Date)
+                    .AnyAsync();
+                if (conflictingAssignment)
+                {
+                    return Json(new { success = false, message = "Guide is already assigned to another tour on the same date" });
+                }
+
+                var assignment = new TourGuideAssignment
+                {
+                    TourGroupID = (int)booking.TourGroupID,
+                    TourGuideID = request.GuideId,
+                    TourManagerID = 2, // Replace with logged-in manager ID (e.g., User.Identity)
+                    AssignmentDate = DateTime.Now,
+                    Status = "Pending"
+                };
+
+                _context.TourGuideAssignments.Add(assignment);
+                tourGroup.Status = "Assigned";
+                tourGroup.AssignedTourGuideID = request.GuideId;
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Guide assigned successfully" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error assigning guide: {ex.Message}\nStackTrace: {ex.StackTrace}");
+                if (ex.InnerException != null)
+                    Console.WriteLine($"InnerException: {ex.InnerException.Message}");
+                return Json(new { success = false, message = $"Error assigning guide: {ex.Message}" });
+            }
+        }
     }
+
+}
+
+public class AssignGuideRequest
+{
+    public int BookingId { get; set; }
+    public int GuideId { get; set; }
 }

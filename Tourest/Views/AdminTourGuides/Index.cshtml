@@ -1,20 +1,19 @@
-﻿@* File: /Views/AdminCustomers/Index.cshtml *@
-@model PaginatedList<AdminTourManagerViewModel>
-@using Tourest.Helpers
+﻿@* File: /Views/AdminTourGuides/Index.cshtml *@
+@model PaginatedList<AdminTourGuideViewModel>
+@using Tourest.Helpers 
 @inject IConfiguration Configuration
 @{
-    Layout = "_AdminLayout"; // Chỉ định layout Admin
-    ViewData["Title"] = "Quản lý Quản lý Tour";
-    // Lấy lại giá trị tìm kiếm để hiển thị trong ô input
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Quản lý Hướng dẫn viên";
     string currentFilter = ViewData["CurrentFilter"] as string ?? "";
     var cloudName = Configuration["CloudinarySettings:CloudName"];
     var defaultAvatar = "assets/images/default-avatar.png";
 }
 
-<h1>@ViewData["Title"]</h1> 
+<h1>@ViewData["Title"]</h1>
 
 <p>
-    <a asp-action="Create" style="background-color: #039e9d; color: white;" class="btn mb-3">Tạo Khách hàng Mới</a>
+    <a asp-action="Create" class="btn btn-primary mb-3">Tạo Hướng dẫn viên Mới</a>
 </p>
 
 @* Form tìm kiếm *@
@@ -22,11 +21,11 @@
     <div class="input-group">
         <input type="text" name="searchTerm" class="form-control" placeholder="Tìm theo tên, email, SĐT..." value="@currentFilter">
         <button class="btn btn-outline-secondary" type="submit">Tìm kiếm</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Reset</a> @* Nút để xóa bộ lọc *@
+        <a asp-action="Index" class="btn btn-outline-secondary">Reset</a>
     </div>
 </form>
 
-@* Hiển thị thông báo thành công/lỗi (nếu có từ TempData) *@
+@* Hiển thị thông báo thành công/lỗi *@
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -42,16 +41,17 @@
     </div>
 }
 
-<table class="table table-striped table-hover">
+<table class="table table-striped table-hover table-responsive-md">
     <thead>
         <tr>
             <th>Ảnh</th>
             <th>ID</th>
             <th>Họ Tên</th>
             <th>Email</th>
-            <th>Số Điện Thoại</th>
+            <th>SĐT</th>
+            <th>Kinh nghiệm</th>
+            <th>Rating TB</th>
             <th>Trạng thái</th>
-            <th>Ngày ĐK</th>
             <th>Hành động</th>
         </tr>
     </thead>
@@ -60,13 +60,15 @@
         {
             <tr>
                 <td>
-                    <img src="@CloudinaryHelper.GetThumbnailUrl(item.ProfilePictureUrl, 50, 50, cloudName, defaultAvatar)"
+                    <img src="@CloudinaryHelper.GetThumbnailUrl(item.ProfilePictureUrl, 50, 50, cloudName, defaultAvatar)"]
                          alt="Avatar của @item.FullName" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;" />
                 </td>
                 <td>@item.UserId</td>
                 <td>@Html.DisplayFor(modelItem => item.FullName)</td>
                 <td>@Html.DisplayFor(modelItem => item.Email)</td>
                 <td>@Html.DisplayFor(modelItem => item.PhoneNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.ExperienceLevel)</td>
+                <td>@(item.AverageRating.HasValue ? item.AverageRating.Value.ToString("0.0") : "N/A")</td>
                 <td>
                     @if (item.IsActive)
                     {
@@ -77,12 +79,9 @@
                         <span class="badge bg-danger">Vô hiệu hóa</span>
                     }
                 </td>
-                <td>@item.RegistrationDate.ToString("dd/MM/yyyy")</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-primary" title="Sửa"><i class="fas fa-edit"></i></a>
                     <a asp-action="Details" asp-route-id="@item.UserId" class="btn btn-sm btn-outline-info" title="Chi tiết"><i class="fas fa-info-circle"></i></a>
-
-                    @* Nút Kích hoạt/Vô hiệu hóa dùng form POST *@
                     <form asp-action="ToggleActive" asp-route-id="@item.UserId" method="post" style="display:inline;">
                         @Html.AntiForgeryToken()
                         @if (item.IsActive)
@@ -94,40 +93,26 @@
                             <button type="submit" class="btn btn-sm btn-outline-success" title="Kích hoạt"><i class="fas fa-user-check"></i></button>
                         }
                     </form>
-
-                    @* Nút Xóa (Không khuyến khích, nên dùng ToggleActive) *@
-                    @*
-                    <form asp-action="Delete" asp-route-id="@item.UserId" method="post" style="display:inline;" onsubmit="return confirm('Bạn chắc chắn muốn xóa người dùng này?');">
-                        @Html.AntiForgeryToken()
-                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa"><i class="fas fa-trash-alt"></i></button>
-                    </form>
-                    *@
+                    @* Không khuyến khích nút Delete *@
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-@* Phân trang *@
+@* Phân trang (Sử dụng logic tương tự trang Index của Customer) *@
 @{
-    // Tạo một partial view cho phân trang để tái sử dụng
     var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled" : "";
 }
-
 <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">
         <li class="page-item @prevDisabled">
-            <a asp-action="Index"
-               asp-route-pageIndex="@(Model.PageIndex - 1)"
-               asp-route-searchTerm="@currentFilter"
-               class="page-link">Trước</a>
+            <a asp-action="Index" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-searchTerm="@currentFilter" class="page-link">Trước</a>
         </li>
-        @* Hiển thị một vài số trang xung quanh trang hiện tại *@
         @{
             int startPage = Math.Max(1, Model.PageIndex - 2);
             int endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
-
             if (startPage > 1)
             {
                 <li class="page-item"><a class="page-link" asp-action="Index" asp-route-pageIndex="1" asp-route-searchTerm="@currentFilter">1</a></li>
@@ -136,17 +121,10 @@
                     <li class="page-item disabled"><span class="page-link">...</span></li>
                 }
             }
-
             for (int i = startPage; i <= endPage; i++)
             {
-                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                    <a asp-action="Index"
-                       asp-route-pageIndex="@i"
-                       asp-route-searchTerm="@currentFilter"
-                       class="page-link">@i</a>
-                </li>
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")"><a asp-action="Index" asp-route-pageIndex="@i" asp-route-searchTerm="@currentFilter" class="page-link">@i</a></li>
             }
-
             if (endPage < Model.TotalPages)
             {
                 if (endPage < Model.TotalPages - 1)
@@ -157,10 +135,7 @@
             }
         }
         <li class="page-item @nextDisabled">
-            <a asp-action="Index"
-               asp-route-pageIndex="@(Model.PageIndex + 1)"
-               asp-route-searchTerm="@currentFilter"
-               class="page-link">Sau</a>
+            <a asp-action="Index" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-searchTerm="@currentFilter" class="page-link">Sau</a>
         </li>
     </ul>
 </nav>

@@ -1,17 +1,16 @@
-﻿@* File: /Views/AdminCustomers/Create.cshtml *@
-@model AdminCreateCustomerViewModel
+﻿@* File: /Views/AdminTourGuides/Create.cshtml *@
+@model AdminCreateTourGuideViewModel
 
 @{
     Layout = "_AdminLayout";
-    ViewData["Title"] = "Tạo Khách hàng Mới";
+    ViewData["Title"] = "Tạo Hướng dẫn viên Mới";
 }
 
 <h1>@ViewData["Title"]</h1>
-
 <hr />
 <div class="row">
     <div class="col-md-8">
-        @* QUAN TRỌNG: Thêm enctype cho form để upload file *@
+        @* Form có thể dài hơn *@
         <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
@@ -47,18 +46,38 @@
                     <textarea asp-for="Address" class="form-control" rows="2"></textarea>
                     <span asp-validation-for="Address" class="text-danger"></span>
                 </div>
-
-                @* --- THÊM INPUT CHO FILE ẢNH --- *@
                 <div class="col-md-12 mb-3">
                     <label asp-for="ProfilePictureFile" class="form-label"></label>
                     <input asp-for="ProfilePictureFile" type="file" class="form-control" accept="image/*" />
                     <span asp-validation-for="ProfilePictureFile" class="text-danger"></span>
                 </div>
-                @* ---------------------------------- *@
-
                 <div class="col-md-12 mb-3 form-check">
                     <input asp-for="IsActive" type="checkbox" class="form-check-input" />
                     <label asp-for="IsActive" class="form-check-label"></label>
+                </div>
+            </div>
+
+            <h4 class="mt-4">Thông tin Hồ sơ Hướng dẫn viên</h4>
+            <div class="row g-3">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ExperienceLevel" class="form-label"></label>
+                    <input asp-for="ExperienceLevel" class="form-control" />
+                    <span asp-validation-for="ExperienceLevel" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="MaxGroupSizeCapacity" class="form-label"></label>
+                    <input asp-for="MaxGroupSizeCapacity" class="form-control" type="number" />
+                    <span asp-validation-for="MaxGroupSizeCapacity" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="LanguagesSpoken" class="form-label"></label>
+                    <input asp-for="LanguagesSpoken" class="form-control" placeholder="Ví dụ: Tiếng Việt;Tiếng Anh" />
+                    <span asp-validation-for="LanguagesSpoken" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Specializations" class="form-label"></label>
+                    <input asp-for="Specializations" class="form-control" placeholder="Ví dụ: Lịch sử;Văn hóa;Leo núi" />
+                    <span asp-validation-for="Specializations" class="text-danger"></span>
                 </div>
             </div>
 

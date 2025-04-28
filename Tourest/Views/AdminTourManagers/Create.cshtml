@@ -12,7 +12,7 @@
 <div class="row">
     <div class="col-md-6">
         @* Giới hạn chiều rộng form *@
-        <form asp-action="Create" method="post">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
             @* Hiển thị tóm tắt lỗi validation *@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -45,6 +45,11 @@
                 <label asp-for="Address" class="form-label"></label>
                 <textarea asp-for="Address" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="col-md-12 mb-3">
+                <label asp-for="ProfilePictureFile" class="form-label"></label>
+                <input asp-for="ProfilePictureFile" type="file" class="form-control" accept="image/*" />
+                <span asp-validation-for="ProfilePictureFile" class="text-danger"></span>
             </div>
             <div class="mb-3 form-check">
                 <input asp-for="IsActive" type="checkbox" class="form-check-input" />

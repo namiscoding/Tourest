@@ -308,10 +308,6 @@
                     </div>
                     <h5 class="mb-3">Recommended Guides</h5>
                     <div id="recommendedGuides" class="row mb-4"></div>
-                    <div class="mb-3">
-                        <label for="assignmentNotes" class="form-label">Assignment Notes</label>
-                        <textarea class="form-control" id="assignmentNotes" rows="4" placeholder="Add any special instructions for the guide..."></textarea>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -326,9 +322,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Initialize countdown timers
-            $('.booking-card').each(function() {
+            $('.booking-card').each(function () {
                 const bookingId = $(this).data('booking-id');
                 const bookingDate = new Date($(this).data('booking-date'));
                 const deadline = new Date(bookingDate);
@@ -354,14 +350,14 @@
             });
 
             // Handle assign guide button click
-            $('.assign-guide-btn').on('click', function() {
+            $('.assign-guide-btn').on('click', function () {
                 const bookingId = $(this).data('booking-id');
                 const tourGroupId = $(this).data('tour-group-id');
                 const tourId = $(this).data('tour-id');
                 const bookingCard = $(`#booking-${bookingId}`);
 
                 // Extract booking details
-                const tourName = bookingCard.find('.tour-name').contents().filter(function() {
+                const tourName = bookingCard.find('.tour-name').contents().filter(function () {
                     return this.nodeType === 3; // Text nodes only
                 }).text().trim();
                 const departure = bookingCard.find('.fa-calendar-day').parent().text().replace('Departure:', '').trim();
@@ -410,7 +406,7 @@
                 $.ajax({
                     url: `/TourManager/GetRecommendedGuides/${tourGroupId}`,
                     type: 'GET',
-                    success: function(data) {
+                    success: function (data) {
                         console.log('Recommended guides response:', data);
                         if (data && Array.isArray(data) && data.length > 0) {
                             let html = '';
@@ -462,7 +458,7 @@
                             $('#requiredExpBadge').text('Unknown').removeClass().addClass('badge bg-secondary');
                         }
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function (jqXHR, textStatus, errorThrown) {
                         console.error(`Failed to load guides: ${textStatus} - ${errorThrown}`);
                         console.log('Error response:', jqXHR.responseText);
                         $('#recommendedGuides').html('<div class="col-12 text-center py-3"><p class="text-danger">Error loading guides. Please try again.</p></div>');
@@ -498,32 +494,37 @@
             }
 
             // Select guide
-            window.selectGuide = function(element) {
+            window.selectGuide = function (element) {
                 $('.guide-card').removeClass('selected');
                 $(element).addClass('selected');
                 $('#confirmAssignBtn').prop('disabled', false);
             };
 
             // Confirm assignment
-            $('#confirmAssignBtn').on('click', function() {
+            $('#confirmAssignBtn').on('click', function () {
                 const bookingId = $('#bookingId').val();
                 const selectedGuideId = $('.guide-card.selected').data('guide-id');
-                const notes = $('#assignmentNotes').val();
 
                 if (!bookingId || !selectedGuideId) {
                     showToast('Please select a tour guide.', 'error');
                     return;
                 }
 
+                console.log('Assigning:', { bookingId, selectedGuideId });
+
                 $.ajax({
-                    url: '@Url.Action("AssignGuide", "TourManager")',
+                    url: '/TourManager/AssignGuide',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify({ bookingId: parseInt(bookingId), guideId: selectedGuideId, notes: notes }),
-                    success: function(response) {
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    data: JSON.stringify({ bookingId: parseInt(bookingId), guideId: parseInt(selectedGuideId) }),
+                    success: function (response) {
+                        console.log('AssignGuide response:', response);
                         if (response.success) {
                             $('#assignGuideModal').modal('hide');
-                            $(`#booking-${bookingId}`).fadeOut(300, function() {
+                            $(`#booking-${bookingId}`).fadeOut(300, function () {
                                 $(this).remove();
                                 if (!$('.booking-card').length) {
                                     $('.col-12').html(`
@@ -543,14 +544,16 @@
                             showToast(response.message || 'Failed to assign guide.', 'error');
                         }
                     },
-                    error: function() {
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error(`Assign guide failed: ${textStatus} - ${errorThrown}`);
+                        console.log('Error response:', jqXHR.responseText);
                         showToast('Error assigning guide. Please try again.', 'error');
                     }
                 });
             });
 
             // Refresh button
-            $('#refreshBtn, #checkForNewBtn').on('click', function() {
+            $('#refreshBtn, #checkForNewBtn').on('click', function () {
                 location.reload();
             });
 

@@ -30,5 +30,9 @@ namespace Tourest.ViewModels.Admin
 
         [Display(Name = "Is Active?")]
         public bool IsActive { get; set; } = true;
+
+        [Display(Name = "Ảnh đại diện")]
+        public IFormFile? ProfilePictureFile { get; set; } 
+
     }
 }
