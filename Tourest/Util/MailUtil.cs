@@ -19,5 +19,18 @@ namespace Tourest.Util
             return emailContent;
         }
 
+        public static string AssignTourGuide(Tourest.Data.Entities.TourGuide tg)
+        {
+            string emailContent = Tourguide.TemplateBooking;
+
+            // Thay thế các placeholder trong template
+            emailContent = emailContent.Replace("{{CustomerName}}", "Quý khách hàng");
+            emailContent = emailContent.Replace("{{TGName}}", tg.User.FullName ?? "Hướng dẫn viên");
+            emailContent = emailContent.Replace("{{PhoneNum}}", tg.User.PhoneNumber);
+            emailContent = emailContent.Replace("{{Email}}", tg.User.Email);
+            emailContent = emailContent.Replace("{{EXP}}", tg.ExperienceLevel); // format số tiền có dấu phẩy
+            emailContent = emailContent.Replace("{{Language}}", tg.ExperienceLevel);
+            return emailContent;
+        }
     }
 }
