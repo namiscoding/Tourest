@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<Tourest.ViewModels.UnassignedBookingViewModel>
 @{
-    ViewData["Title"] = "Unassigned Bookings";
+    ViewData["Title"] = "Unassigned Tour Groups";
     Layout = null;
 }
 
@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Tourest</title>
+    <title>@ViewData["Title"] - Touest</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <style>
@@ -24,13 +24,13 @@
             background-color: #f4f6f9;
         }
 
-        .booking-card {
+        .tourgroup-card {
             transition: all 0.3s ease;
             border-left: 4px solid var(--warning-color);
             margin-bottom: 1.5rem;
         }
 
-            .booking-card:hover {
+            .tourgroup-card:hover {
                 transform: translateY(-3px);
                 box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             }
@@ -124,11 +124,11 @@
         }
 
         .modal-header {
-            background-color:#039e9d;
-            color: #000;
+            background-color: #039e9d;
+            color: white;
         }
 
-        #bookingDetails p {
+        #tourGroupDetails p {
             margin-bottom: 0.5rem;
         }
 
@@ -144,42 +144,36 @@
 </head>
 <body>
     <div class="container-fluid px-0">
-
-        <!-- Header -->
-       
-
-
         <!-- Main Content -->
         <main class="container">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="h4 mb-0"><i class="fas fa-list me-2"></i> Unassigned Bookings List</h2>
+                <h2 class="h4 mb-0"><i class="fas fa-list me-2"></i> Unassigned Tour Groups List</h2>
                 <button class="btn" style="background-color: #039e9d; color: white" id="refreshBtn">
                     <i class="fas fa-sync-alt me-1"></i> Refresh
                 </button>
             </div>
 
-            <!-- Bookings List -->
+            <!-- Tour Groups List -->
             <div class="row">
                 <div class="col-12">
                     @if (Model != null && Model.Any())
                     {
-                        @foreach (var booking in Model)
+                        @foreach (var tourGroup in Model)
                         {
-                            <div class="card booking-card mb-3" id="booking-@booking.BookingId"
-                                 data-booking-id="@booking.BookingId"
-                                 data-tour-group-id="@booking.TourGroupId"
-                                 data-tour-id="@booking.TourId"
-                                 data-booking-date="@booking.BookingDate.ToString("o")">
+                            <div class="card tourgroup-card mb-3" id="tourgroup-@tourGroup.TourGroupId"
+                                 data-tourgroup-id="@tourGroup.TourGroupId"
+                                 data-tour-id="@tourGroup.TourId"
+                                >
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
                                             <h5 class="card-title mb-2">
                                                 <span class="tour-name">
                                                     <i style="color: #039e9d;" class="fas fa-map-marked-alt me-2"></i>
-                                                    @booking.TourName
+                                                    @tourGroup.TourName
                                                 </span>
-                                                <span class="status-badge badge-@booking.Status.ToLower() ms-2">
-                                                    @switch (booking.Status.ToLower())
+                                                <span class="status-badge badge-@tourGroup.Status.ToLower() ms-2">
+                                                    @switch (tourGroup.Status.ToLower())
                                                     {
                                                         case "confirmed":
                                                             <i class="fas fa-check-circle me-1"></i>
@@ -194,40 +188,39 @@
                                                             <i class="fas fa-times-circle me-1"></i>
                                                             break;
                                                     }
-                                                    @booking.Status
+                                                    @tourGroup.Status
                                                 </span>
                                             </h5>
                                             <div class="card-text mb-2">
                                                 <small class="text-muted">
-                                                    <i class="far fa-calendar me-1"></i>
-                                                    Booked on @booking.BookingDate.ToString("MMM dd, yyyy 'at' hh:mm tt")
+                                                    <i class="far fa-clock me-1"></i>
+                                                    Deadline: <span id="countdown-@tourGroup.TourGroupId" class="countdown-timer"></span>
                                                 </small>
                                             </div>
                                             <div class="d-flex flex-wrap gap-3 mb-2">
                                                 <div>
                                                     <i class="fas fa-calendar-day text-info me-1"></i>
-                                                    <span>Departure: @booking.DepartureDate.ToString("MMM dd, yyyy")</span>
+                                                    <span>Departure: @tourGroup.DepartureDate.ToString("MMM dd, yyyy")</span>
                                                 </div>
                                                 <div>
                                                     <i class="fas fa-users text-success me-1"></i>
-                                                    <span>@booking.NumberOfAdults Adults, @booking.NumberOfChildren Children</span>
+                                                    <span>@tourGroup.NumberOfAdults Adults, @tourGroup.NumberOfChildren Children</span>
                                                 </div>
                                                 <div>
                                                     <i class="fas fa-map-marker-alt text-danger me-1"></i>
-                                                    <span>Pickup: @booking.PickupPoint</span>
+                                                    <span>Pickup: @tourGroup.PickupPoint</span>
                                                 </div>
                                                 <div>
                                                     <i class="fas fa-money-bill-wave text-primary me-1"></i>
-                                                    <span>Total: $@booking.TotalPrice.ToString("#,##0")</span>
+                                                    <span>Total: $@tourGroup.TotalPrice.ToString("#,##0")</span>
                                                 </div>
                                             </div>
-                                        
-                                            @if (booking.Status.ToLower() == "rejected" && !string.IsNullOrEmpty(booking.RejectReason))
+                                            @if (tourGroup.Status.ToLower() == "rejected" && !string.IsNullOrEmpty(tourGroup.RejectReason))
                                             {
                                                 <div class="mt-2">
                                                     <small class="reject-reason">
                                                         <i class="fas fa-exclamation-circle me-1"></i>
-                                                        Rejection Reason: @booking.RejectReason
+                                                        Rejection Reason: @tourGroup.RejectReason
                                                     </small>
                                                 </div>
                                             }
@@ -235,12 +228,11 @@
                                         <div class="action-buttons">
                                             <div class="d-flex flex-column gap-2">
                                                 <button style="background-color: #039e9d; color: white" class="btn assign-guide-btn"
-                                                        data-booking-id="@booking.BookingId"
-                                                        data-tour-group-id="@booking.TourGroupId"
-                                                        data-tour-id="@booking.TourId">
+                                                        data-tourgroup-id="@tourGroup.TourGroupId"
+                                                        data-tour-id="@tourGroup.TourId">
                                                     <i class="fas fa-user-plus me-1"></i> Assign Guide
                                                 </button>
-                                                <a href="@Url.Action("ViewCustomers", "TourManager", new { tourId = booking.TourId })" class="btn btn-outline-secondary">
+                                                <a href="@Url.Action("ViewCustomers", "TourManager", new { tourId = tourGroup.TourId })" class="btn btn-outline-secondary">
                                                     <i class="fas fa-users me-1"></i> View Customers
                                                 </a>
                                             </div>
@@ -254,10 +246,10 @@
                     {
                         <div class="text-center py-5 bg-light rounded">
                             <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
-                            <h3 class="h4 text-muted">No Unassigned Bookings</h3>
-                            <p class="text-muted">All bookings have been assigned to tour guides.</p>
+                            <h3 class="h4 text-muted">No Unassigned Tour Groups</h3>
+                            <p class="text-muted">All tour groups have been assigned to tour guides.</p>
                             <button class="btn" style="background-color: #039e9d; color: white" id="checkForNewBtn">
-                                <i class="fas fa-sync-alt me-2"></i> Check for New Bookings
+                                <i class="fas fa-sync-alt me-2"></i> Check for New Tour Groups
                             </button>
                         </div>
                     }
@@ -275,11 +267,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="bookingId" />
+                    <input type="hidden" id="tourGroupId" />
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <h6>Booking Details</h6>
-                            <div id="bookingDetails" class="border p-3 rounded bg-light"></div>
+                            <h6>Tour Group Details</h6>
+                            <div id="tourGroupDetails" class="border p-3 rounded bg-light"></div>
                         </div>
                         <div class="col-md-6">
                             <h6>TOUR DIFFICULTY: <span id="tourDifficultyBadge" class="badge difficulty-badge"></span></h6>
@@ -305,25 +297,23 @@
     <script>
         $(document).ready(function () {
             // Initialize countdown timers
-            $('.booking-card').each(function () {
-                const bookingId = $(this).data('booking-id');
-                const bookingDate = new Date($(this).data('booking-date'));
-                const deadline = new Date(bookingDate);
-                deadline.setHours(deadline.getHours() + 24);
+            $('.tourgroup-card').each(function () {
+                const tourGroupId = $(this).data('tourgroup-id');
+                const deadline = new Date($(this).data('assignment-deadline'));
 
                 function updateCountdown() {
                     const now = new Date();
                     const diff = deadline - now;
 
                     if (diff <= 0) {
-                        $(`#countdown-${bookingId}`).text('Overdue').addClass('text-danger');
+                        $(`#countdown-${tourGroupId}`).text('Overdue').addClass('text-danger');
                         return;
                     }
 
                     const hours = Math.floor(diff / (1000 * 60 * 60));
                     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                    $(`#countdown-${bookingId}`).text(`${hours}h ${minutes}m ${seconds}s`);
+                    $(`#countdown-${tourGroupId}`).text(`${hours}h ${minutes}m ${seconds}s`);
                 }
 
                 updateCountdown();
@@ -332,25 +322,24 @@
 
             // Handle assign guide button click
             $('.assign-guide-btn').on('click', function () {
-                const bookingId = $(this).data('booking-id');
-                const tourGroupId = $(this).data('tour-group-id');
+                const tourGroupId = $(this).data('tourgroup-id');
                 const tourId = $(this).data('tour-id');
-                const bookingCard = $(`#booking-${bookingId}`);
+                const tourGroupCard = $(`#tourgroup-${tourGroupId}`);
 
-                // Extract booking details
-                const tourName = bookingCard.find('.tour-name').contents().filter(function () {
+                // Extract tour group details
+                const tourName = tourGroupCard.find('.tour-name').contents().filter(function () {
                     return this.nodeType === 3; // Text nodes only
                 }).text().trim();
-                const departure = bookingCard.find('.fa-calendar-day').parent().text().replace('Departure:', '').trim();
-                const groupSize = bookingCard.find('.fa-users').parent().text().trim();
-                const pickupPoint = bookingCard.find('.fa-map-marker-alt').parent().text().replace('Pickup:', '').trim();
-                const totalPrice = bookingCard.find('.fa-money-bill-wave').parent().text().replace('Total:', '').trim();
+                const departure = tourGroupCard.find('.fa-calendar-day').parent().text().replace('Departure:', '').trim();
+                const groupSize = tourGroupCard.find('.fa-users').parent().text().trim();
+                const pickupPoint = tourGroupCard.find('.fa-map-marker-alt').parent().text().replace('Pickup:', '').trim();
+                const totalPrice = tourGroupCard.find('.fa-money-bill-wave').parent().text().replace('Total:', '').trim();
 
-                // Set booking ID
-                $('#bookingId').val(bookingId);
+                // Set tour group ID
+                $('#tourGroupId').val(tourGroupId);
 
-                // Populate booking details
-                $('#bookingDetails').html(`
+                // Populate tour group details
+                $('#tourGroupDetails').html(`
                     <p><strong>TOUR:</strong> ${tourName || 'N/A'}</p>
                     <p><strong>DEPARTURE:</strong> ${departure || 'N/A'}</p>
                     <p><strong>GROUP SIZE:</strong> ${groupSize || 'N/A'}</p>
@@ -483,15 +472,15 @@
 
             // Confirm assignment
             $('#confirmAssignBtn').on('click', function () {
-                const bookingId = $('#bookingId').val();
+                const tourGroupId = $('#tourGroupId').val();
                 const selectedGuideId = $('.guide-card.selected').data('guide-id');
 
-                if (!bookingId || !selectedGuideId) {
+                if (!tourGroupId || !selectedGuideId) {
                     showToast('Please select a tour guide.', 'error');
                     return;
                 }
 
-                console.log('Assigning:', { bookingId, selectedGuideId });
+                console.log('Assigning:', { tourGroupId, selectedGuideId });
 
                 $.ajax({
                     url: '/TourManager/AssignGuide',
@@ -500,21 +489,21 @@
                     headers: {
                         'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                     },
-                    data: JSON.stringify({ bookingId: parseInt(bookingId), guideId: parseInt(selectedGuideId) }),
+                    data: JSON.stringify({ tourGroupId: parseInt(tourGroupId), guideId: parseInt(selectedGuideId) }),
                     success: function (response) {
                         console.log('AssignGuide response:', response);
                         if (response.success) {
                             $('#assignGuideModal').modal('hide');
-                            $(`#booking-${bookingId}`).fadeOut(300, function () {
+                            $(`#tourgroup-${tourGroupId}`).fadeOut(300, function () {
                                 $(this).remove();
-                                if (!$('.booking-card').length) {
+                                if (!$('.tourgroup-card').length) {
                                     $('.col-12').html(`
                                         <div class="text-center py-5 bg-light rounded">
                                             <i class="fas fa-calendar-check fa-3x text-muted mb-3"></i>
-                                            <h3 class="h4 text-muted">No Unassigned Bookings</h3>
-                                            <p class="text-muted">All bookings have been assigned to tour guides.</p>
-                                            <button class="btn btn-primary" id="checkForNewBtn">
-                                                <i class="fas fa-sync-alt me-2"></i> Check for New Bookings
+                                            <h3 class="h4 text-muted">No Unassigned Tour Groups</h3>
+                                            <p class="text-muted">All tour groups have been assigned to tour guides.</p>
+                                            <button class="btn" style="background-color: #039e9d; color: white" id="checkForNewBtn">
+                                                <i class="fas fa-sync-alt me-2"></i> Check for New Tour Groups
                                             </button>
                                         </div>
                                     `);
@@ -534,7 +523,7 @@
             });
 
             // Refresh button
-            $('#refreshBtn, #checkForNewBtn').on('click', function () {
+            $(document).on('click', '#refreshBtn, #checkForNewBtn', function () {
                 location.reload();
             });
 

@@ -1,7 +1,11 @@
 ﻿@model List<Tourest.TourGuide.ViewModels.TourGuideRatingViewModel>
+@{
+    ViewData["Title"] = "My Completed Tours";
+    Layout = null; // Remove default layout
+}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -14,7 +18,7 @@
     <link rel="icon" href="assets/images/favicon.png" type="image/x-icon" />
 
     <!-- CSS Files -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
@@ -23,14 +27,45 @@
         body {
             background-color: #f8f9fa;
             font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         .dashboard-header {
             background: linear-gradient(135deg, #28a745, #218838);
             color: white;
-            padding: 2rem;
+            padding: 2rem 0;
             border-radius: 0 0 10px 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            background-color: #ffffff;
+            border-right: 1px solid #e9ecef;
+            height: 100vh;
+            padding-top: 20px;
+            position: fixed;
+            width: 250px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+            .sidebar a {
+                color: #2c3e50;
+                padding: 10px 20px;
+                display: block;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+            }
+
+                .sidebar a:hover, .sidebar a.active {
+                    background-color: #28a745;
+                    color: white;
+                    border-radius: 0 25px 25px 0;
+                }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
         }
 
         .tours-section {
@@ -119,7 +154,7 @@
         .tour-rating {
             display: flex;
             align-items: center;
-            gap0 .5rem;
+            gap: 0.5rem;
         }
 
         .rating-stars {
@@ -177,6 +212,7 @@
 
         .feedback-modal .modal-dialog {
             max-width: 700px;
+            margin-top: 200px;
         }
 
         .feedback-header {
@@ -203,6 +239,11 @@
             color: #6c757d;
         }
 
+     
+
+        .main-content {
+            margin-left: 0;
+        }
 
         .tour-meta {
             flex-direction: column;
@@ -218,12 +259,26 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="p-3">
+            <h4 class="text-center"><i class="fas fa-map-marked-alt me-2"></i>Touest</h4>
+            <hr>
+            <a href="/TourGuide/Index"><i class="fas fa-tachometer-alt me-2"></i>Overview</a>
+            <a href="/TourGuide/Index#schedule"><i class="fas fa-calendar-alt me-2"></i>View Schedule</a>
+            <a href="/TourGuide/Index#assignments"><i class="fas fa-tasks me-2"></i>View Assignments</a>
+            <a href="/TourGuide/CompletedTours" class="active"><i class="fas fa-clipboard-check me-2"></i>Completed Tours</a>
+            <a href="#profile"><i class="fas fa-user me-2"></i>Profile</a>
+            <a href="#logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+        </div>
+    </div>
+
     <!-- Main Content -->
-    <main>
+    <main class="main-content">
         <!-- Dashboard Header -->
         <header class="dashboard-header">
             <div class="container">
-                <h1><i class="fas fa-clipboard-check me-2"></i> My Completed Tours</h1>
+                <h1><i class="fas fa-clipboard-check me-2"></i>My Completed Tours</h1>
                 <p>View all tours you've guided</p>
             </div>
         </header>
@@ -234,7 +289,7 @@
                 <div class="tours-container">
                     <!-- Filter Bar -->
                     <div class="filter-bar">
-                        <h2><i class="fas fa-history me-2"></i> Tour History</h2>
+                        <h2><i class="fas fa-history me-2"></i>Tour History</h2>
                         <select class="form-select w-auto" id="status-filter">
                             <option value="all">All Status</option>
                             <option value="completed">Completed</option>
@@ -346,8 +401,8 @@
     </div>
 
     <!-- JS Files -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Custom JavaScript -->
     <script>
@@ -455,6 +510,20 @@
                 if (interval >= 1) return interval + " minute" + (interval === 1 ? "" : "s") + " ago";
                 return "just now";
             }
+
+            // Sidebar navigation
+            $('.sidebar a').on('click', function (e) {
+                const href = $(this).attr('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    $('.sidebar a').removeClass('active');
+                    $(this).addClass('active');
+                    const target = href;
+                    $('html, body').animate({
+                        scrollTop: $(target).offset().top
+                    }, 500);
+                }
+            });
         });
     </script>
 </body>
