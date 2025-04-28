@@ -1,81 +1,266 @@
-﻿@using Tourest.Helpers 
-@inject IConfiguration Configuration 
+﻿@using Tourest.Helpers
+@inject IConfiguration Configuration
 @model EditCustomerViewModel
-
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Chỉnh sửa Khách hàng";
     var cloudName = Configuration["CloudinarySettings:CloudName"];
     var defaultAvatar = "assets/images/default-avatar.png";
 }
-<h1>@ViewData["Title"]</h1>
-<h4>Khách hàng: @Model.FullName</h4>
-<hr />
-<div class="row">
-    <div class="col-md-8">
-        @* QUAN TRỌNG: enctype cho upload file *@
-        <form asp-action="Edit" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-            <input type="hidden" asp-for="UserId" />
 
-            @* Hiển thị ảnh đại diện hiện tại *@
-            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
-            {
-                <div class="mb-3">
-                    <label class="form-label">Ảnh đại diện hiện tại:</label><br />
-                    <img src="@CloudinaryHelper.GetThumbnailUrl(Model.ProfilePictureUrl, 150, 150, cloudName, defaultAvatar)"
-                         alt="Current Profile Picture" class="img-thumbnail mb-2" style="max-width: 150px; max-height: 150px;" />
-                </div>
-            }
-
-            @* Input để upload ảnh mới *@
-            <div class="mb-3">
-                <label asp-for="ProfilePictureFile" class="form-label"></label>
-                <input asp-for="ProfilePictureFile" type="file" class="form-control" accept="image/*" />
-                <span asp-validation-for="ProfilePictureFile" class="text-danger"></span>
-            </div>
-
-            <hr />
-
-            @* Các trường thông tin khác *@
-            <div class="row g-3">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="FullName" class="form-label"></label>
-                    <input asp-for="FullName" class="form-control" />
-                    <span asp-validation-for="FullName" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Email" class="form-label"></label>
-                    <input asp-for="Email" class="form-control" type="email" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="PhoneNumber" class="form-label"></label>
-                    <input asp-for="PhoneNumber" class="form-control" />
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                </div>
-                <div class="col-md-12 mb-3">
-                    <label asp-for="Address" class="form-label"></label>
-                    <textarea asp-for="Address" class="form-control" rows="2"></textarea>
-                    <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
-                <div class="col-md-12 mb-3 form-check">
-                    <input asp-for="IsActive" type="checkbox" class="form-check-input" />
-                    <label asp-for="IsActive" class="form-check-label"></label>
-                </div>
-            </div>
-
-            <div class="mt-4 mb-3">
-                <input type="submit" value="Lưu thay đổi" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary ms-2">Hủy</a>
-            </div>
-        </form>
+<!-- Page Header -->
+<div class="page-header mb-4">
+    <div class="row align-items-center">
+        <div class="col">
+            <h1 class="page-title">
+                <i class="fas fa-user-edit text-primary me-2"></i>@ViewData["Title"]
+            </h1>
+            <p class="text-muted">Chỉnh sửa thông tin khách hàng: <strong>@Model.FullName</strong></p>
+        </div>
+        <div class="col-auto">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+            </a>
+        </div>
     </div>
 </div>
 
+<div class="row">
+    <div class="col-xl-8 col-lg-9">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-bottom">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Thông tin khách hàng
+                </h5>
+            </div>
+            <div class="card-body">
+                @* QUAN TRỌNG: enctype cho upload file *@
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                    <input type="hidden" asp-for="UserId" />
+
+                    <!-- Profile Picture Section -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 text-center mb-3 mb-md-0">
+                            @if (!string.IsNullOrEmpty(Model.ProfilePictureUrl))
+                            {
+                                <div class="mb-2">
+                                    <img src="@CloudinaryHelper.GetThumbnailUrl(Model.ProfilePictureUrl, 150, 150, cloudName, defaultAvatar)"
+                                         alt="Current Profile Picture" class="rounded-circle border img-thumbnail"
+                                         style="width: 150px; height: 150px; object-fit: cover;" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="mb-2">
+                                    <img src="@defaultAvatar" alt="Default Avatar" class="rounded-circle border img-thumbnail"
+                                         style="width: 150px; height: 150px; object-fit: cover;" />
+                                </div>
+                            }
+                            <small class="text-muted d-block mt-2">Ảnh đại diện hiện tại</small>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label asp-for="ProfilePictureFile" class="form-label fw-medium">Cập nhật ảnh đại diện</label>
+                                <div class="input-group">
+                                    <input asp-for="ProfilePictureFile" type="file" class="form-control" accept="image/*" />
+                                    <label class="input-group-text" for="ProfilePictureFile">
+                                        <i class="fas fa-upload"></i>
+                                    </label>
+                                </div>
+                                <span asp-validation-for="ProfilePictureFile" class="text-danger"></span>
+                                <small class="text-muted">Chấp nhận file .jpg, .jpeg, .png (tối đa 5MB)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="FullName" class="form-control" placeholder="Nhập họ tên" />
+                                <label asp-for="FullName">Họ và tên</label>
+                                <span asp-validation-for="FullName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Email" class="form-control" type="email" placeholder="Nhập email" />
+                                <label asp-for="Email">Email</label>
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                                <label asp-for="PhoneNumber">Số điện thoại</label>
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-3 ps-5">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" role="switch" style="transform: scale(1.5);" />
+                                <label asp-for="IsActive" class="form-check-label ms-2 fw-medium">
+                                    <span class="ms-1">Trạng thái hoạt động</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <textarea asp-for="Address" class="form-control" placeholder="Nhập địa chỉ" style="height: 100px"></textarea>
+                                <label asp-for="Address">Địa chỉ</label>
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-top pt-4 mt-4">
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Lưu thay đổi
+                            </button>
+                            <div>
+                                <a asp-action="Details" asp-route-id="@Model.UserId" class="btn btn-outline-info me-2">
+                                    <i class="fas fa-info-circle me-1"></i>Xem chi tiết
+                                </a>
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>Hủy
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Additional Info Card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-bottom">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-shield-alt me-2"></i>Thông tin bảo mật
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-lock fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading">Đặt lại mật khẩu</h5>
+                            <p class="mb-0">Để đặt lại mật khẩu cho khách hàng này, vui lòng sử dụng chức năng quản lý mật khẩu.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <a href="#" class="btn btn-outline-primary">
+                        <i class="fas fa-key me-2"></i>Đặt lại mật khẩu
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-3">
+        <!-- User Activity Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-bottom">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-line me-2"></i>Hoạt động gần đây
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex align-items-center py-3">
+                        <div class="avatar-sm bg-light rounded-circle me-3 text-center">
+                            <i class="fas fa-sign-in-alt text-primary mt-2"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Đăng nhập gần nhất</h6>
+                            <p class="text-muted small mb-0">10/03/2025, 10:45 AM</p>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center py-3">
+                        <div class="avatar-sm bg-light rounded-circle me-3 text-center">
+                            <i class="fas fa-shopping-cart text-success mt-2"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Đặt tour gần nhất</h6>
+                            <p class="text-muted small mb-0">05/03/2025, 14:30 PM</p>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex align-items-center py-3">
+                        <div class="avatar-sm bg-light rounded-circle me-3 text-center">
+                            <i class="fas fa-comments text-warning mt-2"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Bình luận gần nhất</h6>
+                            <p class="text-muted small mb-0">28/02/2025, 09:15 AM</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer bg-transparent">
+                <a href="#" class="btn btn-outline-secondary btn-sm d-block">
+                    <i class="fas fa-history me-1"></i>Xem toàn bộ lịch sử
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-bottom">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Thống kê
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <h5 class="fw-bold text-primary">5</h5>
+                        <p class="text-muted mb-0">Tour đã đặt</p>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h5 class="fw-bold text-success">3</h5>
+                        <p class="text-muted mb-0">Đã hoàn thành</p>
+                    </div>
+                    <div class="col-6">
+                        <h5 class="fw-bold text-info">8</h5>
+                        <p class="text-muted mb-0">Đánh giá</p>
+                    </div>
+                    <div class="col-6">
+                        <h5 class="fw-bold text-warning">4.5</h5>
+                        <p class="text-muted mb-0">Đánh giá TB</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-sm {
+        width: 36px;
+        height: 36px;
+    }
+</style>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    }   
+    <script>
+        // Preview ảnh trước khi upload
+        $(document).ready(function () {
+            $('#ProfilePictureFile').change(function () {
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('img.img-thumbnail').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        });
+    </script>
 }

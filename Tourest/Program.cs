@@ -13,15 +13,17 @@ using Microsoft.AspNetCore.SignalR;
 using Tourest.Hubs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Tourest.Helpers;
+using BCrypt.Net; // Thêm import này
+using Microsoft.Extensions.Logging; // Add this
 
 namespace Tourest
 {
-	public class Program
-	{
-		public static void Main(string[] args)
-		{
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
 
-			var builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(args);
 
             // connect momo API
             builder.Services.Configure<Tourest.Services.Momo.MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
@@ -40,11 +42,11 @@ namespace Tourest
             // Lấy connection string từ appsettings.json
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-			// Đăng ký ApplicationDbContext với DI Container và chỉ định dùng SQL Server
-			builder.Services.AddDbContext<ApplicationDbContext>(options =>
-				options.UseSqlServer(connectionString));
+            // Đăng ký ApplicationDbContext với DI Container và chỉ định dùng SQL Server
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
             builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-      .AddEntityFrameworkStores<ApplicationDbContext>();
+            .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddDistributedMemoryCache();
             builder.Services.Configure<IdentityOptions>(options =>
             {
@@ -84,7 +86,7 @@ namespace Tourest
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
 
                 options.LoginPath = "/Authentication/Login";
-                
+
                 options.SlidingExpiration = true;
             });
             builder.Services.AddSession(options =>
@@ -93,7 +95,7 @@ namespace Tourest
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-          
+
             builder.Services.AddScoped<ITourRepository, TourRepository>();
             builder.Services.AddScoped<ITourService, TourService>();
 
@@ -104,11 +106,11 @@ namespace Tourest
             builder.Services.AddScoped<ITourAssignmentService, TourAssignmentService>();
             builder.Services.AddScoped<IAssignedTourRespo, AssignedTourRepository>();
 
-            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>(); 
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
-      
+
             builder.Services.AddScoped<ITourGuideService, TourGuideService>();
-      
+
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
 
@@ -123,9 +125,9 @@ namespace Tourest
 
             builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
             builder.Services.AddScoped<IPhotoService, CloudinaryPhotoService>();
-      
+
             builder.Services.AddScoped<IEmailService, EmailService>();
-      
+
             builder.Services.AddScoped<IBookingRepository, BookingRepository>();
             builder.Services.AddScoped<IBookingService, BookingService>();
 
@@ -144,28 +146,45 @@ namespace Tourest
 
             var app = builder.Build();
 
-			// Configure the HTTP request pipeline.
-			if (!app.Environment.IsDevelopment())
-			{
-				app.UseExceptionHandler("/Home/Error");
-				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-				app.UseHsts();
-			}
+            // Configure the HTTP request pipeline.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapIdentityApi<IdentityUser>();
             app.UseHttpsRedirection();
-			app.UseStaticFiles();
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseSession();
             //app.MapHub<NotificationHub>("/notificationHub");
-            app.MapHub<RatingHub>("/ratingHub"); 
+            app.MapHub<RatingHub>("/ratingHub");
 
             app.MapControllerRoute(
-				name: "default",
-				pattern: "{controller=Home}/{action=Index}/{id?}");
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
-			app.Run();
-		}
-	}
+            // Gọi SeedData.Initialize trong Program.cs
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    await SeedData.Initialize(services);
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while seeding the database.");
+                }
+            }
+
+            app.Run();
+        }
+
+    }
 }
+

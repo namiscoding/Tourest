@@ -1,0 +1,37 @@
+﻿@model AdminItineraryDayViewModel
+@{
+    // Get index from ViewData, default to 0 if not found (should always be passed)
+    int index = ViewData["index"] as int? ?? 0;
+    string namePrefix = $"ItineraryDays[{index}]";
+    string idPrefix = $"ItineraryDays_{index}__"; // Note double underscore for list items
+}
+<div class="itinerary-day-item card mb-4 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Ngày <span class="day-number-display">@Model.DayNumber</span></h5>
+        <button type="button" class="btn btn-outline-danger btn-sm remove-itinerary-day" title="Xóa ngày này">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </div>
+    <div class="card-body">
+        <input type="hidden" asp-for="ItineraryDayID" name="@(namePrefix).ItineraryDayID" />
+        <input type="hidden" asp-for="Order" name="@(namePrefix).Order" value="@index" class="day-order" />
+
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label asp-for="DayNumber" class="form-label fw-bold text-primary-custom" for="@(idPrefix)DayNumber"></label>
+                <input asp-for="DayNumber" type="number" min="1" class="form-control day-number-input" name="@(namePrefix).DayNumber" id="@(idPrefix)DayNumber" />
+                <span asp-validation-for="DayNumber" class="text-danger" data-valmsg-for="@(namePrefix).DayNumber"></span>
+            </div>
+            <div class="col-md-10">
+                <label asp-for="Title" class="form-label fw-bold text-primary-custom" for="@(idPrefix)Title"></label>
+                <input asp-for="Title" class="form-control" name="@(namePrefix).Title" id="@(idPrefix)Title" />
+                <span asp-validation-for="Title" class="text-danger" data-valmsg-for="@(namePrefix).Title"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Description" class="form-label fw-bold text-primary-custom" for="@(idPrefix)Description"></label>
+                <textarea asp-for="Description" class="form-control" rows="3" name="@(namePrefix).Description" id="@(idPrefix)Description"></textarea>
+                <span asp-validation-for="Description" class="text-danger" data-valmsg-for="@(namePrefix).Description"></span>
+            </div>
+        </div>
+    </div>
+</div>
