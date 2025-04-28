@@ -1,15 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Tourest.Data;
-using Tourest.Services;
+
+using Tourest.Data.Entities;
 using Tourest.TourGuide.Services;
-using Tourest.ViewModels.NotificationView;
+using Tourest.Util;
+using static Tourest.Controllers.SendEmailController;
+using Tourest.Util;
+using Tourest.Services;
 
 [Route("TourGuide")]
 public class TourGuideController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly ITourAssignmentService _assignmentService;
+
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
 
@@ -20,6 +25,7 @@ public class TourGuideController : Controller
         _assignmentService = assignmentService;
         _notificationService = notificationService;
         _emailService = emailService;
+
     }
 
     [HttpGet("Index")]
@@ -38,7 +44,11 @@ public class TourGuideController : Controller
         return View("TourGuideScheduleWork", schedule);
     }
 
-
+    public TourGuide GetTourGuidebyID(int id)
+    {
+        var tourGuide = _context.TourGuides.FirstOrDefault(tg => tg.TourGuideUserID == id);
+        return tourGuide;
+    }
 
 
 
@@ -46,6 +56,10 @@ public class TourGuideController : Controller
     [HttpPost("AcceptAssignment")]
     public async Task<IActionResult> AcceptAssignment([FromBody] AssignmentRequest request)
     {
+        EmailRequest emailRequest = new EmailRequest();
+        var TourGuideId = 3;
+        emailRequest.htmlbody = MailUtil.AssignTourGuide(GetTourGuidebyID(TourGuideId));
+        _emailSerivce.SendEmail("trangtran.170204@gmail.com", "TOUREST: Xác nhận đặt tour thành công", emailRequest.htmlbody);
         try
         {
             Console.WriteLine($"Accepting assignment ID: {request?.AssignmentId}");
