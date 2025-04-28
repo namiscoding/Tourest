@@ -14,6 +14,29 @@ namespace Tourest.Data.Repositories
         Task<bool> UpdateUserAsync(User user);
         Task<bool> UpdateAccountAsync(Account account);
         Task<User?> GetGuideByIdAsync(int userId);
+        Task<IEnumerable<TourGuideAssignment>> GetAssignmentsByManagerAsync(int managerUserId);
+        Task<(bool Success, string? ErrorMessage)> UpdateFullNameAndAddressAsync(int userId, string fullName, string address);
+        //Task<User?> GetGuideByIdAsync(int userId); // Đã có
+        Task UpdateTourGuideRatingAsync(int tourGuideId, decimal newAverageRating); // Thêm phương thức cập nhật rating
+
+        // --- Phương thức MỚI/SỬA ĐỔI cho TourGuide ---
+
+        // Lấy User kèm Account VÀ TourGuide profile
+        Task<User?> GetUserWithAccountAndGuideProfileByIdAsync(int userId);
+
+        // Thêm User, Account VÀ TourGuide profile (trong transaction)
+        Task<(bool Success, User? CreatedUser)> AddUserAccountAndGuideProfileAsync(User user, Account account, Tourest.Data.Entities.TourGuide guideProfile);
+
+        // Cập nhật TourGuide profile
+        Task<bool> UpdateTourGuideAsync(Tourest.Data.Entities.TourGuide guideProfile);
+
+        // Lấy assignments được dẫn bởi Guide này
+        Task<IEnumerable<TourGuideAssignment>> GetAssignmentsLedByGuideAsync(int guideUserId);
+
+        // Lấy ratings mà Guide này nhận được
+        Task<IEnumerable<Rating>> GetRatingsReceivedByGuideAsync(int guideUserId);
 
     }
+
 }
+

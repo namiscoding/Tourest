@@ -1,5 +1,6 @@
 ﻿using Tourest.Data.Entities;
 using Tourest.ViewModels.Account;
+using Tourest.ViewModels.Admin;
 
 namespace Tourest.Util
 {
@@ -51,7 +52,7 @@ namespace Tourest.Util
                     UserID = accountInsert.UserID,
                     Username = accountInsert.Username,
                     Role = accountInsert.Role,
-                   
+
                 }
                 // Các thuộc tính điều hướng khác có thể được ánh xạ tương tự nếu cần
             };
@@ -68,13 +69,13 @@ namespace Tourest.Util
             Console.WriteLine($"RegistrationDate: {userInsert.RegistrationDate}");
             Console.WriteLine($"IsActive: {userInsert.IsActive}");
 
-          
-                Console.WriteLine("--- Account ---");
-                Console.WriteLine($"AccountID: {userInsert.Account.AccountID}");
-                Console.WriteLine($"UserID: {userInsert.Account.UserID}");
-                Console.WriteLine($"Username: {userInsert.Account.Username}");
-                Console.WriteLine($"Role: {userInsert.Account.Role}");
-          
+
+            Console.WriteLine("--- Account ---");
+            Console.WriteLine($"AccountID: {userInsert.Account.AccountID}");
+            Console.WriteLine($"UserID: {userInsert.Account.UserID}");
+            Console.WriteLine($"Username: {userInsert.Account.Username}");
+            Console.WriteLine($"Role: {userInsert.Account.Role}");
+
 
             return new UserViewModel
             {
@@ -96,6 +97,22 @@ namespace Tourest.Util
                 }
                 // Các thuộc tính điều hướng khác có thể được ánh xạ tương tự nếu cần
             };
+
+
+        }
+        public static EditCustomerViewModel ConvertoEdit(UserViewModel userViewModel)
+        {
+            return new EditCustomerViewModel
+            {
+                UserId = userViewModel.UserID,
+                FullName = userViewModel.FullName,
+                Email = userViewModel.Email,
+                Address = userViewModel.Address,
+                IsActive = userViewModel.IsActive,
+                PhoneNumber = userViewModel.PhoneNumber
+
+            };
+
         }
     }
 }

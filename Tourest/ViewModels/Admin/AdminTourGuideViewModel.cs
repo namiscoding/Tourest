@@ -1,0 +1,14 @@
+﻿namespace Tourest.ViewModels.Admin
+{
+    public class AdminTourGuideViewModel
+    {
+        public int UserId { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? PhoneNumber { get; set; }
+        public bool IsActive { get; set; }
+        public string? ExperienceLevel { get; set; }
+        public decimal? AverageRating { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+    }
+}

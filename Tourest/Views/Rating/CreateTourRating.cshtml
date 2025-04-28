@@ -1,0 +1,474 @@
+﻿@using System.Globalization
+@model Tourest.ViewModels.TourRating.RateTourPageViewModel
+@{
+    ViewData["Title"] = $"Đánh giá Tour: {Model.TourDetails.Name}"; // Lấy tên từ TourDetails
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collapsible Chat</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css"
+          rel="stylesheet" />
+</head>
+<body>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <main>
+
+
+    <div class="container mt-6">
+        <div class="row mb-4 g-4">
+            <div class="col-md-8">
+                <section class="tour-dtls__section section-mini-padding-top">
+            
+                        <article class="tour-dtls__article">
+                            <figure class="tour-thumb">
+                                <img src="./assets/images/tour-details-section/tour-details-thumb.png"
+                                     alt="tour-details-thumb"
+                                     class="w-100" />
+                                <div class="tour-thumb__caption">
+                                    <button>video <i class="fa-solid fa-video"></i></button>
+                                    <button>gallery <i class="fa-regular fa-image"></i></button>
+                                </div>
+                            </figure>
+                            <div class="tour-dtls__content">
+                                <div class="tour-meta">
+                                    <div class="meta-location">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    @Model.TourDetails.Destination
+                                    <a href="https://www.google.com/maps/search/?api=1&query=@System.Net.WebUtility.UrlEncode(Model.TourDetails.Destination)"
+                                       target="_blank"
+                                       class="text-orange-red ms-2">
+                                        View on map
+                                    </a>
+                                    </div>
+                                    <div class="meta-share">
+                                        <a href="#">
+                                            <i class="fa-solid fa-share-nodes"></i>
+                                        </a>
+                                        <a href="#">
+                                            <i class="fa-regular fa-heart"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <h3 class="title">
+                                <a href="tour-details.html">@Model.TourDetails.Name</a>
+                                </h3>
+                                <span class="divider"></span>
+                                <div class="tour-features">
+                                    <div class="feature">
+                                        <span class="features-title">From</span>
+                                    <span class="features-info text-orange-red">
+                                        @Model.TourDetails.ChildPrice.ToString("N0", CultureInfo.GetCultureInfo("vi-VN"))
+                                        - @Model.TourDetails.AdultPrice.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) VND</span>
+                                    </div>
+                                    <div class="feature">
+                                        <span class="features-title">Duration</span>
+                                        <span class="features-info">@Model.TourDetails.DurationDays days</span>
+                                    </div>
+                                    <div class="feature">
+                                        <span class="features-title">Max People</span>
+                                        <span class="features-info">@Model.TourDetails.MaxGroupSize</span>
+                                    </div>
+                                    <div class="feature">
+                                        <span class="features-title">Tour Type</span>
+                                        <span class="features-info">
+                                            @if (Model.TourDetails.Categories != null && Model.TourDetails.Categories.Any())
+                                            {
+                                                @string.Join(", ", Model.TourDetails.Categories.Select(c => c.Name))
+                                            }
+                                            else
+                                            {
+                                                <text>N/A</text> @* Hoặc để trống nếu không có category *@
+                                            }
+                                        </span>
+                                    </div>
+                                    <div class="feature">
+                                        <span class="features-title">Reviews</span>
+                                        <span class="features-info review">
+                                        @if (Model.TourDetails.AverageRating.HasValue)
+                                        {
+                                            @Model.TourDetails.AverageRating.Value.ToString("0.0")
+                                            <span>(@Model.TourDetails.SumRating reviews)</span>
+                                        }
+                                        else
+                                        {
+                                            <text>N/A</text>
+                                            <span>(0 reviews)</span>
+                                        }
+                                        </span>
+                                    </div>
+                                </div>
+                            <div class="tour-included-exclude tour-overview">
+                                <h5 class="overview-title">Pickup Points</h5>
+                                @if (Model.TourDetails.DeparturePointsList != null && Model.TourDetails.DeparturePointsList.Any())
+                                {
+                                    <ul class="include">
+                                        @foreach (var service in Model.TourDetails.DeparturePointsList)
+                                        {
+                                            <li>
+                                                <i style="color:#039e9d" class="fa-solid fa-location-dot"></i>
+                                                @service
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                                <div class="tour-overview">
+                                    <h5 class="overview-title">Overview</h5>
+                                    <p>
+                                        @Model.TourDetails.Description
+                                    </p>
+                                    
+                                </div>
+                            <div class="tour-overview">
+                                <h5 class="overview-title">Điều khoản & Điều kiện</h5>
+                                <p>
+                                    @Model.TourDetails.CancellationPolicyDescription
+                                </p>
+
+                            </div>
+                                <div class="tour-included-exclude">
+                                    <h5 class="included-exclude-title">Included / Exclude</h5>
+                                    <div class="included-exclude">
+                                        @if (Model.TourDetails.IncludedServicesList != null && Model.TourDetails.IncludedServicesList.Any())
+                                        {
+                                        <ul class="include">
+                                            @foreach (var service in Model.TourDetails.IncludedServicesList)
+                                            {
+                                            <li>
+                                                <i class="fa-solid fa-check"></i>
+                                                    @service
+                                            </li>
+                                            }
+                                        </ul>
+                                        }
+                                        @if (Model.TourDetails.ExcludedServicesList != null && Model.TourDetails.ExcludedServicesList.Any())
+                                    {
+                                        <ul class="exclude">
+                                            @foreach (var service in Model.TourDetails.ExcludedServicesList)
+                                            {
+                                                <li>
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                    @service
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                                </div>
+                            <div class="tour-Plan">
+                                <h5 class="plan-title">Tour Plan</h5>
+                                @if (Model.TourDetails.ItineraryDays != null && Model.TourDetails.ItineraryDays.Any())
+                                {
+                                    <div class="faq__accordion accordion accordion-reset" id="itineraryAccordion">
+
+                                        @foreach (var day in Model.TourDetails.ItineraryDays)
+                                        {
+                                            var collapseId = $"collapseItinerary{day.DayNumber}";
+                                            var headingId = $"headingItinerary{day.DayNumber}";
+                                            <div class="accordion-item">
+                                                <h6 class="accordion-header" id="@headingId">
+                                                    <button class="accordion-button tour-faq-number @(day.DayNumber == 1 ? "" : "collapsed")"
+                                                            type="button"
+                                                            data-bs-toggle="collapse"
+                                                            data-bs-target="#@collapseId" 
+                                                            aria-expanded="@(day.DayNumber == 1 ? "true" : "false")"
+                                                            aria-controls="@collapseId">
+                                                        Day @day.DayNumber: @day.Title
+                                                    </button>
+                                                </h6>
+                                                <div id="@collapseId"
+                                                     class="accordion-collapse collapse @(day.DayNumber == 1 ? "show" : "")"
+                                                     aria-labelledby="@headingId"
+                                                     data-bs-parent="#itineraryAccordion">
+                                                    <div class="accordion-body">
+                                                        <div class="tour-plan-list">
+                                                            <ul>
+                                                                <li>
+                                                                    <i class="fa-solid fa-circle"></i>
+                                                                    @Html.Raw(day.Description?.Replace("\n", "<br />"))
+                                                                </li>
+                                                                @* Các mục tĩnh này bạn có thể thay bằng dữ liệu động nếu có trong ViewModel *@
+                                                                @*
+                                                        <li>
+                                                        <i class="fa-solid fa-circle"></i>
+                                                        Awesome Breakfast
+                                                        </li>
+                                                        <li>
+                                                        <i class="fa-solid fa-circle"></i>
+                                                        5 Star Accommodation
+                                                        </li>
+                                                        *@
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <p>No itinerary details available.</p> @* Thêm thông báo nếu không có lịch trình *@
+                                }
+                            </div>
+                            <div class="tour-map">
+                                <h5 class="map-title">Map</h5>
+                                @if (!string.IsNullOrEmpty(Model.TourDetails.Destination))
+                                {
+                                    var encodedDestination = System.Net.WebUtility.UrlEncode(Model.TourDetails.Destination);
+                                    var mapSrc = $"https://maps.google.com/maps?q={encodedDestination}&t=&z=13&ie=UTF8&iwloc=&output=embed";
+
+                                    <iframe src="@mapSrc" @* <--- SRC động dựa trên Model.Destination *@
+                                            width="100%" @* Nên dùng width 100% để responsive tốt hơn *@
+                                            height="412"
+                                            style="border:0;"
+                                            allowfullscreen=""
+                                            loading="lazy"
+                                            referrerpolicy="no-referrer-when-downgrade"
+                                            class="tour-iframe">
+                                    </iframe>
+                                }
+                                else
+                                {
+                                    <p>Map location not available.</p> @* Hiển thị thông báo nếu không có Destination *@
+                                }
+                            </div>
+                            <div class="tour-reviews">
+                                <h5 class="reviews-title">Average Reviews</h5>
+                                <div class="reviews-container">
+                                    <div class="review-item d-flex align-items-center">
+                                        @* Sử dụng flexbox *@
+                                        @if (Model.TourDetails.AverageRating.HasValue)
+                                        {
+                                            <h2 class="total-point me-3">@Model.TourDetails.AverageRating.Value.ToString("0.0")</h2>
+                                            <p class="review-catagory mb-0">
+                                                @* Thêm mb-0 *@
+                                                @if (Model.TourDetails.AverageRating.Value >= 4.5m)
+                                                {
+                                                    <span class="ms-2">Excellent</span> @* Thêm class ms-2 để tạo khoảng cách *@
+                                                }
+                                                else if (Model.TourDetails.AverageRating.Value >= 3.5m)
+                                                {
+                                                    <span class="ms-2">Good</span>
+                                                }
+                                                else if (Model.TourDetails.AverageRating.Value >= 2.5m)
+                                                {
+                                                    <span class="ms-2">Average</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="ms-2">Below Average</span>
+                                                }
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <h2 class="total-point me-3">N/A</h2>
+                                            <p class="review-catagory mb-0 text-muted">No Reviews Yet</p>
+                                        }
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="showing-review">
+                                <h5 class="reviews-title">Showing @Model.TourDetails.Ratings.Count() review@(Model.TourDetails.Ratings.Count() != 1 ? "s" : "")</h5>
+                                @if (!Model.TourDetails.Ratings.Any())
+                                {
+                                    <p>There are no reviews for this tour yet.</p>
+                                }
+                                else
+                                {
+                                    <div class="review-container">
+                                        @foreach (var rating in Model.TourDetails.Ratings)
+                                        {
+                                            <div class="review-item d-flex mb-4">
+                                                @* mb-4 để tạo khoảng cách *@
+                                                <figure class="review-avatar me-3">
+                                                    @* Thêm me-3 *@
+                                                    <img src="@(rating.Customer?.ProfilePictureUrl ?? Url.Content("~/assets/images/default-avatar.png"))" @* Cần ảnh default *@
+                                                         alt="reviewer-avatar" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" />
+                                                </figure>
+                                                <div class="review-content">
+                                                    <span class="review-date text-muted"><small>@rating.RatingDate.ToString("dd MMM, yyyy")</small></span>
+                                                    <h6 class="review-title mt-1 mb-1">@(rating.Customer?.FullName ?? "Anonymous")</h6>
+                                                    <div class="reviews mb-2">
+                                                        @* Thêm mb-2 *@
+                                                        <span class="review-stars">
+                                                            @for (int i = 1; i <= 5; i++)
+                                                            {
+                                                                <i class="fa-solid fa-star @(i <= rating.RatingValue ? "text-warning" : "text-light")"></i>
+                                                            }
+                                                        </span>
+                                                        @* <span class="review-total">15 reviews</span> -- Không cần thiết ở đây *@
+                                                    </div>
+                                                    @if (!string.IsNullOrWhiteSpace(rating.Comment))
+                                                    {
+                                                        <p class="revew-description">@rating.Comment</p>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                          
+
+                        </article>
+                 
+        </section>
+             </div>
+             <div class="col-md-4">
+                                    @* === FORM ĐÁNH GIÁ === *@
+                 <h3 style="color:#039e9d" class="mt-4">Gửi đánh giá của bạn</h3>
+                 <div class="row">
+                     <div >
+                         @* Form trỏ đến Action CreateTourRating [POST] *@
+                         <form asp-action="CreateTourRating" asp-controller="Rating" method="post">
+                             @Html.AntiForgeryToken()
+                             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                              @* Input ẩn - sử dụng asp-for với đối tượng RatingForm *@
+                             <input type="hidden" asp-for="RatingForm.TourId" />
+                             <input type="hidden" asp-for="RatingForm.BookingId" />
+
+                              @* Phần chọn sao - sử dụng asp-for với RatingForm *@
+                             <div class="mb-3">
+                                 <label asp-for="RatingForm.RatingValue" class="form-label fw-bold"></label>
+                                 <div id="star-rating" class="mb-1">
+                                     @for (int i = 5; i >= 1; i--)
+                                     {
+                                         <input type="radio" asp-for="RatingForm.RatingValue" value="@i" id="rate-@i" class="visually-hidden star-radio" required/>
+                                         <label for="rate-@i" class="star-label" title="@i sao"><i class="fa-regular fa-star"></i></label>
+                                     }
+                                 </div>
+                                  <span asp-validation-for="RatingForm.RatingValue" class="text-danger d-block"></span>
+                              </div>
+
+                              @* Phần bình luận - sử dụng asp-for với RatingForm *@
+                             <div class="mb-3">
+                                 <label asp-for="RatingForm.Comment" class="form-label fw-bold"></label>
+                                 <textarea placeholder="Write your comment" asp-for="RatingForm.Comment" class="form-control" rows="5"></textarea>
+                                 <span asp-validation-for="RatingForm.Comment" class="text-danger"></span>
+                             </div>
+
+                             <div class="mb-3">
+                                 <button type="submit" class="common-btn color-two">Gửi đánh giá</button>
+                                 <a style="font-weight: bold" asp-action="Index" asp-controller="BookingHistory" class="btn btn-secondary ms-2">Quay lại Lịch sử</a>
+                             </div>
+                         </form>
+                     </div>
+                 </div>
+                 @* === KẾT THÚC FORM ĐÁNH GIÁ === *@
+
+        </div>
+    </div>
+</main>
+</body>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+
+        @* --- CSS CHO STAR RATING --- *@
+        <style>
+            #star-rating {
+                display: inline-block; /* Hiển thị các sao trên 1 hàng */
+                /* Đảo ngược chiều để dễ dàng tô màu từ phải sang trái khi hover/checked */
+                direction: rtl;
+                unicode-bidi: bidi-override;
+            }
+
+            /* Ẩn radio button gốc */
+            #star-rating input[type="radio"].star-radio {
+                display: none;
+            }
+
+            /* Style cho các label (ngôi sao) */
+            #star-rating label.star-label {
+                color: #ccc; /* Màu sao mặc định (xám nhạt) */
+                font-size: 1.8rem; /* Kích thước sao (điều chỉnh nếu cần) */
+                padding: 0 3px; /* Khoảng cách nhỏ giữa các sao */
+                cursor: pointer;
+                transition: color 0.2s ease-in-out; /* Hiệu ứng chuyển màu mượt */
+                /* Đảm bảo chỉ có icon được chọn */
+                -webkit-user-select: none; /* Safari */
+                -ms-user-select: none; /* IE 10 and IE 11 */
+                user-select: none; /* Standard syntax */
+            }
+
+                /* Đảm bảo icon dùng đúng font và kiểu */
+                 #star-rating label.star-label i::before {
+                     font-family: 'Font Awesome 6 Free'; /* Hoặc 'Font Awesome 6 Pro' nếu bạn dùng bản Pro */
+                     font-weight: 400; /* Trọng lượng của fa-regular */
+                     content: "\f005"; /* Mã unicode cho icon sao (fa-star) */
+                 }
+
+
+            /* Hiệu ứng khi HOVER: tô màu vàng cho sao đang hover và các sao bên phải nó */
+            #star-rating label.star-label:hover,
+            #star-rating label.star-label:hover ~ label.star-label { /* Dùng ~ để chọn các label đứng sau (bên phải do RTL) */
+                color: #ffc107; /* Màu vàng */
+            }
+
+             /* Hiệu ứng khi HOVER: đổi thành sao ĐẶC */
+            #star-rating label.star-label:hover i::before,
+            #star-rating label.star-label:hover ~ label.star-label i::before {
+                font-weight: 900; /* Trọng lượng của fa-solid */
+            }
+
+
+            /* Hiệu ứng khi radio được CHỌN: tô màu vàng và dùng sao ĐẶC cho sao được chọn và các sao bên phải nó */
+            #star-rating input[type="radio"].star-radio:checked ~ label.star-label {
+                color: #ffc107; /* Màu vàng */
+            }
+
+             #star-rating input[type="radio"].star-radio:checked ~ label.star-label i::before {
+                 font-weight: 900; /* Trọng lượng của fa-solid */
+             }
+
+        </style>
+        @* --- KẾT THÚC CSS --- *@
+
+
+        @* --- JAVASCRIPT (Tùy chọn - Chủ yếu CSS đã xử lý) --- *@
+        <script>
+            // JavaScript ở đây có thể dùng để thêm các hiệu ứng phức tạp hơn
+            // hoặc xử lý logic nếu cần, nhưng với CSS ở trên, việc chọn và
+            // hiển thị sao đã hoạt động cơ bản.
+
+            // Ví dụ: có thể thêm JS để cập nhật một thông báo khi chọn sao,
+            // nhưng không bắt buộc cho chức năng cốt lõi.
+             document.addEventListener('DOMContentLoaded', function() {
+                const starLabels = document.querySelectorAll('#star-rating .star-label');
+                starLabels.forEach(label => {
+                    label.addEventListener('click', function() {
+                        // Có thể làm gì đó khi sao được click, ví dụ:
+                        // console.log('Star rating selected:', this.getAttribute('for'));
+                     });
+                 });
+             });
+         </script>
+        @* --- KẾT THÚC JAVASCRIPT --- *@
+    }

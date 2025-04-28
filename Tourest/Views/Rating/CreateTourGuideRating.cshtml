@@ -1,0 +1,209 @@
+﻿@* File: Views/Rating/CreateTourGuideRating.cshtml *@
+@using System.Globalization
+@model Tourest.ViewModels.TourGuideRating.RateTourGuidePageViewModel
+
+@{
+    ViewData["Title"] = $"Đánh giá Hướng dẫn viên: {Model.TourGuideInfo.FullName}";
+    var profilePic = Model.TourGuideInfo.ProfilePictureUrl ?? Url.Content("~/assets/images/default-avatar.png");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collapsible Chat</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+          rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.3.2/mdb.min.css"
+          rel="stylesheet" />
+</head>
+<body>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <main>
+
+
+    <div class="container mt-6">
+        <div class="row mb-4 g-4">
+            <div class="col-md-7">
+                <section class="tour-dtls__section section-mini-padding-top">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="row g-0">
+                                <div class="col-md-3 text-center p-3">
+                                    <img src=" https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" class="img-fluid rounded-circle" alt="@Model.TourGuideInfo.FullName" style="width: 120px; height: 120px; object-fit: cover;">
+                                    <h5 class="mt-2 mb-0">@Model.TourGuideInfo.FullName</h5>
+                                    <small class="text-muted">Hướng dẫn viên</small>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="card-body">
+                                        <h6 class="card-subtitle mb-2 text-muted">Cho chuyến đi:</h6>
+                                        @if (!string.IsNullOrEmpty(Model.RatingForm.TourName))
+                                        {
+                                            <p class="card-text mb-1"><strong>Tour:</strong> @Model.RatingForm.TourName</p>
+                                        }
+                                        @if (Model.RatingForm.DepartureDate.HasValue)
+                                        {
+                                            <p class="card-text"><strong>Ngày đi:</strong> @Model.RatingForm.DepartureDate.Value.ToString("dd/MM/yyyy")</p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                 
+        </section>
+             </div>
+             <div class="col-md-5">
+                                    @* === FORM ĐÁNH GIÁ === *@
+                 <h3 style="color:#039e9d" class="mt-4">Gửi đánh giá của bạn</h3>
+                 <div class="row">
+                     <div >
+                         @* Form trỏ đến Action CreateTourRating [POST] *@
+                            <form asp-action="CreateTourGuideRating" asp-controller="Rating" method="post">
+                             @Html.AntiForgeryToken()
+                             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                              @* Input ẩn - sử dụng asp-for với đối tượng RatingForm *@
+                                <input type="hidden" asp-for="RatingForm.TourGuideId" />
+                                <input type="hidden" asp-for="RatingForm.TourGroupId" />
+                                <input type="hidden" asp-for="RatingForm.BookingId" />
+
+                              @* Phần chọn sao - sử dụng asp-for với RatingForm *@
+                             <div class="mb-3">
+                                 <label asp-for="RatingForm.RatingValue" class="form-label fw-bold"></label>
+                                 <div id="star-rating" class="mb-1">
+                                     @for (int i = 5; i >= 1; i--)
+                                     {
+                                         <input type="radio" asp-for="RatingForm.RatingValue" value="@i" id="rate-@i" class="visually-hidden star-radio" required/>
+                                         <label for="rate-@i" class="star-label" title="@i sao"><i class="fa-regular fa-star"></i></label>
+                                     }
+                                 </div>
+                                  <span asp-validation-for="RatingForm.RatingValue" class="text-danger d-block"></span>
+                              </div>
+
+                              @* Phần bình luận - sử dụng asp-for với RatingForm *@
+                             <div class="mb-3">
+                                 <label asp-for="RatingForm.Comment" class="form-label fw-bold"></label>
+                                 <textarea placeholder="Write your comment" asp-for="RatingForm.Comment" class="form-control" rows="5"></textarea>
+                                 <span asp-validation-for="RatingForm.Comment" class="text-danger"></span>
+                             </div>
+
+                             <div class="mb-3">
+                                 <button type="submit" class="common-btn color-two">Gửi đánh giá</button>
+                                 <a style="font-weight: bold" asp-action="Index" asp-controller="BookingHistory" class="btn btn-secondary ms-2">Quay lại Lịch sử</a>
+                             </div>
+                         </form>
+                     </div>
+                 </div>
+              
+        </div>
+    </div>
+</main>
+</body>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+
+        @* --- CSS CHO STAR RATING --- *@
+        <style>
+            #star-rating {
+                display: inline-block; /* Hiển thị các sao trên 1 hàng */
+                /* Đảo ngược chiều để dễ dàng tô màu từ phải sang trái khi hover/checked */
+                direction: rtl;
+                unicode-bidi: bidi-override;
+            }
+
+            /* Ẩn radio button gốc */
+            #star-rating input[type="radio"].star-radio {
+                display: none;
+            }
+
+            /* Style cho các label (ngôi sao) */
+            #star-rating label.star-label {
+                color: #ccc; /* Màu sao mặc định (xám nhạt) */
+                font-size: 1.8rem; /* Kích thước sao (điều chỉnh nếu cần) */
+                padding: 0 3px; /* Khoảng cách nhỏ giữa các sao */
+                cursor: pointer;
+                transition: color 0.2s ease-in-out; /* Hiệu ứng chuyển màu mượt */
+                /* Đảm bảo chỉ có icon được chọn */
+                -webkit-user-select: none; /* Safari */
+                -ms-user-select: none; /* IE 10 and IE 11 */
+                user-select: none; /* Standard syntax */
+            }
+
+                /* Đảm bảo icon dùng đúng font và kiểu */
+                 #star-rating label.star-label i::before {
+                     font-family: 'Font Awesome 6 Free'; /* Hoặc 'Font Awesome 6 Pro' nếu bạn dùng bản Pro */
+                     font-weight: 400; /* Trọng lượng của fa-regular */
+                     content: "\f005"; /* Mã unicode cho icon sao (fa-star) */
+                 }
+
+
+            /* Hiệu ứng khi HOVER: tô màu vàng cho sao đang hover và các sao bên phải nó */
+            #star-rating label.star-label:hover,
+            #star-rating label.star-label:hover ~ label.star-label { /* Dùng ~ để chọn các label đứng sau (bên phải do RTL) */
+                color: #ffc107; /* Màu vàng */
+            }
+
+             /* Hiệu ứng khi HOVER: đổi thành sao ĐẶC */
+            #star-rating label.star-label:hover i::before,
+            #star-rating label.star-label:hover ~ label.star-label i::before {
+                font-weight: 900; /* Trọng lượng của fa-solid */
+            }
+
+
+            /* Hiệu ứng khi radio được CHỌN: tô màu vàng và dùng sao ĐẶC cho sao được chọn và các sao bên phải nó */
+            #star-rating input[type="radio"].star-radio:checked ~ label.star-label {
+                color: #ffc107; /* Màu vàng */
+            }
+
+             #star-rating input[type="radio"].star-radio:checked ~ label.star-label i::before {
+                 font-weight: 900; /* Trọng lượng của fa-solid */
+             }
+
+        </style>
+        @* --- KẾT THÚC CSS --- *@
+
+
+        @* --- JAVASCRIPT (Tùy chọn - Chủ yếu CSS đã xử lý) --- *@
+        <script>
+            // JavaScript ở đây có thể dùng để thêm các hiệu ứng phức tạp hơn
+            // hoặc xử lý logic nếu cần, nhưng với CSS ở trên, việc chọn và
+            // hiển thị sao đã hoạt động cơ bản.
+
+            // Ví dụ: có thể thêm JS để cập nhật một thông báo khi chọn sao,
+            // nhưng không bắt buộc cho chức năng cốt lõi.
+             document.addEventListener('DOMContentLoaded', function() {
+                const starLabels = document.querySelectorAll('#star-rating .star-label');
+                starLabels.forEach(label => {
+                    label.addEventListener('click', function() {
+                        // Có thể làm gì đó khi sao được click, ví dụ:
+                        // console.log('Star rating selected:', this.getAttribute('for'));
+                     });
+                 });
+             });
+         </script>
+        @* --- KẾT THÚC JAVASCRIPT --- *@
+    }
+
+
+
+
+

@@ -1,0 +1,941 @@
+﻿@* File: /Views/AdminTours/Create.cshtml *@
+@model CreateEditTourViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Tạo Tour Mới";
+}
+
+@* --- CSS Styles --- *@
+<style>
+    :root {
+        --primary-color: #039e9d;
+        --primary-dark: #028a89;
+        --primary-light: #4dbcbb;
+        --primary-ultra-light: #e0f7f7;
+        --secondary-color: #ff9642;
+        --secondary-light: #ffc395;
+        --accent-color: #6c63ff;
+        --danger-color: #ff5a5a;
+        --success-color: #28a745;
+        --text-dark: #343a40;
+        --text-light: #f8f9fa;
+    }
+
+    /* General Styles */
+    .card {
+        border: none;
+    }
+
+    .form-label {
+        margin-bottom: 0.3rem;
+        font-size: 0.9rem;
+    }
+
+    .input-group-text {
+        background-color: var(--primary-ultra-light);
+        border-color: var(--primary-light);
+        color: var(--primary-dark);
+    }
+
+        .input-group-text i {
+            color: var(--primary-color);
+        }
+    /* Icon color inside input group */
+
+    /* Custom Colors */
+    .bg-primary-custom {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    .bg-primary-light {
+        background-color: var(--primary-ultra-light);
+        color: var(--primary-dark);
+    }
+
+    .bg-secondary-custom {
+        background-color: var(--secondary-color);
+        color: white;
+    }
+
+    .border-primary-custom {
+        border-color: var(--primary-color) !important;
+    }
+
+    .text-primary-custom {
+        color: var(--primary-color);
+    }
+
+    /* Buttons */
+    .btn-primary-custom {
+        background-color: var(--primary-color);
+        border-color: var(--primary-dark);
+        color: white;
+        transition: background-color 0.2s ease;
+    }
+
+        .btn-primary-custom:hover {
+            background-color: var(--primary-dark);
+            color: white;
+        }
+
+    .btn-secondary-custom {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        color: white;
+        transition: background-color 0.2s ease;
+    }
+
+        .btn-secondary-custom:hover {
+            background-color: #e68739;
+            border-color: #e68739;
+            color: white;
+        }
+
+    .btn-outline-primary-custom {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+        .btn-outline-primary-custom:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+    .btn-outline-secondary {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+
+    .btn-outline-danger {
+        color: var(--danger-color);
+        border-color: var(--danger-color);
+    }
+
+        .btn-outline-danger:hover {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+    /* Card Headers */
+    .card-header-primary {
+        background: linear-gradient(45deg, var(--primary-color), var(--primary-light));
+        color: white;
+        border-bottom: none;
+        padding: 1rem 1.25rem;
+    }
+
+    .card-header-secondary {
+        background-color: var(--primary-ultra-light);
+        color: var(--primary-dark);
+        border-bottom: 1px solid rgba(3, 158, 157, 0.2);
+        padding: 0.8rem 1.25rem;
+    }
+
+        .card-header-secondary h4, .card-header-secondary h5 {
+            font-weight: 600;
+        }
+
+    /* Form Controls */
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-light);
+        box-shadow: 0 0 0 0.2rem rgba(3, 158, 157, 0.2);
+    }
+
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(3, 158, 157, 0.2);
+    }
+
+    .form-switch .form-check-input {
+        width: 2.5em;
+        height: 1.25em;
+    }
+
+    /* Dropzone */
+    .dropzone-container {
+        border: 2px dashed var(--primary-light);
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .dropzone-highlight {
+        background-color: var(--primary-ultra-light) !important;
+        border-color: var(--primary-color) !important;
+        border-style: solid;
+    }
+
+    .dropzone-container p {
+        margin-bottom: 0;
+        color: #6c757d;
+    }
+
+    /* Image Previews */
+    #image-previews .img-preview-container {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+
+    #image-previews .card {
+        overflow: hidden;
+    }
+    /* Ensure image fits card */
+    #image-previews .card-img-top {
+        height: 120px;
+        object-fit: cover;
+        border-bottom: 1px solid #eee;
+    }
+
+    #image-previews .card-body {
+        padding: 0.5rem;
+        background-color: #f8f9fa;
+    }
+
+    #image-previews .card-text {
+        font-size: 0.75rem;
+        line-height: 1.2;
+        margin-bottom: 0.3rem;
+    }
+
+    #image-previews .img-preview-remove-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        background-color: rgba(255, 90, 90, 0.8); /* danger-color with transparency */
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        line-height: 22px; /* Vertically center icon */
+        text-align: center;
+        cursor: pointer;
+        padding: 0;
+        transition: background-color 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+        #image-previews .img-preview-remove-btn:hover {
+            background-color: rgba(255, 90, 90, 1);
+        }
+
+        #image-previews .img-preview-remove-btn i {
+            vertical-align: middle;
+        }
+
+    /* Itinerary */
+    .itinerary-day-item {
+        border-left: 4px solid var(--primary-light);
+    }
+
+        .itinerary-day-item .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        /* Lighter header for days */
+        .itinerary-day-item .day-number-display {
+            font-weight: bold;
+            color: var(--primary-dark);
+        }
+
+    /* Category List */
+    .category-container {
+        border: 1px solid var(--primary-light) !important;
+        border-radius: 0.375rem;
+        padding: 10px;
+        background-color: #fff;
+    }
+
+        .category-container .form-check {
+            margin-bottom: 0.5rem;
+        }
+
+    /* Validation Summary */
+    .validation-summary-errors {
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header card-header-primary">
+            <h2 class="mb-0 fw-bold">@ViewData["Title"]</h2>
+        </div>
+        <div class="card-body p-4">
+            @* enctype is crucial for file uploads *@
+            <form asp-action="Create" method="post" enctype="multipart/form-data" id="tourForm" novalidate>
+                @* Displays model-level errors and custom errors added in controller *@
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <div class="row g-4">
+                    @* --- Left Column: Basic Tour Info --- *@
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header card-header-secondary">
+                                <h4 class="mb-0"><i class="fas fa-info-circle me-2 text-primary-custom"></i>Thông tin cơ bản</h4>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label asp-for="Name" class="form-label fw-bold text-primary-custom"></label>
+                                    <input asp-for="Name" class="form-control form-control-lg" placeholder="Ví dụ: Tour khám phá Hà Giang 3 ngày 2 đêm" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Destination" class="form-label fw-bold text-primary-custom"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                        <input asp-for="Destination" class="form-control" placeholder="Ví dụ: Hà Giang, Việt Nam" />
+                                    </div>
+                                    <span asp-validation-for="Destination" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Description" class="form-label fw-bold text-primary-custom"></label>
+                                    <textarea asp-for="Description" class="form-control" rows="5" placeholder="Mô tả chi tiết về điểm nổi bật, lịch sử, văn hóa liên quan đến tour..."></textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-3">
+                                        <label asp-for="DurationDays" class="form-label fw-bold text-primary-custom"></label>
+                                        <div class="input-group">
+                                            <input asp-for="DurationDays" type="number" min="1" class="form-control" />
+                                            <span class="input-group-text">ngày</span>
+                                        </div>
+                                        <span asp-validation-for="DurationDays" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label asp-for="DurationNights" class="form-label fw-bold text-primary-custom"></label>
+                                        <div class="input-group">
+                                            <input asp-for="DurationNights" type="number" min="0" class="form-control" />
+                                            <span class="input-group-text">đêm</span>
+                                        </div>
+                                        <span asp-validation-for="DurationNights" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label asp-for="AdultPrice" class="form-label fw-bold text-primary-custom"></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">VNĐ</span>
+                                            <input asp-for="AdultPrice" type="number" min="0" step="1000" class="form-control" placeholder="1,000,000" />
+                                        </div>
+                                        <span asp-validation-for="AdultPrice" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label asp-for="ChildPrice" class="form-label fw-bold text-primary-custom"></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">VNĐ</span>
+                                            <input asp-for="ChildPrice" type="number" min="0" step="1000" class="form-control" placeholder="700,000" />
+                                        </div>
+                                        <span asp-validation-for="ChildPrice" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="MinGroupSize" class="form-label fw-bold text-primary-custom"></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-users"></i></span>
+                                            <input asp-for="MinGroupSize" type="number" min="1" class="form-control" placeholder="1" />
+                                        </div>
+                                        <span asp-validation-for="MinGroupSize" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label asp-for="MaxGroupSize" class="form-label fw-bold text-primary-custom"></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-users"></i></span>
+                                            <input asp-for="MaxGroupSize" type="number" min="1" class="form-control" placeholder="20" />
+                                        </div>
+                                        <span asp-validation-for="MaxGroupSize" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="DeparturePoints" class="form-label fw-bold text-primary-custom"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-plane-departure"></i></span>
+                                        <input asp-for="DeparturePoints" class="form-control" placeholder="Ví dụ: Hà Nội; TP. Hồ Chí Minh; Đà Nẵng" />
+                                    </div>
+                                    <div class="form-text">Nhập các điểm khởi hành, cách nhau bằng dấu chấm phẩy (;).</div>
+                                    <span asp-validation-for="DeparturePoints" class="text-danger"></span>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="IncludedServices" class="form-label fw-bold text-primary-custom"></label>
+                                            <textarea asp-for="IncludedServices" class="form-control" rows="4" placeholder="- Xe đưa đón&#10;- Khách sạn 3*&#10;- Vé tham quan&#10;- Ăn sáng"></textarea>
+                                            <span asp-validation-for="IncludedServices" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label asp-for="ExcludedServices" class="form-label fw-bold text-primary-custom"></label>
+                                            <textarea asp-for="ExcludedServices" class="form-control" rows="4" placeholder="- Chi phí cá nhân&#10;- Đồ uống&#10;- Tip cho HDV"></textarea>
+                                            <span asp-validation-for="ExcludedServices" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="CancellationPolicyDescription" class="form-label fw-bold text-primary-custom"></label>
+                                    <textarea asp-for="CancellationPolicyDescription" class="form-control" rows="3" placeholder="Mô tả chi tiết chính sách hủy tour..."></textarea>
+                                    <span asp-validation-for="CancellationPolicyDescription" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input asp-for="IsCancellable" type="checkbox" class="form-check-input" role="switch" />
+                                    <label asp-for="IsCancellable" class="form-check-label fw-bold text-primary-custom"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* --- Right Column: Status, Categories, Images --- *@
+                    <div class="col-lg-4">
+                        <div class="vstack gap-4">
+                            @* Use vstack for vertical spacing *@
+                            <div class="card shadow-sm">
+                                <div class="card-header card-header-secondary">
+                                    <h4 class="mb-0"><i class="fas fa-toggle-on me-2 text-primary-custom"></i>Trạng thái</h4>
+                                </div>
+                                <div class="card-body">
+                                    <label asp-for="Status" class="form-label fw-bold text-primary-custom"></label>
+                                    <select asp-for="Status" class="form-select">
+                                        <option value="Draft">Bản nháp (Draft)</option>
+                                        <option value="Active">Hoạt động (Active)</option>
+                                        <option value="Inactive">Không hoạt động (Inactive)</option>
+                                    </select>
+                                    <span asp-validation-for="Status" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="card shadow-sm">
+                                <div class="card-header card-header-secondary">
+                                    <h4 class="mb-0"><i class="fas fa-tags me-2 text-primary-custom"></i>Danh mục</h4>
+                                </div>
+                                <div class="card-body">
+                                    <label asp-for="SelectedCategoryIds" class="form-label fw-bold text-primary-custom"></label>
+                                    <div class="category-container" style="max-height: 200px; overflow-y: auto;">
+                                        @if (Model.AvailableCategories != null && Model.AvailableCategories.Any())
+                                        {
+                                            @foreach (var category in Model.AvailableCategories)
+                                            {
+                                                <div class="form-check">
+                                                    @* Name must be SelectedCategoryIds for list binding *@
+                                                    <input class="form-check-input" type="checkbox" name="SelectedCategoryIds" value="@category.CategoryId" id="category_@category.CategoryId"
+                                                    @(Model.SelectedCategoryIds != null && Model.SelectedCategoryIds.Contains(category.CategoryId) ? "checked" : "")>
+                                                    <label class="form-check-label" for="category_@category.CategoryId">
+                                                        @category.Name
+                                                    </label>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <p class="text-muted fst-italic mb-0">Không có danh mục nào.</p>
+                                        }
+                                    </div>
+                                    @* Validation message for the category selection concept *@
+                                    <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="card shadow-sm">
+                                <div class="card-header card-header-secondary">
+                                    <h4 class="mb-0"><i class="fas fa-images me-2 text-primary-custom"></i>Hình ảnh</h4>
+                                </div>
+                                <div class="card-body">
+                                    @* Label for the file input concept *@
+                                    <label asp-for="NewImageFiles" class="form-label fw-bold text-primary-custom"></label>
+                                    <div class="mb-3">
+                                        <div class="dropzone-container position-relative p-4 text-center" id="dropzone">
+                                            @* Actual file input, hidden but clickable via label/dropzone JS.
+                                               Name MUST match the controller parameter.
+                                               'multiple' allows selecting multiple files. *@
+                                            <input name="imageFiles" type="file" class="position-absolute opacity-0 w-100 h-100 start-0 top-0" style="cursor:pointer" id="imageInput" multiple accept="image/*" aria-labelledby="imageUploadLabel" />
+                                            <i class="fas fa-cloud-upload-alt fa-3x text-primary-custom mb-2"></i>
+                                            <p id="imageUploadLabel">Kéo thả ảnh vào đây hoặc <span class="text-primary-custom fw-bold">chọn ảnh</span></p>
+                                        </div>
+                                        @* Validation message related to the image upload concept *@
+                                        <span asp-validation-for="NewImageFiles" class="text-danger"></span>
+                                    </div>
+                                    @* Container for image previews generated by JS *@
+                                    <div id="image-previews" class="row row-cols-2 g-2 mt-3">
+                                        @* Previews will be added here by JavaScript *@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> @* End Row g-4 *@
+
+                @* --- Itinerary Section --- *@
+                <div class="card shadow-sm mt-4">
+                    <div class="card-header card-header-secondary d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="fas fa-calendar-alt me-2 text-primary-custom"></i>Lịch trình chi tiết</h4>
+                        <button type="button" id="add-itinerary-day" class="btn btn-secondary-custom btn-sm">
+                            <i class="fas fa-plus me-1"></i> Thêm ngày
+                        </button>
+                    </div>
+                    <div class="card-body p-4">
+                        @* Container where itinerary day items will be added/removed *@
+                        <div id="itinerary-section">
+                            @* Initialize with existing days if Model has them (e.g., validation failed), otherwise empty *@
+                            @if (Model.ItineraryDays != null)
+                            {
+                                @for (int i = 0; i < Model.ItineraryDays.Count; i++)
+                                {
+                                    @* Render partial view for each day item *@
+                                    @await Html.PartialAsync("_AdminItineraryDayItem", Model.ItineraryDays[i], new ViewDataDictionary(ViewData) { { "index", i } })
+                                }
+                            }
+                            @* Message shown if no itinerary days exist initially or after deletion *@
+                            <div id="no-itinerary-message" class="text-center text-muted fst-italic py-3 @(Model.ItineraryDays != null && Model.ItineraryDays.Any() ? "d-none" : "")">
+                                Chưa có ngày nào trong lịch trình. Nhấn "Thêm ngày" để bắt đầu.
+                            </div>
+                        </div>
+                        @* Validation message specifically for the itinerary section (e.g., must have at least one day) *@
+                        <span asp-validation-for="ItineraryDays" class="text-danger"></span>
+                    </div>
+                </div>
+
+                @* --- Action Buttons --- *@
+                <div class="mt-4 mb-3 d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+                    </a>
+                    <button type="submit" class="btn btn-primary-custom btn-lg px-4">
+                        <i class="fas fa-save me-1"></i> Lưu Tour
+                    </button>
+                </div>
+            </form>
+        </div> @* End Card Body *@
+    </div> @* End Main Card *@
+</div> @* End Container Fluid *@
+
+
+@* --- Template for new Itinerary Day Item (used by JavaScript) --- *@
+<template id="itinerary-day-template">
+    <div class="itinerary-day-item card mb-4 shadow-sm" style="opacity: 0; transform: translateY(20px);">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Ngày <span class="day-number-display">{dayNumber}</span></h5>
+            <button type="button" class="btn btn-outline-danger btn-sm remove-itinerary-day" title="Xóa ngày này">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            @* Hidden fields for ID (always 0 for new) and Order (set by JS) *@
+            <input type="hidden" name="ItineraryDays[{index}].ItineraryDayID" value="0" />
+            <input type="hidden" name="ItineraryDays[{index}].Order" value="{index}" class="day-order" />
+
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label for="ItineraryDays_{index}__DayNumber" class="form-label fw-bold text-primary-custom">Số ngày</label>
+                    @* Name and ID follow MVC convention for list binding and label association *@
+                    <input type="number" name="ItineraryDays[{index}].DayNumber" id="ItineraryDays_{index}__DayNumber" value="{dayNumber}" min="1" class="form-control day-number-input" data-val="true" data-val-required="Số ngày là bắt buộc." data-val-range="Số ngày phải lớn hơn 0." data-val-range-min="1" />
+                    @* Validation message placeholder *@
+                    <span class="text-danger field-validation-valid" data-valmsg-for="ItineraryDays[{index}].DayNumber" data-valmsg-replace="true"></span>
+                </div>
+                <div class="col-md-10">
+                    <label for="ItineraryDays_{index}__Title" class="form-label fw-bold text-primary-custom">Tiêu đề</label>
+                    <input type="text" name="ItineraryDays[{index}].Title" id="ItineraryDays_{index}__Title" class="form-control" placeholder="Ví dụ: Khám phá Đồng Văn" data-val="true" data-val-required="Tiêu đề không được để trống." />
+                    <span class="text-danger field-validation-valid" data-valmsg-for="ItineraryDays[{index}].Title" data-valmsg-replace="true"></span>
+                </div>
+                <div class="col-12">
+                    <label for="ItineraryDays_{index}__Description" class="form-label fw-bold text-primary-custom">Mô tả</label>
+                    <textarea name="ItineraryDays[{index}].Description" id="ItineraryDays_{index}__Description" class="form-control" rows="3" placeholder="Mô tả chi tiết hoạt động trong ngày..." data-val="true" data-val-required="Mô tả không được để trống."></textarea>
+                    <span class="text-danger field-validation-valid" data-valmsg-for="ItineraryDays[{index}].Description" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+
+@* --- Partial View for Itinerary Day Item (used for initial rendering) --- *@
+@* Create a file named _AdminItineraryDayItem.cshtml in Views/Shared or Views/AdminTours *@
+@* Content of _AdminItineraryDayItem.cshtml:
+@model AdminItineraryDayViewModel
+@{
+    // Get index from ViewData, default to 0 if not found (should always be passed)
+    int index = ViewData["index"] as int? ?? 0;
+    string namePrefix = $"ItineraryDays[{index}]";
+    string idPrefix = $"ItineraryDays_{index}__"; // Note double underscore for list items
+}
+<div class="itinerary-day-item card mb-4 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Ngày <span class="day-number-display">@Model.DayNumber</span></h5>
+        <button type="button" class="btn btn-outline-danger btn-sm remove-itinerary-day" title="Xóa ngày này">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </div>
+    <div class="card-body">
+        <input type="hidden" asp-for="ItineraryDayID" name="@(namePrefix).ItineraryDayID" />
+        <input type="hidden" asp-for="Order" name="@(namePrefix).Order" value="@index" class="day-order" />
+
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label asp-for="DayNumber" class="form-label fw-bold text-primary-custom" for="@(idPrefix)DayNumber"></label>
+                <input asp-for="DayNumber" type="number" min="1" class="form-control day-number-input" name="@(namePrefix).DayNumber" id="@(idPrefix)DayNumber" />
+                <span asp-validation-for="DayNumber" class="text-danger" data-valmsg-for="@(namePrefix).DayNumber"></span>
+            </div>
+            <div class="col-md-10">
+                <label asp-for="Title" class="form-label fw-bold text-primary-custom" for="@(idPrefix)Title"></label>
+                <input asp-for="Title" class="form-control" name="@(namePrefix).Title" id="@(idPrefix)Title" />
+                <span asp-validation-for="Title" class="text-danger" data-valmsg-for="@(namePrefix).Title"></span>
+            </div>
+            <div class="col-12">
+                <label asp-for="Description" class="form-label fw-bold text-primary-custom" for="@(idPrefix)Description"></label>
+                <textarea asp-for="Description" class="form-control" rows="3" name="@(namePrefix).Description" id="@(idPrefix)Description"></textarea>
+                <span asp-validation-for="Description" class="text-danger" data-valmsg-for="@(namePrefix).Description"></span>
+            </div>
+        </div>
+    </div>
+</div>
+*@
+
+
+@section Scripts {
+    @{
+        // Include jQuery validation scripts
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Wrap all script logic in DOMContentLoaded to ensure elements exist
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // --- Global Variables & Elements ---
+            const form = document.getElementById('tourForm');
+            const imageInput = document.getElementById('imageInput');
+            const previewContainer = document.getElementById('image-previews');
+            const dropzone = document.getElementById('dropzone');
+            const itinerarySection = document.getElementById('itinerary-section');
+            const addItineraryButton = document.getElementById('add-itinerary-day');
+            const itineraryTemplate = document.getElementById('itinerary-day-template');
+            const noItineraryMessage = document.getElementById('no-itinerary-message');
+
+            // Store files selected by the user persistently across interactions
+            let currentFiles = []; // Array to hold File objects
+
+            // --- Image Upload & Preview Logic ---
+
+            // Function to handle file selection (both browse and drop)
+            function handleFiles(files) {
+                const newFiles = Array.from(files).filter(file =>
+                    file.type.startsWith('image/') && // Only accept image files
+                    !currentFiles.some(existingFile => // Avoid duplicates
+                        existingFile.name === file.name && existingFile.size === file.size
+                    )
+                );
+
+                if (newFiles.length > 0) {
+                    currentFiles = currentFiles.concat(newFiles); // Add new valid files
+                    updateFileInput(); // Sync the actual input element
+                    renderImagePreviews(); // Update the visual previews
+                }
+                 // Optionally provide feedback if non-image files were dropped/selected
+                 const nonImageFiles = Array.from(files).filter(file => !file.type.startsWith('image/'));
+                 if (nonImageFiles.length > 0) {
+                     alert('Một số tệp không phải là hình ảnh và đã bị bỏ qua.');
+                 }
+            }
+
+            // Function to render image previews based on the currentFiles array
+            function renderImagePreviews() {
+                previewContainer.innerHTML = ''; // Clear existing previews
+                currentFiles.forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const col = document.createElement('div');
+                        col.className = 'col img-preview-container';
+                        // Store the index in a data attribute for easy removal
+                        col.dataset.fileIndex = index;
+
+                        col.innerHTML = `
+                            <div class="card h-100 border-primary-custom">
+                                <img src="${e.target.result}" class="card-img-top" alt="Preview ${file.name}">
+                                <div class="card-body">
+                                    <p class="card-text text-truncate" title="${file.name}">${file.name}</p>
+                                </div>
+                                <button type="button" class="btn img-preview-remove-btn" title="Xóa ảnh này">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `;
+                        previewContainer.appendChild(col);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // Function to remove an image by its index
+            function removeImage(index) {
+                if (index >= 0 && index < currentFiles.length) {
+                    currentFiles.splice(index, 1); // Remove from our array
+                    updateFileInput(); // Sync the actual input
+                    renderImagePreviews(); // Re-render previews
+                }
+            }
+
+            // Function to update the hidden file input's FileList
+            // This is necessary because FileList is immutable directly
+            function updateFileInput() {
+                const dataTransfer = new DataTransfer();
+                currentFiles.forEach(file => dataTransfer.items.add(file));
+                imageInput.files = dataTransfer.files;
+                // console.log("Updated input files count:", imageInput.files.length);
+            }
+
+            // --- Drag & Drop Event Listeners ---
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, preventDefaults, false);
+                // Prevent browser default behavior for drag events on the whole page
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, () => dropzone.classList.add('dropzone-highlight'), false);
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, () => dropzone.classList.remove('dropzone-highlight'), false);
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files); // Process dropped files
+            }, false);
+
+            // --- Browse Button Event Listener ---
+            imageInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files); // Process selected files
+                // Reset input value to allow selecting the same file again after removing it
+                e.target.value = null;
+            });
+
+            // --- Image Preview Removal (using Event Delegation) ---
+            previewContainer.addEventListener('click', function(e) {
+                // Check if the clicked element or its parent is the remove button
+                const removeButton = e.target.closest('.img-preview-remove-btn');
+                if (removeButton) {
+                    const container = removeButton.closest('.img-preview-container');
+                    if (container && container.dataset.fileIndex !== undefined) {
+                        removeImage(parseInt(container.dataset.fileIndex, 10));
+                    }
+                }
+            });
+
+            // Helper to prevent default drag/drop behavior
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // --- Itinerary Management Logic ---
+
+            // Function to add a new itinerary day item
+            function addItineraryDay() {
+                const dayItems = itinerarySection.querySelectorAll('.itinerary-day-item');
+                const nextIndex = dayItems.length; // New item's index
+                const nextDayNumber = calculateNextDayNumber(); // Suggest the next logical day number
+
+                // Clone the template content
+                const templateContent = itineraryTemplate.content.cloneNode(true);
+                const newItem = templateContent.querySelector('.itinerary-day-item');
+
+                // Replace placeholders in the template HTML
+                let htmlContent = newItem.outerHTML
+                    .replace(/{index}/g, nextIndex) // Replace all occurrences of {index}
+                    .replace(/{dayNumber}/g, nextDayNumber); // Replace {dayNumber}
+
+                // Insert the new HTML into the DOM
+                itinerarySection.insertAdjacentHTML('beforeend', htmlContent);
+                const addedElement = itinerarySection.lastElementChild; // Get the actual added element
+
+                // Add fade-in animation
+                setTimeout(() => {
+                    addedElement.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    addedElement.style.opacity = '1';
+                    addedElement.style.transform = 'translateY(0)';
+                }, 10); // Small delay for transition
+
+                // Re-parse jQuery validation for the new elements
+                 if (typeof $ !== 'undefined' && $.validator && $.validator.unobtrusive) {
+                     $(form).validate().settings.ignore = ""; // Ensure dynamically added elements are validated
+                    $.validator.unobtrusive.parse(addedElement); // Parse only the new element for efficiency
+                }
+
+                toggleNoItineraryMessage(); // Hide the 'no items' message
+            }
+
+            // Function to remove an itinerary day item
+            function removeItineraryDay(button) {
+                const dayItem = button.closest('.itinerary-day-item');
+                if (!dayItem) return;
+
+                // Add fade-out animation
+                dayItem.style.transition = 'all 0.3s ease-out';
+                dayItem.style.opacity = '0';
+                dayItem.style.transform = 'translateX(-20px)';
+                // Animate margin to collapse space smoothly
+                dayItem.style.marginBottom = `-${dayItem.offsetHeight}px`;
+                dayItem.style.marginTop = '0'; // Adjust margin collapse
+                dayItem.style.paddingTop = '0';
+                dayItem.style.paddingBottom = '0';
+                dayItem.style.borderWidth = '0';
+
+
+                setTimeout(() => {
+                    dayItem.remove();
+                    updateItineraryIndexes(); // Update indexes of remaining items
+                    toggleNoItineraryMessage(); // Show message if last item was removed
+                }, 300); // Match transition duration
+            }
+
+            // Function to update indexes and names/ids after removal
+            function updateItineraryIndexes() {
+                const dayItems = itinerarySection.querySelectorAll('.itinerary-day-item');
+                dayItems.forEach((item, index) => {
+                    // Update hidden Order value
+                    const orderInput = item.querySelector('.day-order');
+                    if (orderInput) orderInput.value = index;
+
+                    // Update name and id attributes for all relevant inputs, labels, spans
+                    const elementsToUpdate = item.querySelectorAll('[name^="ItineraryDays["], [id^="ItineraryDays_"], [data-valmsg-for^="ItineraryDays["]');
+                    const oldIndexRegex = /ItineraryDays\[\d+\]/;
+                    const oldIdRegex = /ItineraryDays_\d+__/;
+                    const newNamePrefix = `ItineraryDays[${index}]`;
+                    const newIdPrefix = `ItineraryDays_${index}__`;
+
+                    elementsToUpdate.forEach(el => {
+                        // Update 'name' attribute
+                        if (el.hasAttribute('name')) {
+                            el.name = el.name.replace(oldIndexRegex, newNamePrefix);
+                        }
+                        // Update 'id' attribute
+                        if (el.hasAttribute('id')) {
+                            el.id = el.id.replace(oldIdRegex, newIdPrefix);
+                        }
+                        // Update 'data-valmsg-for' attribute for validation spans
+                        if (el.hasAttribute('data-valmsg-for')) {
+                            el.dataset.valmsgFor = el.dataset.valmsgFor.replace(oldIndexRegex, newNamePrefix);
+                        }
+                        // Update label 'for' attribute (find associated label)
+                        if (el.hasAttribute('id') && el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                            const label = item.querySelector(`label[for^="ItineraryDays_"]`);
+                            // This is tricky if multiple labels exist, better to rely on id update
+                            if(label && label.htmlFor.match(oldIdRegex)) {
+                                label.htmlFor = label.htmlFor.replace(oldIdRegex, newIdPrefix);
+                            }
+                         }
+                    });
+                     // Update the display number span if needed (though usually done on input change)
+                    const dayNumberInput = item.querySelector('.day-number-input');
+                    const dayNumberDisplay = item.querySelector('.day-number-display');
+                     if(dayNumberInput && dayNumberDisplay){
+                        dayNumberDisplay.textContent = dayNumberInput.value;
+                     }
+                });
+            }
+
+            // Function to calculate the next suggested day number
+            function calculateNextDayNumber() {
+                const dayNumberInputs = itinerarySection.querySelectorAll('.day-number-input');
+                let maxDay = 0;
+                dayNumberInputs.forEach(input => {
+                    const dayVal = parseInt(input.value, 10);
+                    if (!isNaN(dayVal) && dayVal > maxDay) {
+                        maxDay = dayVal;
+                    }
+                });
+                return maxDay + 1;
+            }
+
+            // Function to show/hide the "No itinerary days" message
+            function toggleNoItineraryMessage() {
+                const hasItems = itinerarySection.querySelector('.itinerary-day-item') !== null;
+                 if (noItineraryMessage) {
+                    noItineraryMessage.classList.toggle('d-none', hasItems);
+                 }
+            }
+
+            // --- Itinerary Event Listeners (using Event Delegation) ---
+            itinerarySection.addEventListener('click', function(e) {
+                // Handle remove button clicks
+                const removeButton = e.target.closest('.remove-itinerary-day');
+                if (removeButton) {
+                    removeItineraryDay(removeButton);
+                }
+            });
+
+            itinerarySection.addEventListener('change', function(e) {
+                // Update day number display when input changes
+                if (e.target.classList.contains('day-number-input')) {
+                    const dayItem = e.target.closest('.itinerary-day-item');
+                    if (dayItem) {
+                        const display = dayItem.querySelector('.day-number-display');
+                        if (display) {
+                            display.textContent = e.target.value || '?'; // Show '?' if empty
+                        }
+                    }
+                }
+            });
+
+            // Listener for the "Add Day" button
+            addItineraryButton.addEventListener('click', addItineraryDay);
+
+
+            // --- Form Submission ---
+            form.addEventListener('submit', function(e) {
+                // Client-side check: Ensure at least one itinerary day exists
+                if (itinerarySection.querySelectorAll('.itinerary-day-item').length === 0) {
+                    e.preventDefault(); // Stop submission
+                    alert('Vui lòng thêm ít nhất một ngày cho lịch trình tour.');
+                    // Optionally, scroll to the itinerary section and highlight it
+                    itinerarySection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    itinerarySection.closest('.card').style.borderColor = 'red'; // Example highlight
+                    setTimeout(() => {
+                         itinerarySection.closest('.card').style.borderColor = ''; // Remove highlight
+                    }, 2000);
+                    return false;
+                }
+
+                // Ensure the file input is up-to-date before submitting
+                updateFileInput();
+
+                 // If using jQuery Validate, ensure the form is valid before allowing submission
+                 if (typeof $ !== 'undefined' && $(form).valid && !$(form).valid()) {
+                    e.preventDefault();
+                     console.warn("Form is invalid according to jQuery Validate.");
+                    // Focus on the first invalid element
+                    $(form).find('.input-validation-error').first().focus();
+                    return false;
+                 }
+
+                // Optional: Add a submitting state to the button
+                const submitButton = form.querySelector('button[type="submit"]');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Đang lưu...';
+                }
+            });
+
+            // --- Initial Setup ---
+            toggleNoItineraryMessage(); // Check if initial message should be shown
+            renderImagePreviews(); // Render any initial files (if applicable, e.g., in an Edit view scenario)
+
+        }); // End DOMContentLoaded
+    </script>
+}

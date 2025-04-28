@@ -1,45 +1,48 @@
-"use strict";
+﻿"use strict";
 
-// Custom Cursor  js
+// Custom Cursor js
 // custom cursor
 if (document.querySelectorAll(".custom-cursor").length) {
-  var cursor = document.querySelector(".custom-cursor__cursor");
-  var cursorinner = document.querySelector(".custom-cursor__cursor-two");
-  var hyperLinks = document.querySelectorAll("a");
+    var cursor = document.querySelector(".custom-cursor__cursor");
+    var cursorinner = document.querySelector(".custom-cursor__cursor-two");
+    var hyperLinks = document.querySelectorAll("a");
 
-  document.addEventListener("mousemove", function (e) {
-    var x = e.clientX;
-    var y = e.clientY;
-    cursor.style.transform = `translate3d(calc(${x}px - 50%), calc(${y}px - 50%), 0)`;
-  });
+    if (cursor && cursorinner) {
+        document.addEventListener("mousemove", function (e) {
+            var x = e.clientX;
+            var y = e.clientY;
+            cursor.style.transform = `translate3d(calc(<span class="math-inline">\{x\}px \- 50%\), calc\(</span>{y}px - 50%), 0)`;
+        });
 
-  document.addEventListener("mousemove", function (e) {
-    var x = e.clientX;
-    var y = e.clientY;
-    cursorinner.style.left = x + "px";
-    cursorinner.style.top = y + "px";
-  });
+        document.addEventListener("mousemove", function (e) {
+            var x = e.clientX;
+            var y = e.clientY;
+            cursorinner.style.left = x + "px";
+            cursorinner.style.top = y + "px";
+        });
 
-  document.addEventListener("mousedown", function () {
-    cursor.classList.add("click");
-    cursorinner.classList.add("custom-cursor__innerhover");
-  });
+        document.addEventListener("mousedown", function () {
+            cursor.classList.add("click");
+            cursorinner.classList.add("custom-cursor__innerhover");
+        });
 
-  document.addEventListener("mouseup", function () {
-    cursor.classList.remove("click");
-    cursorinner.classList.remove("custom-cursor__innerhover");
-  });
+        document.addEventListener("mouseup", function () {
+            cursor.classList.remove("click");
+            cursorinner.classList.remove("custom-cursor__innerhover");
+        });
 
-  hyperLinks.forEach((item) => {
-    item.addEventListener("mouseover", () => {
-      cursor.classList.add("custom-cursor__hover");
-    });
-    item.addEventListener("mouseleave", () => {
-      cursor.classList.remove("custom-cursor__hover");
-    });
-  });
+        hyperLinks.forEach((item) => {
+            item.addEventListener("mouseover", () => {
+                cursor.classList.add("custom-cursor__hover");
+            });
+            item.addEventListener("mouseleave", () => {
+                cursor.classList.remove("custom-cursor__hover");
+            });
+        });
+    } else {
+        console.error("Custom cursor elements not found!");
+    }
 }
-
 // preloader js
 function preloader() {
   $("#preloader").delay(800).fadeOut("slow");

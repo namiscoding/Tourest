@@ -4,6 +4,6 @@ namespace Tourest.Services
 {
     public interface INotificationService
     {
-        Task<string> SendingMessage(List<int> listUserID, NotificationViewModel notificationView);  // type == RelatedEntityID
+        Task<string> SendingMessage(int userId, NotificationViewModel notificationView);  // type == RelatedEntityID
     }
 }
