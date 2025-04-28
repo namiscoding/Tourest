@@ -2,7 +2,13 @@
 @using System.Globalization
 @model Tourest.ViewModels.Tour.TourDetailsViewModel
 @using System.Net
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+    @using Newtonsoft.Json
+    @using Tourest.ViewModels.Account;
 @{
+    var session = HttpContextAccessor.HttpContext.Session;
+    var accountJson = session.GetString("CurrentAccount");
+    var currentAccount = accountJson == null ? null : JsonConvert.DeserializeObject<UserViewModel>(accountJson);
     ViewData["Title"] = Model.Name;
     var firstImage = Model.ImageUrlList?.FirstOrDefault() ?? Url.Content("~/assets/images/placeholder-image.png");
 
@@ -362,431 +368,130 @@
                              <div class="widget__item pricing-widget p-3 border rounded shadow-sm"> @* Thêm padding, border,... *@
                                  <p class="fs-6"><strong>Giá người lớn:</strong> <span class="float-end">@Model.AdultPrice.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) VND</span></p>
                                  <p class="fs-6 mb-3"><strong>Giá trẻ em:</strong> <span class="float-end">@Model.ChildPrice.ToString("N0", CultureInfo.GetCultureInfo("vi-VN")) VND</span></p>
-                            @* --- Form Đặt Tour --- *@
-                                 <form asp-action="Create" asp-controller="Booking" method="post" class="pricing-form needs-validation" novalidate>
-                                     <input type="hidden" name="TourId" value="@Model.TourId"/>
-                                     <input type="hidden" id="adultPriceHidden" value="@Model.AdultPrice" />
-                                     <input type="hidden" id="childPriceHidden" value="@Model.ChildPrice" />
+                            
+                                @if (currentAccount != null)
+                                {
+                                    @* --- Form Đặt Tour --- *@
+                                    <form asp-action="Create" asp-controller="Booking" method="post" class="pricing-form needs-validation" novalidate>
+                                        <input type="hidden" name="TourId" value="@Model.TourId" />
+                                        <input type="hidden" id="adultPriceHidden" value="@Model.AdultPrice" />
+                                        <input type="hidden" id="childPriceHidden" value="@Model.ChildPrice" />
 
-                                     <div class="input-group-wrapper">
-                                    @* --- Phần Chọn Ngày --- *@
-                                         <div class="mb-3">
-                                             <label for="datePickerInput" class="form-label fw-bold">Chọn ngày tham quan:</label>
-                                             <div class="input-group input-group-sm mb-2">
-                                                 <input type="text" id="datePickerInput" class="form-control datepicker-trigger" placeholder="dd/mm/yyyy" readonly style="background-color: white; cursor: pointer;">
-                                                 <span class="input-group-text"><i class="fa-regular fa-calendar-alt"></i></span>
-                                             </div>
-                                        @* Input ẩn cho flatpickr nếu dùng altInput *@
-                                        @* <input type="text" id="flatpickrHiddenInput" style="display: none;" /> *@
-
-                                             <div class="quick-dates-wrapper position-relative mb-2">
-                                                <button type="button" class="btn btn-sm btn-light quick-scroll-btn prev" id="quickDatePrevBtn" aria-label="Previous dates" style="position: absolute; left: -10px; top: 50%; transform: translateY(-50%); z-index: 2; padding: 0.1rem 0.4rem;">&lt;</button>
-                                                <div id="quickDateButtons" class="d-flex overflow-hidden pb-1" style="scroll-behavior: smooth;">
-                                                     <span class="text-muted small p-2">Đang tải ngày...</span>
+                                        <div class="input-group-wrapper">
+                                            @* --- Phần Chọn Ngày --- *@
+                                            <div class="mb-3">
+                                                <label for="datePickerInput" class="form-label fw-bold">Chọn ngày tham quan:</label>
+                                                <div class="input-group input-group-sm mb-2">
+                                                    <input type="text" id="datePickerInput" class="form-control datepicker-trigger" placeholder="dd/mm/yyyy" readonly style="background-color: white; cursor: pointer;">
+                                                    <span class="input-group-text"><i class="fa-regular fa-calendar-alt"></i></span>
                                                 </div>
-                                                 <button type="button" class="btn btn-sm btn-light quick-scroll-btn next" id="quickDateNextBtn" aria-label="Next dates" style="position: absolute; right: -10px; top: 50%; transform: translateY(-50%); z-index: 2; padding: 0.1rem 0.4rem;">&gt;</button>
+                                                @* Input ẩn cho flatpickr nếu dùng altInput *@
+                                                @* <input type="text" id="flatpickrHiddenInput" style="display: none;" /> *@
+
+                                                <div class="quick-dates-wrapper position-relative mb-2">
+                                                    <button type="button" class="btn btn-sm btn-light quick-scroll-btn prev" id="quickDatePrevBtn" aria-label="Previous dates" style="position: absolute; left: -10px; top: 50%; transform: translateY(-50%); z-index: 2; padding: 0.1rem 0.4rem;">&lt;</button>
+                                                    <div id="quickDateButtons" class="d-flex overflow-hidden pb-1" style="scroll-behavior: smooth;">
+                                                        <span class="text-muted small p-2">Đang tải ngày...</span>
+                                                    </div>
+                                                    <button type="button" class="btn btn-sm btn-light quick-scroll-btn next" id="quickDateNextBtn" aria-label="Next dates" style="position: absolute; right: -10px; top: 50%; transform: translateY(-50%); z-index: 2; padding: 0.1rem 0.4rem;">&gt;</button>
+                                                </div>
+
+                                                <div id="selectedDateDisplay" class="alert alert-info py-1 px-2 small" role="alert" style="display: none;">
+                                                    Ngày tham quan đã chọn: <strong id="selectedDateText"></strong>
+                                                </div>
+
+                                                <input type="hidden" name="SelectedDate" id="selectedDateHidden" required />
+                                                <div class="invalid-feedback">Vui lòng chọn ngày tham quan.</div>
                                             </div>
-
-                                             <div id="selectedDateDisplay" class="alert alert-info py-1 px-2 small" role="alert" style="display: none;">
-                                                 Ngày tham quan đã chọn: <strong id="selectedDateText"></strong>
-                                             </div>
-
-                                             <input type="hidden" name="SelectedDate" id="selectedDateHidden" required/>
-                                             <div class="invalid-feedback">Vui lòng chọn ngày tham quan.</div>
-                                         </div>
-                                    @* --- Kết thúc Phần Chọn Ngày --- *@
-                                    @* --- Phần chọn điểm đón*@
-                                    @if (Model.DeparturePointsList != null && Model.DeparturePointsList.Any())
-                                    {
-                                        <div class="input-group mb-3">
+                                            @* --- Kết thúc Phần Chọn Ngày --- *@
+                                            @* --- Phần chọn điểm đón*@
                                             <label for="pickupPointSelect" class="form-label fw-bold">Chọn điểm đón:</label>
-                                            <select class="form-select form-select-sm" id="pickupPointSelect" name="SelectedPickupPoint" required>
-                                                @* Đặt name để gửi đi *@
-                                                <option value="" selected disabled>-- Vui lòng chọn --</option>
-                                                @foreach (var point in Model.DeparturePointsList)
-                                                {
-                                                    <option value="@point">@point</option>
-                                                }
-                                            </select>
-                                            <div class="invalid-feedback">Vui lòng chọn điểm đón.</div> @* Validation message *@
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        @* Tùy chọn: Hiển thị thông báo nếu không có điểm đón *@
-                                        @* <p><small class="text-muted">Không có thông tin điểm đón cụ thể cho tour này.</small></p> *@
-                                        @* Hoặc thêm input ẩn với giá trị mặc định nếu cần *@
-                                        @* <input type="hidden" name="SelectedPickupPoint" value="Default Location" /> *@
-                                    }
-                                    @* --- Kết thúc Phần chọn điểm đón*@
-                                    <div class="alert alert-danger alert-dismissible fade" role="alert" id="maxGroupAlert" style="display: none;">
+                                            @if (Model.DeparturePointsList != null && Model.DeparturePointsList.Any())
+                                            {
+                                                <div class="input-group mb-3">
+
+
+                                                    <select class="form-select form-select-sm" id="pickupPointSelect" name="SelectedPickupPoint" required>
+                                                        @* Đặt name để gửi đi *@
+                                                        <option value="" selected disabled>-- Vui lòng chọn --</option>
+                                                        @foreach (var point in Model.DeparturePointsList)
+                                                        {
+                                                            <option value="@point">@point</option>
+                                                        }
+                                                    </select>
+
+                                                    <div class="invalid-feedback">Vui lòng chọn điểm đón.</div>@* Validation message *@
+                                                </div>
+
+                                            }
+                                            else
+                                            {
+                                                @* Tùy chọn: Hiển thị thông báo nếu không có điểm đón *@
+                                                @* <p><small class="text-muted">Không có thông tin điểm đón cụ thể cho tour này.</small></p> *@
+                                                @* Hoặc thêm input ẩn với giá trị mặc định nếu cần *@
+                                                @* <input type="hidden" name="SelectedPickupPoint" value="Default Location" /> *@
+                                            }
+                                            @* --- Kết thúc Phần chọn điểm đón*@
+                                            <div class="alert alert-danger alert-dismissible fade" role="alert" id="maxGroupAlert" style="display: none;">
                                                 <h5 class="alert-heading">Thông báo</h5>
                                                 Đã đạt số lượng người tối đa cho tour này. Không thể tăng thêm.
                                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                             </div>
-                                    @* --- Bộ đếm Người lớn --- *@
-                                         <div class="input-group has-btn mb-3">
-                                             <label for="adults-input" class="form-label--extend">Người lớn <small class="text-muted">(từ tuổi)</small></label> @* Use MinAge *@
-                                             <div class="btn-group">
-                                                 <button class="btn btn-outline-secondary counter-btn" data-input="adults-input" data-action="decrement" type="button">
-                                                     <i class="fa-solid fa-minus"></i>
-                                                 </button>
-                                                 <input type="number" class="form-control text-center counter-input" id="adults-input" name="NumberOfAdults" value="1" min="1" readonly/>
-                                                 <button class="btn btn-outline-secondary counter-btn" data-input="adults-input" data-action="increment" type="button">
-                                                     <i class="fa-solid fa-plus"></i>
-                                                 </button>
-                                             </div>
-                                         </div>
+                                            @* --- Bộ đếm Người lớn --- *@
+                                            <div class="input-group has-btn mb-3">
+                                                <label for="adults-input" class="form-label--extend">Người lớn <small class="text-muted">(từ tuổi)</small></label> @* Use MinAge *@
+                                                <div class="btn-group">
+                                                    <button class="btn btn-outline-secondary counter-btn" data-input="adults-input" data-action="decrement" type="button">
+                                                        <i class="fa-solid fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" class="form-control text-center counter-input" id="adults-input" name="NumberOfAdults" value="1" min="1" readonly />
+                                                    <button class="btn btn-outline-secondary counter-btn" data-input="adults-input" data-action="increment" type="button">
+                                                        <i class="fa-solid fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
 
-                                    @* --- Bộ đếm Trẻ em --- *@
-                                          <div class="input-group has-btn mb-3">
-                                              <label for="children-input" class="form-label--extend">Trẻ em <small class="text-muted">(dưới  0) tuổi)</small></label> @* Use MinAge *@
-                                              <div class="btn-group">
-                                                  <button class="btn btn-outline-secondary counter-btn" data-input="children-input" data-action="decrement" type="button">
-                                                      <i class="fa-solid fa-minus"></i>
-                                                  </button>
-                                                  <input type="number" class="form-control text-center counter-input" id="children-input" name="NumberOfChildren" value="0" min="0" readonly/>
-                                                  <button class="btn btn-outline-secondary counter-btn" data-input="children-input" data-action="increment" type="button">
-                                                      <i class="fa-solid fa-plus"></i>
-                                                  </button>
-                                              </div>
-                                          </div>
+                                            @* --- Bộ đếm Trẻ em --- *@
+                                            <div class="input-group has-btn mb-3">
+                                                <label for="children-input" class="form-label--extend">Trẻ em <small class="text-muted">(dưới  0) tuổi)</small></label> @* Use MinAge *@
+                                                <div class="btn-group">
+                                                    <button class="btn btn-outline-secondary counter-btn" data-input="children-input" data-action="decrement" type="button">
+                                                        <i class="fa-solid fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" class="form-control text-center counter-input" id="children-input" name="NumberOfChildren" value="0" min="0" readonly />
+                                                    <button class="btn btn-outline-secondary counter-btn" data-input="children-input" data-action="increment" type="button">
+                                                        <i class="fa-solid fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
 
-                                    @* --- Tổng giá tiền --- *@
-                                         <div class="input-group pricing flex-row justify-content-between align-items-center mb-3 pt-2 border-top">
-                                             <label class="form-label--extend fw-bold">Tổng giá tiền</label>
-                                             <span class="total-price fw-bold fs-5 text-danger" id="totalPriceDisplay"></span>
-                                         </div>
-                                         
-                                    @* --- Nút Đặt Ngay --- *@
-                                         <button type="submit" class="common-btn color-two w-100" id="book-now-button">
-                                             Đặt ngay
-                                         </button>
-                                        
-                                    
-                                     </div>
-                                 </form>
-                                 
-                             </div>
+                                            @* --- Tổng giá tiền --- *@
+                                            <div class="input-group pricing flex-row justify-content-between align-items-center mb-3 pt-2 border-top">
+                                                <label class="form-label--extend fw-bold">Tổng giá tiền</label>
+                                                <span class="total-price fw-bold fs-5 text-danger" id="totalPriceDisplay"></span>
+                                            </div>
+
+                                            @* --- Nút Đặt Ngay --- *@
+                                            <button type="submit" class="common-btn color-two w-100" id="book-now-button">
+                                                Đặt ngay
+                                            </button>
+                                        </div>
+                                    </form>
+                                }
+                                else
+                                {
+
+
+                                }
+
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
         <!-- Tour-Details__section end  -->
-        <!-- featured-tours__section start  -->
-        <section class="featured-tours__section position-relative bg-white section-padding-top-bottom">
-            <figure class="featured-tours__shap-icon-1">
-                <img src="./assets/images/featured-tours-section/icon-wave-1.png"
-                     alt="icon" />
-            </figure>
-            <figure class="featured-tours__shap-icon-2">
-                <img src="./assets/images/featured-tours-section/icon-wave-2.png"
-                     alt="icon" />
-            </figure>
-            <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="section__header">
-                            <h2 class="section__title char-animation mt-0">
-                                You may also like...
-                            </h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="row section-mini-padding-top">
-                    <div class="col-12">
-                        <div class="swiper featured-tours__slider">
-                            <div class="swiper-wrapper">
-                                <div class="swiper-slide">
-                                    <div class="featured-tours__slide">
-                                        <figure class="slide-thumb">
-                                            <a href="#0" class="favorite">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </a>
-                                            <img src="./assets/images/featured-tours-section/tour-1.png"
-                                                 alt="tour" />
-                                        </figure>
-                                        <div class="slide-content">
-                                            <p class="tour-location">Budapest, Hungary</p>
-                                            <h6 class="tour-title">
-                                                <a href="tour-details.html" class="line-clamp-2">Wonders of the West Coast & Kimberley</a>
-                                            </h6>
-                                            <div class="featured-tours__meta">
-                                                <div class="revew">
-                                                    <span class="total-ratings bg-orange-red text-white">
-                                                        <i class="fa-solid fa-star"></i>
-                                                        4.8
-                                                    </span>
-                                                    <span class="total-review">15 reviews</span>
-                                                </div>
-                                                <div class="duration">
-                                                    <i class="fa-regular fa-clock"></i>
-                                                    7 days
-                                                </div>
-                                            </div>
-                                            <div class="pricing">
-                                                <p>Starting From</p>
-                                                <span class="price">$520</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="featured-tours__slide">
-                                        <figure class="slide-thumb">
-                                            <a href="#0" class="favorite">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </a>
-                                            <img src="./assets/images/featured-tours-section/tour-2.png"
-                                                 alt="tour" />
-                                        </figure>
-                                        <div class="slide-content">
-                                            <p class="tour-location">Greater London, UK</p>
-                                            <h6 class="tour-title">
-                                                <a href="tour-details.html" class="line-clamp-2">Windsor Castle, and Bath from London</a>
-                                            </h6>
-                                            <div class="featured-tours__meta">
-                                                <div class="revew">
-                                                    <span class="total-ratings bg-orange-red text-white">
-                                                        <i class="fa-solid fa-star"></i>
-                                                        4.8
-                                                    </span>
-                                                    <span class="total-review">15 reviews</span>
-                                                </div>
-                                                <div class="duration">
-                                                    <i class="fa-regular fa-clock"></i>
-                                                    7 days
-                                                </div>
-                                            </div>
-                                            <div class="pricing">
-                                                <p>Starting From</p>
-                                                <span class="price">$350</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="featured-tours__slide">
-                                        <figure class="slide-thumb">
-                                            <a href="#0" class="favorite">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </a>
-                                            <img src="./assets/images/featured-tours-section/tour-3.png"
-                                                 alt="tour" />
-                                        </figure>
-                                        <div class="slide-content">
-                                            <p class="tour-location">Australia</p>
-                                            <h6 class="tour-title">
-                                                <a href="tour-details.html" class="line-clamp-2">
-                                                    Enchanting Great Barrier Reef, Aquatic
-                                                    Wonderland
-                                                </a>
-                                            </h6>
-                                            <div class="featured-tours__meta">
-                                                <div class="revew">
-                                                    <span class="total-ratings bg-orange-red text-white">
-                                                        <i class="fa-solid fa-star"></i>
-                                                        4.8
-                                                    </span>
-                                                    <span class="total-review">15 reviews</span>
-                                                </div>
-                                                <div class="duration">
-                                                    <i class="fa-regular fa-clock"></i>
-                                                    7 days
-                                                </div>
-                                            </div>
-                                            <div class="pricing">
-                                                <p>Starting From</p>
-                                                <span class="price">$450</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="featured-tours__slide">
-                                        <figure class="slide-thumb">
-                                            <a href="#0" class="favorite">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </a>
-                                            <img src="./assets/images/featured-tours-section/tour-4.png"
-                                                 alt="tour" />
-                                        </figure>
-                                        <div class="slide-content">
-                                            <p class="tour-location">Oman</p>
-                                            <h6 class="tour-title">
-                                                <a href="tour-details.html" class="line-clamp-2">Ancient Heritage and Desert Adventures</a>
-                                            </h6>
-                                            <div class="featured-tours__meta">
-                                                <div class="revew">
-                                                    <span class="total-ratings bg-orange-red text-white">
-                                                        <i class="fa-solid fa-star"></i>
-                                                        4.8
-                                                    </span>
-                                                    <span class="total-review">15 reviews</span>
-                                                </div>
-                                                <div class="duration">
-                                                    <i class="fa-regular fa-clock"></i>
-                                                    7 days
-                                                </div>
-                                            </div>
-                                            <div class="pricing">
-                                                <p>Starting From</p>
-                                                <span class="price">$599</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="featured-tours__slide">
-                                        <figure class="slide-thumb">
-                                            <a href="#0" class="favorite">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </a>
-                                            <img src="./assets/images/featured-tours-section/tour-1.png"
-                                                 alt="tour" />
-                                        </figure>
-                                        <div class="slide-content">
-                                            <p class="tour-location">Budapest, Hungary</p>
-                                            <h6 class="tour-title">
-                                                <a href="tour-details.html" class="line-clamp-2">Wonders of the West Coast & Kimberley</a>
-                                            </h6>
-                                            <div class="featured-tours__meta">
-                                                <div class="revew">
-                                                    <span class="total-ratings bg-orange-red text-white">
-                                                        <i class="fa-solid fa-star"></i>
-                                                        4.8
-                                                    </span>
-                                                    <span class="total-review">15 reviews</span>
-                                                </div>
-                                                <div class="duration">
-                                                    <i class="fa-regular fa-clock"></i>
-                                                    7 days
-                                                </div>
-                                            </div>
-                                            <div class="pricing">
-                                                <p>Starting From</p>
-                                                <span class="price">$520</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="featured-tours__slide">
-                                        <figure class="slide-thumb">
-                                            <a href="#0" class="favorite">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </a>
-                                            <img src="./assets/images/featured-tours-section/tour-2.png"
-                                                 alt="tour" />
-                                        </figure>
-                                        <div class="slide-content">
-                                            <p class="tour-location">Greater London, UK</p>
-                                            <h6 class="tour-title">
-                                                <a href="tour-details.html" class="line-clamp-2">Windsor Castle, and Bath from London</a>
-                                            </h6>
-                                            <div class="featured-tours__meta">
-                                                <div class="revew">
-                                                    <span class="total-ratings bg-orange-red text-white">
-                                                        <i class="fa-solid fa-star"></i>
-                                                        4.8
-                                                    </span>
-                                                    <span class="total-review">15 reviews</span>
-                                                </div>
-                                                <div class="duration">
-                                                    <i class="fa-regular fa-clock"></i>
-                                                    7 days
-                                                </div>
-                                            </div>
-                                            <div class="pricing">
-                                                <p>Starting From</p>
-                                                <span class="price">$350</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="featured-tours__slide">
-                                        <figure class="slide-thumb">
-                                            <a href="#0" class="favorite">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </a>
-                                            <img src="./assets/images/featured-tours-section/tour-3.png"
-                                                 alt="tour" />
-                                        </figure>
-                                        <div class="slide-content">
-                                            <p class="tour-location">Australia</p>
-                                            <h6 class="tour-title">
-                                                <a href="tour-details.html" class="line-clamp-2">
-                                                    Enchanting Great Barrier Reef, Aquatic
-                                                    Wonderland
-                                                </a>
-                                            </h6>
-                                            <div class="featured-tours__meta">
-                                                <div class="revew">
-                                                    <span class="total-ratings bg-orange-red text-white">
-                                                        <i class="fa-solid fa-star"></i>
-                                                        4.8
-                                                    </span>
-                                                    <span class="total-review">15 reviews</span>
-                                                </div>
-                                                <div class="duration">
-                                                    <i class="fa-regular fa-clock"></i>
-                                                    7 days
-                                                </div>
-                                            </div>
-                                            <div class="pricing">
-                                                <p>Starting From</p>
-                                                <span class="price">$450</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="featured-tours__slide">
-                                        <figure class="slide-thumb">
-                                            <a href="#0" class="favorite">
-                                                <i class="fa-regular fa-heart"></i>
-                                            </a>
-                                            <img src="./assets/images/featured-tours-section/tour-4.png"
-                                                 alt="tour" />
-                                        </figure>
-                                        <div class="slide-content">
-                                            <p class="tour-location">Oman</p>
-                                            <h6 class="tour-title">
-                                                <a href="tour-details.html" class="line-clamp-2">Ancient Heritage and Desert Adventures</a>
-                                            </h6>
-                                            <div class="featured-tours__meta">
-                                                <div class="revew">
-                                                    <span class="total-ratings bg-orange-red text-white">
-                                                        <i class="fa-solid fa-star"></i>
-                                                        4.8
-                                                    </span>
-                                                    <span class="total-review">15 reviews</span>
-                                                </div>
-                                                <div class="duration">
-                                                    <i class="fa-regular fa-clock"></i>
-                                                    7 days
-                                                </div>
-                                            </div>
-                                            <div class="pricing">
-                                                <p>Starting From</p>
-                                                <span class="price">$599</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Pagination -->
-                            <div class="featured-tours__pagination pagination-orange-red section-mini-margin-top"></div>
-                            <!-- Navigation -->
-                            <div class="featured-tours__button-next"></div>
-                            <div class="featured-tours__button-prev"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        
 
     </main>
 </body>

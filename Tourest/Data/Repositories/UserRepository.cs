@@ -293,6 +293,21 @@ namespace Tourest.Data.Repositories
             }
         }
 
-        
+
+        public async Task UpdateTourGuideRatingAsync(int tourGuideId, decimal newAverageRating)
+        {
+            var tourGuideUser = await _context.Users
+                                          .Include(u => u.TourGuide) // Cần Include TourGuide để cập nhật
+                                          .FirstOrDefaultAsync(u => u.UserID == tourGuideId && u.TourGuide != null);
+
+            if (tourGuideUser?.TourGuide != null)
+            {
+                tourGuideUser.TourGuide.AverageRating = newAverageRating;
+                // Không cần gọi Update vì context đang theo dõi
+                // SaveChanges sẽ được gọi ở Service trong transaction
+            }
+            // Có thể log warning nếu không tìm thấy TourGuide
+        }
+
     }
 }

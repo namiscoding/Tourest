@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Tourest.Data;
 using Tourest.TourGuide.Services;
 
@@ -17,6 +18,7 @@ public class TourGuideController : Controller
     [HttpGet("Index")]
     public async Task<IActionResult> Index(int tourGuideId)
     {
+        await UpdateExpiredAssignmentsAsync();
         var assignments = await _assignmentService.GetTourAssignmentsAsync(3);
         return View(assignments);
     }
@@ -115,32 +117,47 @@ public class TourGuideController : Controller
         return Json(feedback);
     }
     [HttpGet("GetAssignmentDetails")]
-    public async Task<IActionResult> GetAssignmentDetails(int assignmentId, int tourGuideId)
+    public async Task<IActionResult> GetAssignmentDetails(int assignmentId)
     {
-        if (assignmentId <= 0 || tourGuideId <= 0)
-        {
-            return BadRequest("Invalid assignment ID or tour guide ID.");
-        }
+        if (assignmentId <= 0)
+            return BadRequest("Invalid assignment ID.");
 
         try
         {
+            
+            int tourGuideId = 3;
             var assignments = await _assignmentService.GetTourAssignmentsAsync(tourGuideId);
             var assignment = assignments.FirstOrDefault(a => a.AssignmentId == assignmentId);
 
             if (assignment == null)
-            {
-                return NotFound($"Assignment with ID {assignmentId} not found for tour guide ID {tourGuideId}.");
-            }
+                return NotFound(new { message = $"Assignment {assignmentId} not found." });
 
-            return PartialView("_AssignmentDetails", assignment);
+            // Trả về JSON của viewmodel
+            return Json(assignment);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching assignment details for ID {assignmentId}: {ex.Message}");
-            return StatusCode(500, "An error occurred while fetching assignment details. Please try again later.");
+            Console.WriteLine($"Error fetching assignment details for ID {assignmentId}: {ex}");
+            return StatusCode(500, new { message = "An error occurred. Please try again later." });
         }
     }
+    public async Task UpdateExpiredAssignmentsAsync()
+    {
+        var now = DateTime.UtcNow;
+        var expiredAssignments = await _context.TourGuideAssignments
+            .Where(a => a.Status == "Pending" && now > a.AssignmentDate.AddHours(12))
+            .ToListAsync();
 
+        foreach (var assignment in expiredAssignments)
+        {
+            assignment.Status = "Expired";
+        }
+
+        if (expiredAssignments.Any())
+        {
+            await _context.SaveChangesAsync();
+        }
+    }
 
 }
 

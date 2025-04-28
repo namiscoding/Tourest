@@ -24,7 +24,7 @@ namespace Tourest.ViewModels.Account
         public virtual ICollection<Tourest.Data.Entities.SupportRequest> HandledSupportRequests { get; set; } = new List<Tourest.Data.Entities.SupportRequest>();
         public virtual ICollection<TourGuideAssignment> TourGuideAssignments { get; set; } = new List<TourGuideAssignment>(); // As Guide
         public virtual ICollection<TourGuideAssignment> TourManagerAssignments { get; set; } = new List<TourGuideAssignment>(); // As Manager
-        public virtual ICollection<TourGuideRating> TourGuideRatingsReceived { get; set; } = new List<TourGuideRating>();
+        public virtual ICollection<Tourest.Data.Entities.TourGuideRating> TourGuideRatingsReceived { get; set; } = new List<Tourest.Data.Entities.TourGuideRating>();
         public virtual ICollection<TourAuditLog> TourAuditLogsPerformed { get; set; } = new List<TourAuditLog>();
         public virtual ICollection<Notification> NotificationsReceived { get; set; } = new List<Notification>();
         public virtual ICollection<Notification> NotificationsSent { get; set; } = new List<Notification>();

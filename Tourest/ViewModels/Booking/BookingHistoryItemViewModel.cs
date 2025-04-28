@@ -1,4 +1,6 @@
-﻿namespace Tourest.ViewModels.Booking
+﻿using Tourest.Data.Entities;
+
+namespace Tourest.ViewModels.Booking
 {
     public class BookingHistoryItemViewModel
     {
@@ -14,8 +16,12 @@
         public string Status { get; set; } = string.Empty;
         public DateTime? CancellationDate { get; set; }
         public int? RefundAmount { get; set; }
+        public TourGroup? TourGroup { get; set; } // Thêm TourGroup để lấy thông tin tour group nếu cần
 
         // Thêm TourId để tạo link đến chi tiết tour nếu muốn
         public int TourId { get; set; }
+
+        public bool HasRatedTour { get; set; } = false; 
+        public bool HasRatedTourGuide { get; set; } = false;
     }
 }

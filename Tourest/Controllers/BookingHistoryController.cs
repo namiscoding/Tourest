@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Tourest.Data.Entities;
 using Tourest.Services;
@@ -14,14 +15,16 @@ namespace Tourest.Controllers
         {
             _bookingService = bookingService;
         }
-
+        [Authorize(Roles = "Customer")]
         // GET: /BookingHistory hoặc /BookingHistory?destinationFilter=SomePlace
         public async Task<IActionResult> Index(string? destinationFilter)
         {
-            // --- Lấy ID của người dùng đang đăng nhập ---
-            // Cách phổ biến là dùng ClaimsPrincipal. Cần đảm bảo bạn lưu UserID claim khi đăng nhập.
-            //var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userIdString = 4;
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int customerId))
+            {
+                return Challenge();
+            }
+            
             //if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int customerId))
             //{
             //    // Xử lý trường hợp không lấy được UserID (chưa đăng nhập hoặc cấu hình claim sai)
@@ -32,8 +35,6 @@ namespace Tourest.Controllers
             //}
             // --- Kết thúc lấy User ID ---
 
-            var customerId = 4;
-            // Gọi service để lấy dữ liệu lịch sử booking
             var viewModel = await _bookingService.GetBookingHistoryAsync(customerId, destinationFilter);
 
             return View(viewModel); // Trả về View Index với ViewModel

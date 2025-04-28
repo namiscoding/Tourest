@@ -384,9 +384,10 @@ public class PaymentController : Controller
                 if (booking.Status != "Paid")
                 { 
                     request.htmlbody = MailUtil.CreateBooking(booking);
-                    _emailSerivce.SendEmail("namlin118@gmail.com", "TOUREST: Xác nhận đặt tour thành công", request.htmlbody);
+                    _emailSerivce.SendEmail("trangtran.170204@gmail.com", "TOUREST: Xác nhận đặt tour thành công", request.htmlbody);
                    
                     booking.Status = "Paid";
+                    booking.TourGroupID = tourGroup.TourGroupID;
                     var paymentTime = callbackData.ResponseTimeConvertedUtc ?? DateTime.UtcNow; // Lấy thời gian chuẩn
 
                     // Tạo hoặc cập nhật Payment record

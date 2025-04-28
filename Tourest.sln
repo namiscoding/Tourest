@@ -5,9 +5,9 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tourest", "Tourest\Tourest.csproj", "{5C946428-774A-46FC-8A00-91897151F3DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TourestTests", "TourestTests\TourestTests.csproj", "{8D64C877-694F-4817-A747-31D1B331FAFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TourestTests", "TourestTests\TourestTests.csproj", "{8D64C877-694F-4817-A747-31D1B331FAFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{9D91E15A-C4E6-45A5-B604-447CA747C7C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{9D91E15A-C4E6-45A5-B604-447CA747C7C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

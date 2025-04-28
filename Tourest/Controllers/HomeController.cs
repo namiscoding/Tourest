@@ -29,7 +29,7 @@ namespace Tourest.Controllers
             int reviewCount = await _ratingService.GetTotalTourRatingCountAsync();
             var categoryStats = await _categoryService.GetCategoryStatisticsAsync(); // Trả về List<CategoryStatViewModel>
             var availableCategories = await _categoryService.GetAllCategoriesForDisplayAsync(); // Trả về List<CategoryViewModel>
-            var featuredTours = await _tourService.GetFeaturedToursForDisplayAsync(6); // Ví dụ lấy 6 tour
+            var featuredTours = await _tourService.GetFeaturedToursForDisplayAsync(10); // Ví dụ lấy 6 tour
 
             var viewModel = new HomeViewModel
             {
@@ -43,6 +43,10 @@ namespace Tourest.Controllers
             };
 
             return View(viewModel);
+        }
+        public async Task<IActionResult> Privacy()
+        {
+            return View();
         }
     }
 }
