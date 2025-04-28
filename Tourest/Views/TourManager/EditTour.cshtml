@@ -4,54 +4,86 @@
     ViewData["Title"] = "Edit Tour";
 }
 
-<style>
-    .container-centered {
-        max-width: 800px;
-        margin: 2rem auto;
-        background-color: #fff;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-
-    h2 {
-        text-align: center;
-        color: #333;
-        margin-bottom: 1.5rem;
-    }
-
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-    label {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #555;
-    }
-
-    input, textarea {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        font-size: 1rem;
-    }
-
-        input[type="submit"] {
-            width: auto;
-            padding: 0.6rem 1.2rem;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
+@section Style {
+    <style>
+        .container-centered {
+            max-width: 800px;
+            margin: 2rem auto;
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-            input[type="submit"]:hover {
-                background-color: #0056b3;
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+
+        .btn-custom {
+            display: inline-block;
+            padding: 0.75rem 2rem; /* Tăng chiều rộng nút */
+            font-size: 1.1rem; /* Tăng kích thước chữ */
+            font-weight: 500;
+            border-radius: 8px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+            .btn-custom.save {
+                background-color: #007bff;
+                color: white;
             }
-</style>
+
+                .btn-custom.save:hover {
+                    background-color: #0056b3;
+                    transform: translateY(-2px);
+                }
+
+            .btn-custom.cancel {
+                background-color: #6c757d; /* Màu xám cho nút View Tour List */
+                color: white;
+            }
+
+                .btn-custom.cancel:hover {
+                    background-color: #5a6268;
+                    transform: translateY(-2px);
+                }
+
+        .actions {
+            margin-top: 2rem; /* Tăng khoảng cách phía trên */
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem; /* Tăng khoảng cách giữa các nút */
+        }
+    </style>
+}
 
 <div class="container-centered">
     <h2>Edit Tour: @Model.Name</h2>
@@ -154,9 +186,9 @@
             <input asp-for="IsCancellable" type="checkbox" class="form-check-input" />
         </div>
 
-        <input type="submit" value="Save Changes" class="btn btn-primary" />
+        <div class="actions">
+            <input type="submit" value="Save Changes" class="btn-custom save" />
+            <a asp-controller="TourManager" asp-action="ListTour" class="btn-custom cancel">📋 View Tour List</a>
+        </div>
     </form>
-    <div class="actions">
-        <a asp-controller="TourManager" asp-action="ListTour">📋 View Tour List</a>
-    </div>
 </div>

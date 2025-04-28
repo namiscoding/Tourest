@@ -66,8 +66,13 @@
             margin-bottom: 1.5rem;
             color: #343a40;
         }
-    </style>
 
+        .actions {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
 }
 
 <h2>Tour Guide Detail</h2>
@@ -117,7 +122,7 @@
             </td>
         </tr>
     </table>
-    <div class="actions" style="margin-top: 1.5rem;">
+    <div class="actions">
         <a asp-controller="TourManager" asp-action="TourGuide" class="btn-custom">← View Tour Guides List</a>
     </div>
 </div>
