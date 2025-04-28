@@ -176,5 +176,130 @@ namespace Tourest.Data.Repositories
                              .Distinct()
                              .CountAsync();
         }
+
+        public async Task<Tour> AddTourAsync(Tour tour)
+        {
+            await _context.Tours.AddAsync(tour);
+            await _context.SaveChangesAsync(); // Lưu để lấy TourID
+            return tour;
+        }
+
+        public async Task DeleteTourAsync(int tourId)
+        {
+            var tour = await _context.Tours
+                                     .Include(t => t.ItineraryDays) // Include để xóa kèm
+                                     .Include(t => t.TourCategories) // Include để xóa kèm
+                                     .FirstOrDefaultAsync(t => t.TourID == tourId);
+            if (tour != null)
+            {
+                // EF Core thường tự xóa các entity phụ thuộc nếu được cấu hình Cascade
+                // Hoặc bạn có thể xóa thủ công ở đây nếu không dùng cascade
+                // _context.ItineraryDays.RemoveRange(tour.ItineraryDays);
+                // _context.TourCategories.RemoveRange(tour.TourCategories);
+                _context.Tours.Remove(tour);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<IEnumerable<Category>> GetAllCategoriesAsync() // Cần method này
+        {
+            return await _context.Categories.OrderBy(c => c.Name).AsNoTracking().ToListAsync();
+        }
+
+
+        public async Task<Tour?> GetTourByIdAsync(int tourId)
+        {
+            return await _context.Tours.FindAsync(tourId);
+        }
+
+        public async Task<Tour?> GetTourDetailsByIdAsync(int tourId)
+        {
+            return await _context.Tours
+                                 .Include(t => t.TourCategories).ThenInclude(tc => tc.Category)
+                                 .Include(t => t.ItineraryDays.OrderBy(i => i.DayNumber).ThenBy(i => i.Order)) // Sắp xếp lịch trình
+                                 .AsNoTracking()
+                                 .FirstOrDefaultAsync(t => t.TourID == tourId);
+        }
+
+        public async Task<Tour?> GetTourForEditByIdAsync(int tourId)
+        {
+            return await _context.Tours
+                                .Include(t => t.TourCategories) // Chỉ cần ID category liên quan
+                                .Include(t => t.ItineraryDays.OrderBy(i => i.DayNumber).ThenBy(i => i.Order))
+                                .FirstOrDefaultAsync(t => t.TourID == tourId);
+        }
+
+        public async Task<(IEnumerable<Tour> Tours, int TotalCount)> GetToursPagedAsync(int pageIndex, int pageSize, string? searchTerm, string? statusFilter)
+        {
+            var query = _context.Tours.AsQueryable();
+
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                query = query.Where(t => t.Status == statusFilter);
+            }
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.Trim().ToLower();
+                query = query.Where(t => (t.Name != null && t.Name.ToLower().Contains(searchTerm)) ||
+                                         (t.Destination != null && t.Destination.ToLower().Contains(searchTerm)));
+            }
+
+            var totalCount = await query.CountAsync();
+            var tours = await query.OrderByDescending(t => t.TourID) // Sắp xếp mới nhất trước
+                                   .Skip((pageIndex - 1) * pageSize)
+                                   .Take(pageSize)
+                                   .AsNoTracking()
+                                   .ToListAsync();
+            return (tours, totalCount);
+        }
+
+        public async Task<bool> IsTourInUseAsync(int tourId)
+        {
+            // Kiểm tra xem có Booking hoặc TourGroup nào liên kết không
+            bool hasBookings = await _context.Bookings.AnyAsync(b => b.TourID == tourId);
+            if (hasBookings) return true;
+
+            bool hasGroups = await _context.TourGroups.AnyAsync(tg => tg.TourID == tourId);
+            return hasGroups;
+        }
+
+        public async Task UpdateItineraryAsync(int tourId, List<ItineraryDay> currentItinerary)
+        {
+            // Xóa itinerary cũ
+            var oldItinerary = await _context.ItineraryDays.Where(i => i.TourID == tourId).ToListAsync();
+            if (oldItinerary.Any())
+            {
+                _context.ItineraryDays.RemoveRange(oldItinerary);
+            }
+
+            // Thêm itinerary mới (đã được gán TourID ở Service)
+            if (currentItinerary.Any())
+            {
+                await _context.ItineraryDays.AddRangeAsync(currentItinerary);
+            }
+            // SaveChanges sẽ được gọi bên ngoài trong transaction của Service
+        }
+
+        public async Task UpdateTourAsync(Tour tour)
+        {
+            _context.Entry(tour).State = EntityState.Modified;
+            // SaveChanges sẽ được gọi bên ngoài trong transaction của Service
+            await Task.CompletedTask; // Chỉ để hàm là async, không cần làm gì thêm ở đây
+        }
+
+        public async Task UpdateTourCategoriesAsync(int tourId, List<int> selectedCategoryIds)
+        {
+            var existingLinks = await _context.TourCategories.Where(tc => tc.TourID == tourId).ToListAsync();
+            _context.TourCategories.RemoveRange(existingLinks); // Xóa hết link cũ
+
+            if (selectedCategoryIds != null && selectedCategoryIds.Any())
+            {
+                var newLinks = selectedCategoryIds.Select(catId => new TourCategory { TourID = tourId, CategoryID = catId });
+                await _context.TourCategories.AddRangeAsync(newLinks); // Thêm link mới
+            }
+            // SaveChanges sẽ được gọi bên ngoài trong transaction của Service
+        }
     }
 }
+

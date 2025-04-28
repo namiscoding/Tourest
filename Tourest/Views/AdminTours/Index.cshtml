@@ -1,0 +1,320 @@
+﻿@* File: /Views/AdminTours/Index.cshtml *@
+@model PaginatedList<AdminTourListViewModel>
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Quản lý Tours";
+    var cloudName = Configuration["CloudinarySettings:CloudName"];
+    var defaultTourImage = "assets/images/tour-image.png"; // Ảnh mặc định cho tour
+    string currentFilter = ViewData["CurrentFilter"] as string ?? "";
+    string? currentStatus = ViewData["CurrentStatus"] as string;
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h2 class="text-primary">
+            <i class="fas fa-map me-2"></i>@ViewData["Title"]
+        </h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Tạo Tour Mới
+        </a>
+    </div>
+
+    @* Form Filter/Search - Enhanced styling *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label for="searchTerm" class="form-label">
+                        <i class="fas fa-search me-1"></i>Tìm kiếm (Tên, Điểm đến)
+                    </label>
+                    <input type="text" name="searchTerm" id="searchTerm" class="form-control"
+                           placeholder="Nhập từ khóa..." value="@currentFilter">
+                </div>
+                <div class="col-md-4">
+                    <label for="statusFilter" class="form-label">
+                        <i class="fas fa-filter me-1"></i>Trạng thái
+                    </label>
+                    <select name="statusFilter" id="statusFilter" class="form-select"
+                            asp-items="@(new SelectList(ViewData["Statuses"] as List<string> ?? new List<string>()))">
+                        <option value="">-- Tất cả --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        <i class="fas fa-search me-1"></i> Lọc
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-redo me-1"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* TempData Messages with improved styling *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Script để chọn lại status cũ *@
+    @if (!string.IsNullOrEmpty(currentStatus))
+    {
+        <script>document.getElementById('statusFilter').value = '@currentStatus';</script>
+    }
+
+    @* Hiển thị dạng Card *@
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        @if (!Model.Any())
+        {
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>Không tìm thấy tour nào phù hợp.
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-200 tour-card shadow-hover position-relative">
+                        @* Tour Card with hover effect *@
+                        <div class="card-img-overlay-top">
+                            <div class="dropdown position-absolute top-0 end-0 m-2" style="z-index: 20;">
+                                <button class="btn btn-sm btn-light bg-white rounded-circle p-1 shadow-sm action-button"
+                                        type="button" id="dropdownMenuButton-@item.TourId"
+                                        data-bs-toggle="dropdown" aria-expanded="false" title="Hành động">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuButton-@item.TourId">
+                                    <li>
+                                        <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.TourId">
+                                            <i class="fas fa-edit me-2 fa-fw text-primary"></i>Sửa
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.TourId">
+                                            <i class="fas fa-trash-alt me-2 fa-fw"></i>Xóa
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            @* Status Badge - Positioned at top-left *@
+                            <div class="position-absolute top-0 start-0 m-2" style="z-index: 10;">
+                                @if (item.Status == "Active")
+                                {
+                                    <span class="badge bg-success shadow-sm">
+                                        <i class="fas fa-check-circle me-1"></i>Hoạt động
+                                    </span>
+                                }
+                                else if (item.Status == "Inactive")
+                                {
+                                    <span class="badge bg-secondary shadow-sm">
+                                        <i class="fas fa-pause-circle me-1"></i>Không hoạt động
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark shadow-sm">
+                                        <i class="fas fa-edit me-1"></i>Bản nháp
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        @* Full card is clickable with overlay link *@
+                        <a asp-action="Details" asp-route-id="@item.TourId" class="card-link-overlay"></a>
+
+                        @* Tour Image *@
+                        <div class="tour-image-container">
+                            <img src="assets/images/tour-image.png"
+                                 class="card-img-top" alt="@item.Name">
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-truncate">@item.Name</h5>
+
+                            <p class="card-text mb-1 text-muted">
+                                <i class="fas fa-map-marker-alt me-1 text-danger"></i> @item.Destination
+                            </p>
+
+                            <p class="card-text mb-2">
+                                <i class="fas fa-clock me-1 text-primary"></i> @item.DurationDays ngày
+                            </p>
+
+                            <div class="mt-auto pt-2 d-flex justify-content-between align-items-center">
+                                <span class="card-price">@item.AdultPrice.ToString("N0") đ</span>
+                                <span class="card-view-details">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    @* Phân trang - Enhanced styling *@
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    }
+
+    @if (Model.Any() && Model.TotalPages > 1)
+    {
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @prevDisabled">
+                    <a asp-action="Index"
+                       asp-route-pageIndex="@(Model.PageIndex - 1)"
+                       asp-route-searchTerm="@currentFilter"
+                       asp-route-statusFilter="@currentStatus"
+                       class="page-link">
+                        <i class="fas fa-chevron-left me-1"></i>Trước
+                    </a>
+                </li>
+                @{
+                    int startPage = Math.Max(1, Model.PageIndex - 2);
+                    int endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
+                    if (startPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-pageIndex="1"
+                               asp-route-searchTerm="@currentFilter" asp-route-statusFilter="@currentStatus">1</a>
+                        </li>
+                        if (startPage > 2)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                    }
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-pageIndex="@i"
+                               asp-route-searchTerm="@currentFilter" asp-route-statusFilter="@currentStatus">@i</a>
+                        </li>
+                    }
+                    if (endPage < Model.TotalPages)
+                    {
+                        if (endPage < Model.TotalPages - 1)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        }
+                        <li class="page-item">
+                            <a class="page-link" asp-action="Index" asp-route-pageIndex="@Model.TotalPages"
+                               asp-route-searchTerm="@currentFilter" asp-route-statusFilter="@currentStatus">@Model.TotalPages</a>
+                        </li>
+                    }
+                }
+                <li class="page-item @nextDisabled">
+                    <a asp-action="Index"
+                       asp-route-pageIndex="@(Model.PageIndex + 1)"
+                       asp-route-searchTerm="@currentFilter"
+                       asp-route-statusFilter="@currentStatus"
+                       class="page-link">
+                        Sau<i class="fas fa-chevron-right ms-1"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+@* CSS styles for enhanced tour cards with hover effects *@
+<style>
+    /* Card hover styles */
+    .tour-card {
+        transition: all 0.3s ease;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,.125);
+    }
+
+    .shadow-hover {
+        transition: all 0.3s ease;
+    }
+
+        .shadow-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+            border-color: rgba(0,123,255,0.5);
+        }
+
+    /* Card image container */
+    .tour-image-container {
+        height: 250px;
+        overflow: hidden;
+    }
+
+        .tour-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+    .tour-card:hover .tour-image-container img {
+        transform: scale(1.1);
+    }
+
+    /* Make the entire card clickable */
+    .card-link-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
+    }
+
+    /* Ensure the dropdown menu actions are above the overlay */
+    .action-button {
+        z-index: 20;
+        transition: all 0.2s ease;
+    }
+
+        .action-button:hover {
+            background-color: #f8f9fa !important;
+            transform: scale(1.1);
+        }
+
+    /* Price styling */
+    .card-price {
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: #dc3545;
+    }
+
+    /* View details icon styling */
+    .card-view-details {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        color: #0d6efd;
+        transition: all 0.3s ease;
+    }
+
+    .tour-card:hover .card-view-details {
+        background-color: #0d6efd;
+        color: white;
+        transform: translateX(5px);
+    }
+</style>

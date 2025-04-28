@@ -8,18 +8,35 @@
         // Ví dụ này làm đơn giản để minh họa cách tạo URL.
 
         // Hàm tạo URL cơ bản
-        public static string GetImageUrl(string? publicId, string cloudName, string defaultImage = "/images/default-avatar.png")
+        public static string GetImageUrl(string? publicId, string cloudName, int? width = null, int? height = null, string defaultImage = "assets/images/tour-image.png")
         {
             if (string.IsNullOrEmpty(publicId) || string.IsNullOrEmpty(cloudName))
                 return defaultImage;
 
-            // Chỉ cần tạo URL đơn giản, không cần SDK nếu không transform phức tạp
-            // Lưu ý: Luôn dùng HTTPS (res.cloudinary.com)
-            return $"https://res.cloudinary.com/{cloudName}/image/upload/{publicId}";
+            string transformation = "";
+            if (width.HasValue)
+            {
+                transformation += $"w_{width}";
+            }
+            if (height.HasValue)
+            {
+                if (!string.IsNullOrEmpty(transformation))
+                {
+                    transformation += ",";
+                }
+                transformation += $"h_{height}";
+            }
+
+            if (!string.IsNullOrEmpty(transformation))
+            {
+                transformation += "/";
+            }
+
+            return $"https://res.cloudinary.com/{cloudName}/image/upload/{transformation}{publicId}";
         }
 
         // Hàm tạo URL có transformation (ví dụ thumbnail)
-        public static string GetThumbnailUrl(string? publicId, int width, int height, string cloudName, string defaultImage = "/images/default-avatar.png")
+        public static string GetThumbnailUrl(string? publicId, int width, int height, string cloudName, string defaultImage = "assets/images/tour-image.png")
         {
             if (string.IsNullOrEmpty(publicId) || string.IsNullOrEmpty(cloudName))
                 return defaultImage;

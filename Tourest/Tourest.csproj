@@ -43,7 +43,6 @@
 
   <ItemGroup>
     <Folder Include="TourGuide\Views\" />
-    <Folder Include="ViewModels\Admin\AdminTour\" />
     <Folder Include="ViewModels\Booking\" />
     <Folder Include="wwwroot\assets\images\icons\" />
     <Folder Include="wwwroot\assets\uploads\" />
