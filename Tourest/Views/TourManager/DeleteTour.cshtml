@@ -1,0 +1,12 @@
+﻿@model Tourest.ViewModels.Tour.TourListViewModel
+
+<h2>Delete Tour</h2>
+<p>Are you sure you want to delete this tour?</p>
+<div>
+    <p><strong>Name:</strong> @Model.Name</p>
+    <p><strong>Destination:</strong> @Model.Destination</p>
+</div>
+<form method="post" asp-controller="TourManager" asp-action="ConfirmDeleteTour" asp-route-id="@Model.TourId">
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-controller="TourManager" asp-action="ListTour" class="btn btn-secondary">Cancel</a>
+</form>
