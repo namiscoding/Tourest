@@ -1,7 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Tourest.Data;
+
+using Tourest.Data.Entities;
 using Tourest.TourGuide.Services;
+using Tourest.Util;
+using static Tourest.Controllers.SendEmailController;
+using Tourest.Util;
+using Tourest.Services;
 
 [Route("TourGuide")]
 public class TourGuideController : Controller
@@ -9,10 +15,17 @@ public class TourGuideController : Controller
     private readonly ApplicationDbContext _context;
     private readonly ITourAssignmentService _assignmentService;
 
-    public TourGuideController(ApplicationDbContext context, ITourAssignmentService assignmentService)
+    private readonly INotificationService _notificationService;
+    private readonly IEmailService _emailService;
+
+    public TourGuideController(ApplicationDbContext context, ITourAssignmentService assignmentService, INotificationService notificationService,
+        IEmailService emailService)
     {
         _context = context;
         _assignmentService = assignmentService;
+        _notificationService = notificationService;
+        _emailService = emailService;
+
     }
 
     [HttpGet("Index")]
@@ -31,7 +44,11 @@ public class TourGuideController : Controller
         return View("TourGuideScheduleWork", schedule);
     }
 
-
+    public TourGuide GetTourGuidebyID(int id)
+    {
+        var tourGuide = _context.TourGuides.FirstOrDefault(tg => tg.TourGuideUserID == id);
+        return tourGuide;
+    }
 
 
 
@@ -39,6 +56,10 @@ public class TourGuideController : Controller
     [HttpPost("AcceptAssignment")]
     public async Task<IActionResult> AcceptAssignment([FromBody] AssignmentRequest request)
     {
+        EmailRequest emailRequest = new EmailRequest();
+        var TourGuideId = 3;
+        emailRequest.htmlbody = MailUtil.AssignTourGuide(GetTourGuidebyID(TourGuideId));
+        _emailSerivce.SendEmail("trangtran.170204@gmail.com", "TOUREST: Xác nhận đặt tour thành công", emailRequest.htmlbody);
         try
         {
             Console.WriteLine($"Accepting assignment ID: {request?.AssignmentId}");
@@ -82,6 +103,68 @@ public class TourGuideController : Controller
             if (!result.success)
             {
                 return Json(new { success = false, message = result.message });
+            }
+            var assignment = await _context.TourGuideAssignments
+               .Include(a => a.TourGroup)
+               .ThenInclude(tg => tg.Bookings)
+               .FirstOrDefaultAsync(a => a.AssignmentID == request.AssignmentId);
+
+            if (assignment?.TourGroup == null)
+            {
+                Console.WriteLine("Assignment or TourGroup not found.");
+                return Json(new { success = true }); // Proceed without notifications if no TourGroup
+            }
+
+            // Get all bookings for the TourGroup
+            var bookings = assignment.TourGroup.Bookings;
+            if (!bookings.Any())
+            {
+                Console.WriteLine("No bookings found for this TourGroup.");
+                return Json(new { success = true }); // Proceed without notifications if no bookings
+            }
+
+            // Iterate through bookings to notify each customer
+            foreach (var booking in bookings)
+            {
+                // Fetch customer details
+                var customer = await _context.Users
+                    .FirstOrDefaultAsync(u => u.UserID == booking.CustomerID);
+
+                if (customer == null || string.IsNullOrEmpty(customer.Email))
+                {
+                    Console.WriteLine($"Customer not found or email is missing for CustomerID: {booking.CustomerID}.");
+                    continue; // Skip to next booking
+                }
+
+                // Prepare notification
+                var notificationView = new NotificationViewModel
+                {
+                    SenderUserID = 3, // Assuming tour guide ID is 3; adjust as needed
+                    RecipientUserID = booking.CustomerID,
+                    Type = "AssignmentAccepted",
+                    Title = "Tour Guide Assignment Accepted",
+                    Content = $"The tour guide has accepted your tour assignment (ID: {request.AssignmentId}).",
+                    RelatedEntityID = "TourAssignment",
+                    RelatedEntityType = "TourAssignment",
+                    ActionUrl = $"/Tour/Details/{assignment.TourGroupID}" // Adjust URL as needed
+                };
+
+                // Send SignalR notification
+                await _notificationService.SendingMessage(booking.CustomerID, notificationView);
+
+                // Prepare and send email
+                string subject = "Tour Guide Assignment Accepted";
+                string htmlBody = $@"<h3>Tour Assignment Accepted</h3>
+                    <p>Dear {customer.FullName},</p>
+                    <p>The tour guide has accepted your tour assignment (ID: {request.AssignmentId}).</p>
+                    <p><a href='https://yourwebsite.com/Tour/Details/{assignment.TourGroupID}'>View Tour Details</a></p>
+                    <p>Thank you for choosing our service!</p>";
+
+                bool emailSent = _emailService.SendEmail(customer.Email, subject, htmlBody);
+                if (!emailSent)
+                {
+                    Console.WriteLine($"Failed to send email to {customer.Email}.");
+                }
             }
 
             return Json(new { success = true });
