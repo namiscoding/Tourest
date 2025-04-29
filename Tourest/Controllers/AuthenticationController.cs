@@ -9,6 +9,12 @@ using Tourest.Data.Entities;
 using Tourest.Services;
 using Tourest.Util;
 using Tourest.ViewModels.Account;
+using Azure.Core;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Tourest.Data;
+using Tourest.ViewModels.NotificationView;
 
 namespace Tourest.Controllers
 {
@@ -18,11 +24,23 @@ namespace Tourest.Controllers
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IAccountService _accountService;
-        public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAccountService accountService)
+        private readonly IEmailService _emailserivce;
+        private readonly INotificationService _noti;
+
+     
+
+        private readonly ApplicationDbContext _dbcontext;
+
+       
+        public AuthenticationController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager, IAccountService accountService, IEmailService emailserivce, ApplicationDbContext dbcontext, INotificationService noti)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _accountService = accountService;
+            _emailserivce = emailserivce;
+            _dbcontext = dbcontext;
+            _noti = noti;
+
         }
 
         // GET: /Account/Login
@@ -34,6 +52,131 @@ namespace Tourest.Controllers
             var model = new AuthenticationViewModel();
             return View(model);
         }
+
+        [HttpGet]
+        public IActionResult EnterEmail()
+        {
+
+           
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SendLink(string Email)
+        {
+            Console.WriteLine(Email);
+            string token = MailUtil.GenerateResetToken();
+            bool AddTokenStatus = await _accountService.AddtokenForgot(token, Email);
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            Console.Write(baseUrl);
+            var emailContent = MailUtil.CreatEmailForgot(token, baseUrl);
+            Console.WriteLine(emailContent);
+                
+            bool result = _emailserivce.SendEmail(Email, "Did you forget the password ?", MailUtil.CreatEmailForgot(emailContent));
+            if (result == true)
+            {
+                TempData["Message"] = "Send Successfulll";
+            }
+            return RedirectToAction("EnterEmail", "Authentication");
+
+        }
+
+
+        [HttpPost]
+        [Route("/Authentication/SubmitResetPassword")]
+        public async Task<IActionResult> SubmitResetPassword(ResetPasswordModel model)
+        {
+            if (model.NewPassword != model.ConfirmPassword)
+            {
+                ModelState.AddModelError(string.Empty, "Mật khẩu xác nhận không khớp.");
+                return View("ResetPasswordForm", model);
+            }
+
+            var account = await _dbcontext.Accounts.FirstOrDefaultAsync(a => a.PasswordResetToken == model.Token);
+
+            if (account == null || account.ResetTokenExpiration < DateTime.UtcNow)
+            {
+                return BadRequest("Token không hợp lệ hoặc đã hết hạn!");
+            }
+
+            // Hash mật khẩu mới và update
+            account.PasswordHash = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);
+
+            // Xóa token reset (để 1 lần dùng thôi)
+            account.PasswordResetToken = null;
+            account.ResetTokenExpiration = null;
+
+            _dbcontext.Accounts.Update(account);
+            await _dbcontext.SaveChangesAsync();
+            TempData["ActiveTab"] = "signin";
+
+            var notification = new NotificationViewModel
+            {
+                RecipientUserID = account.UserID, // ID của user vừa đổi mật khẩu
+                SenderUserID = null, // Hệ thống gửi, nên để null hoặc 0
+                Type = "Security", // Loại thông báo: bảo mật
+                Title = "Đổi mật khẩu thành công",
+                Content = "Bạn đã thay đổi mật khẩu của mình thành công. Nếu đây không phải là bạn, hãy liên hệ với bộ phận hỗ trợ ngay lập tức.",
+                RelatedEntityID = "1", // Nếu bạn muốn link tới tài khoản có thể gán ID
+                RelatedEntityType = "Account", // hoặc gán "Account" nếu thích
+                Timestamp = DateTime.UtcNow,
+                IsRead = false, // Ban đầu gán false
+                ActionUrl = "/Profile/Security" // Link tới trang đổi mật khẩu hoặc bảo mật
+            };
+
+            await _noti.SendingMessage(account.UserID, notification);
+            return RedirectToAction("Login", "Authentication"); // hoặc báo đổi mật khẩu thành công
+        }
+
+        [HttpGet]
+        [Route("/Authentication/ResetPassword")]
+        public async Task<IActionResult> ResetPassword(string token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Token không hợp lệ!");
+            }
+
+            var account = await _dbcontext.Accounts
+                                        .FirstOrDefaultAsync(a => a.PasswordResetToken == token);
+
+            if (account == null)
+            {
+                return BadRequest("Token không tồn tại hoặc đã hết hạn!");
+            }
+
+            if (account.ResetTokenExpiration == null || account.ResetTokenExpiration < DateTime.UtcNow)
+            {
+                return BadRequest("Token đã hết hạn!");
+            }
+
+            // Nếu token hợp lệ, trả về view ResetPasswordForm (form nhập mật khẩu mới)
+            var model = new ResetPasswordModel
+            {
+                Token = token // Gửi token xuống view để submit lại
+            };
+
+            return View("ResetPasswordForm", model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> GetLink(string token)
+        {
+
+            return null;
+        } 
+        
+
+        [HttpGet]
+        public IActionResult AccessDenied(string returnUrl = null)
+        {
+
+
+            return View("AccessDenied");// Nếu bạn có file Views/Authentication/AccessDenied.cshtml
+
+        }
+
 
         //private readonly IUserService _userService;
         [HttpPost]

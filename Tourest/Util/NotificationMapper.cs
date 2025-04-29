@@ -10,7 +10,7 @@ namespace Tourest.Util
         {
             return new Notification
             {
-                NotificationID = notification.NotificationID,
+               
                 RecipientUserID = notification.RecipientUserID,
                 SenderUserID = notification.SenderUserID,
                 Type = notification.Type,

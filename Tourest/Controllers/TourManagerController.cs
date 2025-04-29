@@ -18,11 +18,12 @@ namespace Tourest.Controllers
     {
         private readonly ITourManagerService _tourManagerService;
         private readonly ApplicationDbContext _context;
-
-        public TourManagerController(ApplicationDbContext context, ITourManagerService tourManagerService)
+        private readonly IEmailService _emailService;
+        public TourManagerController(ApplicationDbContext context, ITourManagerService tourManagerService, IEmailService emailService)
         {
             _context = context;
             _tourManagerService = tourManagerService;
+            _emailService = emailService;
         }
 
         public List<TourGuideListViewModel> TourGuides { get; set; }
@@ -337,42 +338,51 @@ namespace Tourest.Controllers
 
         // GET: /TourManager/GetUnassignedBookings
         [HttpGet("GetUnassignedBookings")]
-        public async Task<IActionResult> GetUnassignedBookings()
+        public async Task<IActionResult> GetUnassignedTourGroups()
         {
             try
             {
-                var bookings = await _context.Bookings
-                    .Where(b => b.TourGroupID != null)
-                    .Include(b => b.Tour)
-                    .Include(b => b.Customer)
-                    .Join(_context.TourGroups,
-                        booking => booking.TourGroupID,
-                        tourGroup => tourGroup.TourGroupID,
-                        (booking, tourGroup) => new { Booking = booking, TourGroup = tourGroup })
-                    .Where(joined => joined.TourGroup.AssignedTourGuideID == null)
-                    .Select(joined => new UnassignedBookingViewModel
+                var tourGroups = await _context.TourGroups
+                    .Where(tg => tg.Status == "PendingAssignment")
+                    .Join(_context.Tours,
+                          tg => tg.TourID,
+                          t => t.TourID,
+                          (tg, t) => new { TourGroup = tg, Tour = t })
+                    .GroupJoin(_context.Bookings,
+                               tg => tg.TourGroup.TourGroupID,
+                               b => b.TourGroupID,
+                               (tg, bookings) => new { tg.TourGroup, tg.Tour, Bookings = bookings })
+                    .Select(tg => new
                     {
-                        BookingId = joined.Booking.BookingID,
-                        TourGroupId = joined.TourGroup.TourGroupID,
-                        TourName = joined.Booking.Tour.Name,
-                        BookingDate = joined.Booking.BookingDate,
-                        DepartureDate = joined.Booking.DepartureDate,
-                        NumberOfAdults = joined.Booking.NumberOfAdults,
-                        NumberOfChildren = joined.Booking.NumberOfChildren,
-                        PickupPoint = joined.Booking.PickupPoint,
-                        TotalPrice = joined.Booking.TotalPrice,
-                        Status = joined.Booking.Status,
-                        TourId = joined.Booking.TourID
+                        ViewModel = new UnassignedBookingViewModel
+                        {
+                            TourGroupId = tg.TourGroup.TourGroupID,
+                            TourId = tg.Tour.TourID,
+                            TourName = tg.Tour.Name,
+                            DepartureDate = tg.TourGroup.DepartureDate,
+                          
+                            NumberOfAdults = tg.Bookings.Sum(b => b.NumberOfAdults),
+                            NumberOfChildren = tg.Bookings.Sum(b => b.NumberOfChildren),
+                            PickupPoint = tg.Bookings.Select(b => b.PickupPoint).FirstOrDefault(p => p != null) ?? "N/A",
+                            TotalPrice = tg.Bookings.Sum(b => b.TotalPrice),
+                            Status = tg.TourGroup.Status,
+                          
+                        },
+                        BookingCount = tg.Bookings.Count(),
+                        BookingDetails = tg.Bookings.Select(b => new { b.BookingID, b.NumberOfAdults, b.NumberOfChildren, b.PickupPoint, b.TotalPrice })
                     })
                     .AsNoTracking()
                     .ToListAsync();
 
+                // Log the data for debugging
+               
 
-
-                return View("GetUnassignedBookings", bookings);
+                var result = tourGroups.Select(tg => tg.ViewModel).ToList();
+                return View("GetUnassignedBookings", result);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
@@ -585,27 +595,22 @@ namespace Tourest.Controllers
         {
             try
             {
-                Console.WriteLine($"Assigning guide ID: {request.GuideId} to Booking ID: {request.BookingId}");
+                Console.WriteLine($"Assigning guide ID: {request.GuideId} to TourGroup ID: {request.TourGroupId}");
 
-                if (request.BookingId <= 0 || request.GuideId <= 0)
+                if (request.TourGroupId <= 0 || request.GuideId <= 0)
                 {
-                    return Json(new { success = false, message = "Invalid booking ID or guide ID" });
+                    return Json(new { success = false, message = "Invalid tour group ID or guide ID" });
                 }
 
-                var booking = await _context.Bookings
-                    .FirstOrDefaultAsync(b => b.BookingID == request.BookingId && b.Status == "PendingAssignment");
-                if (booking == null)
-                {
-                    return Json(new { success = false, message = "Booking not found or already assigned" });
-                }
-
+                // Check TourGroups for a valid, unassigned tour group
                 var tourGroup = await _context.TourGroups
-                    .FirstOrDefaultAsync(tg => tg.TourGroupID == booking.TourGroupID);
+                    .FirstOrDefaultAsync(tg => tg.TourGroupID == request.TourGroupId && tg.Status == "PendingAssignment");
                 if (tourGroup == null)
                 {
-                    return Json(new { success = false, message = "Tour group not found" });
+                    return Json(new { success = false, message = "Tour group not found or already assigned" });
                 }
 
+                // Verify the tour guide exists
                 var guide = await _context.TourGuides
                     .FirstOrDefaultAsync(g => g.TourGuideUserID == request.GuideId);
                 if (guide == null)
@@ -613,6 +618,7 @@ namespace Tourest.Controllers
                     return Json(new { success = false, message = "Tour guide not found" });
                 }
 
+                // Check for conflicting assignments on the same date
                 var conflictingAssignment = await _context.TourGuideAssignments
                     .Join(_context.TourGroups,
                           tga => tga.TourGroupID,
@@ -627,15 +633,17 @@ namespace Tourest.Controllers
                     return Json(new { success = false, message = "Guide is already assigned to another tour on the same date" });
                 }
 
+                // Create a new tour guide assignment
                 var assignment = new TourGuideAssignment
                 {
-                    TourGroupID = (int)booking.TourGroupID,
+                    TourGroupID = tourGroup.TourGroupID,
                     TourGuideID = request.GuideId,
-                    TourManagerID = 2, // Replace with logged-in manager ID (e.g., User.Identity)
+                    TourManagerID = 2, // Replace with logged-in manager ID (e.g., from User.Identity)
                     AssignmentDate = DateTime.Now,
                     Status = "Pending"
                 };
 
+                // Update tour group status and assigned guide
                 _context.TourGuideAssignments.Add(assignment);
                 tourGroup.Status = "Assigned";
                 tourGroup.AssignedTourGuideID = request.GuideId;
@@ -726,13 +734,54 @@ namespace Tourest.Controllers
                 return Json(new { success = false, message = $"Error reassigning guide: {ex.Message}" });
             }
         }
+
+        private async Task SendEmailToCustomersForGuideAssignment(
+            List<Booking> bookings,
+            string tourName,
+            DateTime departureDate,
+            string guideName,
+            bool isReassignment)
+        {
+            foreach (var booking in bookings)
+            {
+                var customer = booking.Customer;
+                var customerEmail = customer.Email;
+                var customerName = customer.FullName ?? "Customer";
+
+                var emailSubject = isReassignment
+                    ? "Tour Guide Reassigned for Your Booking - Tourest"
+                    : "Tour Guide Assigned for Your Booking - Tourest";
+
+                var emailMessage = $@"
+                    <h3>Tour Guide {(isReassignment ? "Reassigned" : "Assigned")}</h3>
+                    <p>Dear {customerName},</p>
+                    <p>We {(isReassignment ? "wanted to inform you that a new tour guide has been reassigned" : "are pleased to inform you that a tour guide has been assigned")} to your booking:</p>
+                    <ul>
+                        <li><strong>Tour Name:</strong> {tourName}</li>
+                        <li><strong>Departure Date:</strong> {departureDate:MMM dd, yyyy}</li>
+                        <li><strong>Assigned Guide:</strong> {guideName}</li>
+                        <li><strong>Pickup Point:</strong> {booking.PickupPoint}</li>
+                    </ul>
+                    <p>We look forward to providing you with an amazing tour experience!</p>
+                    <p>Best regards,<br/>Tourest Team</p>";
+
+                bool emailSent = _emailService.SendEmail(customerEmail, emailSubject, emailMessage);
+                if (!emailSent)
+                {
+                    Console.WriteLine($"Failed to send email to customer {customerEmail}, but {(isReassignment ? "reassignment" : "assignment")} was successful.");
+                }
+
+                // Small delay to avoid overwhelming the SMTP server (optional)
+                await Task.Delay(100);
+            }
+        }
     }
 
 }
 
 public class AssignGuideRequest
 {
-    public int BookingId { get; set; }
+    public int TourGroupId { get; set; }
     public int GuideId { get; set; }
 }
 public class ReassignGuideRequest
