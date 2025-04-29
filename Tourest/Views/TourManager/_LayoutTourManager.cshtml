@@ -1,10 +1,19 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- CSS Libraries -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/admin_layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    @RenderSection("Style", required: false)
+    @RenderSection("Scripts", required: false)
     <style>
         body {
             margin: 0;
@@ -70,9 +79,11 @@
         🛠️ Tour Manager Dashboard
     </div>
     <div class="sidebar">
-        <h2>Menu</h2>
+        <h2>Dashboard</h2>
         <a asp-controller="TourManager" asp-action="TourGuide">📋 View Tour Guides List</a>
         <a asp-controller="TourManager" asp-action="ListTour">🗺️ View Tour List</a>
+        <a asp-controller="TourManager" asp-action="GetRejectedAssignedTours">🗺️ View Rejected Assigned Tours</a>
+        <a asp-controller="TourManager" asp-action="GetUnassignedBookings">🗺️ View Unassigned Bookings</a>
     </div>
     <div class="content">
         @RenderBody()

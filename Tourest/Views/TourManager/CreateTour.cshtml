@@ -1,5 +1,4 @@
-﻿
-@model Tourest.ViewModels.Tour.TourListViewModel
+﻿@model Tourest.ViewModels.Tour.TourListViewModel
 
 @{
     Layout = "/Views/TourManager/_LayoutTourManager.cshtml";
@@ -52,6 +51,11 @@
             input[type="submit"]:hover {
                 background-color: #0056b3;
             }
+
+    .actions {
+        text-align: center; /* Căn giữa nút */
+        margin-top: 1.5rem;
+    }
 </style>
 
 <div class="container-centered">
@@ -136,9 +140,12 @@
             <input asp-for="IsCancellable" type="checkbox" />
         </div>
 
-        <input type="submit" value="Create Tour" />
+        <div class="actions">
+            <input type="submit" value="Create Tour" />
+        </div>
     </form>
 </div>
+
 <script>
     document.querySelectorAll('input[type="number"]').forEach(input => {
         input.addEventListener('input', (e) => {

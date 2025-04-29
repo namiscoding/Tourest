@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Tourest.Data;
 using Tourest.Data.Entities;
+using Tourest.Helpers;
 using Tourest.Services;
 using Tourest.ViewModels;
 using Tourest.ViewModels.Tour;
@@ -101,6 +102,63 @@ namespace Tourest.Controllers
             var tours = _tourManagerService.GetAllTours();
             return View(tours);
         }
+
+        [HttpPost("ListTour")]
+        public IActionResult ListTour(string searchTerm, string statusFilter)
+        {
+            // Truy vấn dữ liệu từ database
+            var query = _context.Tours
+                .Select(t => new TourListAllViewModel
+                {
+                    TourID = t.TourID,
+                    Name = t.Name,
+                    Destination = t.Destination,
+                    Description = t.Description,
+                    DurationDays = t.DurationDays,
+                    DurationNights = t.DurationNights,
+                    AdultPrice = t.AdultPrice,
+                    ChildPrice = t.ChildPrice,
+                    MinGroupSize = t.MinGroupSize,
+                    MaxGroupSize = t.MaxGroupSize,
+                    DeparturePoints = t.DeparturePoints,
+                    IncludedServices = t.IncludedServices,
+                    ExcludedServices = t.ExcludedServices,
+                    ImageUrls = t.ImageUrls,
+                    Status = t.Status,
+                    AverageRating = t.AverageRating,
+                    IsCancellable = t.IsCancellable,
+                    CancellationPolicyDescription = t.CancellationPolicyDescription
+                })
+                .AsQueryable();
+
+            // Áp dụng tìm kiếm nếu có searchTerm
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower().Trim(); // Xử lý khoảng trắng
+                query = query.Where(t => t.Name.ToLower().Contains(searchTerm) ||
+                                         (t.Destination != null && t.Destination.ToLower().Contains(searchTerm)));
+            }
+
+            // Áp dụng lọc theo trạng thái nếu có statusFilter
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                query = query.Where(t => t.Status == statusFilter);
+            }
+
+            // Lấy tất cả dữ liệu đã lọc
+            var tours = query.ToList();
+
+            // Lưu các giá trị tìm kiếm và lọc để hiển thị lại trong form
+            ViewData["CurrentFilter"] = searchTerm;
+            ViewData["CurrentStatus"] = statusFilter;
+
+            // Truyền danh sách trạng thái cho dropdown
+            var statuses = new List<string> { "Active", "Inactive", "Draft" }; // Danh sách trạng thái có thể điều chỉnh
+            ViewData["Statuses"] = statuses;
+
+            return View(tours);
+        }
+
         [HttpGet("GetTourDetails")]
         public async Task<IActionResult> GetTourDetails(int id)
         {
