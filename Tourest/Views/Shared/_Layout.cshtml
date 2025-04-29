@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -64,7 +65,7 @@
                                             <i class="fa-brands fa-linkedin-in"></i>
                                         </a>
                                     </li>
-                                    <li> 
+                                    <li>
                                         <a href="#">
                                             <i class="fa-brands fa-pinterest-p"></i>
                                         </a>
@@ -116,7 +117,7 @@
                                             <li><a href="TourManager">Tour Manager</a></li>
 
                                         }-->
-                                        
+
 
                                     </ul>
                                 </nav>
@@ -126,71 +127,65 @@
                     <div class="col-6 col-md-3 col-xl-4">
                         <div class="header__main-right d-flex justify-content-end">
                             <ul>
-                               
+
                                 <li>
-                                    
-                                        
-                                        @if (currentAccount != null)
-                                        {
-                                            <a href="/Profile/Index/@currentAccount.UserID">Hello, @currentAccount.FullName!</a>
-                                        } 
-                                        else
-                                        {
-                                            
-                                            <a asp-controller="Authentication" asp-action="Login"><button class="btn" style="background-color: #039e9d; color: white">Login/Signup</button> </a>
-                                        }
-                                    
-                            </li>
-                               @if (currentAccount != null)
-                                        {
-                                <li class="position-relative">
-                                    <button class="btn btn-link p-1 lh-1" type="button" id="notificationButton">
-                                        <i class="fa-solid fa-bell"></i>
-                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                            3
-                                        </span>
-                                    </button>
 
-                                    <div class="position-absolute bg-white shadow rounded p-3" id="notificationModal" style="width: 300px; right: 0; top: 120%;">
-                                        <div class="fw-bold mb-2">Thông báo</div>
 
-                                        <div class="d-flex align-items-start mb-2">
-                                            <i class="fa-solid fa-circle-info text-primary me-2 mt-1"></i>
-                                            <div>
-                                                <div>Chào mừng bạn đến với hệ thống của chúng tôi!</div>
-                                                <small class="text-muted">1 giờ trước</small>
+                                    @if (currentAccount != null)
+                                    {
+                                        <a href="/Profile/Index/@currentAccount.UserID">Hello, @currentAccount.FullName!</a>
+                                    }
+                                    else
+                                    {
+
+                                        <a asp-controller="Authentication" asp-action="Login"><button class="btn" style="background-color: #039e9d; color: white">Login/Signup</button> </a>
+                                    }
+
+                                </li>
+                                @if (currentAccount != null)
+                                {
+                                    <li class="position-relative">
+                                        <button class="btn btn-link p-1 lh-1" type="button" id="notificationButton">
+                                            <i class="fa-solid fa-bell"></i>
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                3
+                                            </span>
+                                        </button>
+
+                                        <div class="position-absolute bg-white shadow rounded p-3" id="notificationModal" style="width: 300px; right: 0; top: 120%;">
+                                            <div class="fw-bold mb-2">Thông báo</div>
+
+
+                                            @foreach (var x in _dbcontext.Notifications.Where(x => x.RecipientUserID == currentAccount.UserID))
+                                            {
+                                                Console.WriteLine(x);
+
+                                                
+                                            <div class="d-flex align-items-start mb-2">
+                                                <i class="fa-solid fa-circle-info text-primary me-2 mt-1"></i>
+                                                <div>
+                                                <div>@x.Title</div>
+                                                <small class="text-muted">@x.Timestamp</small>
+                                            </div>
+                                        </div>}
+
+
+
+                                      
+
+                                            <div class="text-center">
+                                                <a href="#" class="text-decoration-none">Xem tất cả thông báo</a>
                                             </div>
                                         </div>
-
-                                        <div class="d-flex align-items-start mb-2">
-                                            <i class="fa-solid fa-check-circle text-success me-2 mt-1"></i>
-                                            <div>
-                                                <div>Đơn hàng #12345 đã được xác nhận</div>
-                                                <small class="text-muted">3 giờ trước</small>
-                                            </div>
-                                        </div>
-
-                                        <div class="d-flex align-items-start mb-3">
-                                            <i class="fa-solid fa-exclamation-circle text-warning me-2 mt-1"></i>
-                                            <div>
-                                                <div>Bạn có thông báo mới từ hệ thống</div>
-                                                <small class="text-muted">12 giờ trước</small>
-                                            </div>
-                                        </div>
-
-                                        <div class="text-center">
-                                            <a href="#" class="text-decoration-none">Xem tất cả thông báo</a>
-                                        </div>
-                                    </div>
                                     </li>
                                 }
 
-                        </ul>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </header>
 
     <div>
@@ -345,7 +340,7 @@
             notificationModal.style.display = 'none';
 
             notificationButton.addEventListener('click', function (event) {
-                event.stopPropagation(); 
+                event.stopPropagation();
                 notificationModal.style.display = (notificationModal.style.display === 'block') ? 'none' : 'block';
             });
 

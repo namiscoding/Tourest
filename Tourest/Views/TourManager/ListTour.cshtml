@@ -1,73 +1,387 @@
 ﻿@model IEnumerable<Tourest.ViewModels.Tour.TourListAllViewModel>
 
 @{
+    Layout = "/Views/TourManager/_LayoutTourManager.cshtml";
     ViewData["Title"] = "Tour List";
+    string currentFilter = ViewData["CurrentFilter"] as string ?? "";
+    string currentStatus = ViewData["CurrentStatus"] as string ?? "";
 }
 
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h2 class="text-primary">
+            <i class="fas fa-map me-2"></i>@ViewData["Title"]
+        </h2>
+        <a asp-controller="TourManager" asp-action="CreateTour" class="btn btn-primary btn-custom">
+            <i class="fas fa-plus me-1"></i> Create New Tour
+        </a>
+    </div>
+
+    @* Form Filter/Search *@
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form asp-action="ListTour" method="get" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label for="searchTerm" class="form-label">
+                        <i class="fas fa-search me-1"></i>Search (Name, Destination)
+                    </label>
+                    <input type="text" name="searchTerm" id="searchTerm" class="form-control"
+                           placeholder="Enter keyword..." value="@currentFilter">
+                </div>
+                <div class="col-md-4">
+                    <label for="statusFilter" class="form-label">
+                        <i class="fas fa-filter me-1"></i>Status
+                    </label>
+                    <select name="statusFilter" id="statusFilter" class="form-select"
+                            asp-items="@(new SelectList(ViewData["Statuses"] as List<string> ?? new List<string>()))">
+                        <option value="">-- All --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 mb-2 btn-custom">
+                        <i class="fas fa-search me-1"></i> Filter
+                    </button>
+                    <a asp-action="ListTour" class="btn btn-outline-secondary w-100 btn-custom">
+                        <i class="fas fa-redo me-1"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* Script to select the current status *@
+    @if (!string.IsNullOrEmpty(currentStatus))
+    {
+        <script>document.getElementById('statusFilter').value = '@currentStatus';</script>
+    }
+
+    @* Hiển thị dạng Card - 4 đối tượng mỗi hàng *@
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        @if (!Model.Any())
+        {
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>No tours found for search term: <strong>@currentFilter</strong>
+                    @if (!string.IsNullOrEmpty(currentStatus))
+                    {
+                        <span> and status: <strong>@currentStatus</strong></span>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            @foreach (var tour in Model)
+            {
+                <div class="col">
+                    <div class="card tour-card shadow-hover position-relative">
+                        @* Card with actions dropdown *@
+                        <div class="card-img-overlay-top">
+                            <div class="dropdown position-absolute top-0 end-0 m-2" style="z-index: 20;">
+                                <button class="btn btn-sm btn-light bg-white rounded-circle p-1 shadow-sm action-button"
+                                        type="button" id="dropdownMenuButton-@tour.TourID"
+                                        data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuButton-@tour.TourID">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="TourManager" asp-action="ViewCustomers" asp-route-tourId="@tour.TourID">
+                                            <i class="fas fa-users me-2 fa-fw text-info"></i>View Customers
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="TourManager" asp-action="GetTourDetails" asp-route-id="@tour.TourID">
+                                            <i class="fas fa-info-circle me-2 fa-fw text-primary"></i>Details
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="TourManager" asp-action="EditTour" asp-route-id="@tour.TourID">
+                                            <i class="fas fa-edit me-2 fa-fw text-primary"></i>Edit
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" asp-controller="TourManager" asp-action="DeleteTour" asp-route-tourId="@tour.TourID"
+                                           onclick="return confirm('Are you sure to delete tour with ID: @tour.TourID?')">
+                                            <i class="fas fa-trash-alt me-2 fa-fw"></i>Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            @* Status Badge *@
+                            <div class="position-absolute top-0 start-0 m-2" style="z-index: 10;">
+                                @if (tour.Status == "Active")
+                                {
+                                    <span class="badge bg-success shadow-sm">
+                                        <i class="fas fa-check-circle me-1"></i>Active
+                                    </span>
+                                }
+                                else if (tour.Status == "Inactive")
+                                {
+                                    <span class="badge bg-secondary shadow-sm">
+                                        <i class="fas fa-pause-circle me-1"></i>Inactive
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark shadow-sm">
+                                        <i class="fas fa-edit me-1"></i>Draft
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        @* Full card is clickable with overlay link *@
+                        <a asp-controller="TourManager" asp-action="GetTourDetails" asp-route-id="@tour.TourID" class="card-link-overlay"></a>
+
+                        @* Tour Image with fallback *@
+                        <div class="tour-image-container">
+                            <img src="@(!string.IsNullOrEmpty(tour.ImageUrls) ? tour.ImageUrls : "assets/images/tour-image.png")"
+                                 class="card-img-top tour-image" alt="@tour.Name"
+                                 onerror="this.onerror=null; this.src=''; this.classList.add('tour-image-fallback');">
+                        </div>
+
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-truncate tour-title">@tour.Name</h5>
+                            <p class="card-text mb-1 text-muted">
+                                <i class="fas fa-map-marker-alt me-1 text-danger"></i> @tour.Destination
+                            </p>
+                            <p class="card-text mb-2">
+                                <i class="fas fa-clock me-1 text-primary"></i> @tour.DurationDays days
+                            </p>
+                            <div class="mt-auto pt-2 d-flex justify-content-between align-items-center">
+                                <span class="card-price">@tour.AdultPrice.ToString("N0") đ</span>
+                                <span class="card-view-details">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@* CSS styles for enhanced tour cards with hover effects *@
 <style>
-    .container-centered {
-        max-width: 800px;
-        margin: 2rem auto;
-        background-color: #fff;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    /* Container styling */
+    .container-fluid {
+        padding: 0 2rem;
     }
 
-    h2 {
-        text-align: center;
-        color: #333;
-        margin-bottom: 1.5rem;
+    /* Form and button styling */
+    .card {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 1rem;
-        background-color: white;
+    .form-control, .form-select {
         border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #ced4da;
+        padding: 0.75rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
-    th, td {
-        padding: 12px 15px;
-        border: 1px solid #dee2e6;
-        text-align: left;
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+            outline: none;
+        }
+
+    .btn-custom {
+        padding: 0.5rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
     }
 
-    th {
+    .btn-primary.btn-custom {
         background-color: #007bff;
-        color: white;
+        border: none;
     }
 
-    tr:nth-child(even) {
+        .btn-primary.btn-custom:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+    .btn-outline-secondary.btn-custom {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+        .btn-outline-secondary.btn-custom:hover {
+            background-color: #6c757d;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    /* Card hover styles */
+    .tour-card {
+        transition: all 0.3s ease;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,.1);
+        border-radius: 12px;
+        height: 100%;
+        background-color: #fff;
+    }
+
+    .shadow-hover {
+        transition: all 0.3s ease;
+    }
+
+        .shadow-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+            border-color: rgba(0,123,255,0.5);
+        }
+
+    /* Card image container */
+    .tour-image-container {
+        height: 200px;
+        overflow: hidden;
+        background-color: #e9ecef; /* Màu xám mặc định nếu không có ảnh */
+        position: relative;
+    }
+
+    .tour-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .tour-card:hover .tour-image {
+        transform: scale(1.1);
+    }
+
+    /* Fallback khi ảnh không hiển thị */
+    .tour-image-fallback {
+        background-color: #e9ecef; /* Màu xám khi ảnh lỗi */
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 1.2rem;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    /* Card body styling */
+    .card-body {
+        padding: 1.25rem;
+    }
+
+    .tour-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 0.5rem;
+    }
+
+    .tour-id {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    /* Price styling */
+    .card-price {
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: #dc3545;
+    }
+
+    /* Make the entire card clickable */
+    .card-link-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
+    }
+
+    /* Ensure the dropdown menu actions are above the overlay */
+    .action-button {
+        z-index: 20;
+        transition: all 0.2s ease;
+        border: 1px solid #dee2e6;
+    }
+
+        .action-button:hover {
+            background-color: #f8f9fa !important;
+            transform: scale(1.1);
+            border-color: #007bff;
+        }
+
+    /* View details icon styling */
+    .card-view-details {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
         background-color: #f8f9fa;
+        color: #0d6efd;
+        transition: all 0.3s ease;
+        border: 1px solid #dee2e6;
+    }
+
+    .tour-card:hover .card-view-details {
+        background-color: #0d6efd;
+        color: white;
+        transform: translateX(5px);
+        border-color: #0d6efd;
+    }
+
+    /* Dropdown menu styling */
+    .dropdown-menu {
+        border-radius: 8px;
+        border: none;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        z-index: 30; /* Đảm bảo dropdown hiển thị trên tất cả các phần tử khác */
+    }
+
+    .dropdown-item {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+        transition: background-color 0.2s ease;
+    }
+
+        .dropdown-item:hover {
+            background-color: #f1f3f5;
+        }
+
+    .dropdown-divider {
+        margin: 0.25rem 0;
     }
 </style>
 
-<div class="container-centered">
-    <h2>@ViewData["Title"]</h2>
+@section Scripts {
+    @* Thêm Font Awesome *@
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
-    <table >
-        <thead>
-            <tr >
-                <th>ID</th>
-                <th>Tour</th>
-                <th>View Customers</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var tour in Model)
-            {
-                <tr>
-                    <td>@tour.TourID</td>
-                    <td>@tour.Name</td>
-                    <td>
-                        <a asp-controller="TourManager" asp-action="ViewCustomers" asp-route-tourId="@tour.TourID">View</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+    @* Thêm Bootstrap JavaScript và Popper.js *@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Kiểm tra xem dropdown có hoạt động không
+            $('.dropdown-toggle').on('click', function () {
+                console.log('Dropdown clicked!');
+            });
+
+            // Đảm bảo dropdown hiển thị đúng
+            $('.dropdown').on('show.bs.dropdown', function () {
+                console.log('Dropdown is opening!');
+            });
+        });
+    </script>
+}

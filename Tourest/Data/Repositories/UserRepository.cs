@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tourest.Data.Entities;
+using Tourest.ViewModels.Admin.AdminDashboard;
 
 namespace Tourest.Data.Repositories
 {
@@ -308,6 +309,96 @@ namespace Tourest.Data.Repositories
             }
             // Có thể log warning nếu không tìm thấy TourGuide
         }
+
+
+        public async Task<int> GetUserCountByRoleAsync(string roleName)
+        {
+            _logger.LogInformation("Getting user count for role: {RoleName}", roleName);
+            try
+            {
+                // Đếm số lượng Account có Role tương ứng
+                return await _context.Accounts
+                                     .CountAsync(a => a.Role == roleName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user count for role {RoleName}", roleName);
+                return 0;
+            }
+        }
+
+        public async Task<IEnumerable<TopGuideViewModel>> GetTopRatedGuidesAsync(int count)
+        {
+            _logger.LogInformation("Getting top {Count} rated guides.", count);
+            try
+            {
+                // Lấy tất cả RatingID liên quan đến TourGuide
+                var guideRatingIds = _context.TourGuideRatings.Select(tgr => tgr.RatingID);
+
+                // Truy vấn Ratings, chỉ lấy những cái liên quan đến TourGuide, group theo GuideID
+                var topGuides = await _context.Ratings
+                    .Where(r => guideRatingIds.Contains(r.RatingID)) // Chỉ lấy rating của guide
+                    .Include(r => r.TourGuideRating) // Include để lấy TourGuideID
+                        .ThenInclude(tgr => tgr.TourGuide) // Include User (Guide) để lấy tên
+                    .Where(r => r.TourGuideRating != null && r.TourGuideRating.TourGuide != null) // Đảm bảo dữ liệu join không null
+                    .GroupBy(r => new {
+                        GuideUserId = r.TourGuideRating!.TourGuideID, // Dùng ! vì đã Where not null
+                        GuideName = r.TourGuideRating!.TourGuide!.FullName // Lấy tên Guide
+                    })
+                    .Select(g => new TopGuideViewModel // Project sang ViewModel
+                    {
+                        UserId = g.Key.GuideUserId,
+                        FullName = g.Key.GuideName,
+                        AverageRating = g.Average(r => r.RatingValue), // Tính trung bình rating
+                        RatingCount = g.Count() // Đếm số lượng rating (ví dụ)
+                    })
+                    .OrderByDescending(vm => vm.AverageRating) // Sắp xếp theo rating giảm dần
+                    .ThenByDescending(vm => vm.RatingCount) // Nếu rating bằng nhau, ưu tiên người nhiều rating hơn
+                    .Take(count) // Lấy top 'count'
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return topGuides;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting top rated guides.", ex);
+                return Enumerable.Empty<TopGuideViewModel>(); // Trả về danh sách rỗng nếu lỗi
+            }
+        }
+
+
+        public async Task<bool> ChangePassword(int uid, string newPassword, string currentPass)
+        {
+            // 1. Lấy tài khoản theo UserID
+            var account = await _context.Accounts
+                                        .FirstOrDefaultAsync(a => a. UserID == uid);
+
+            if (account == null)
+            {
+                return false;
+            }
+
+            // 2. Verify mật khẩu hiện tại
+            bool isCurrentPasswordValid = BCrypt.Net.BCrypt.Verify(currentPass, account.PasswordHash);
+            if (!isCurrentPasswordValid)
+            {
+                return false;
+            }
+
+            // 3. Hash mật khẩu mới bằng BCrypt
+            string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            // 4. Cập nhật lại PasswordHash
+            account.PasswordHash = newPasswordHash;
+
+            // 5. Save thay đổi vào database
+            _context.Accounts.Update(account);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
 
     }
 }

@@ -5,18 +5,20 @@ namespace Tourest.Controllers
 {
     public class AdminDashboardController : Controller
     {
+        private readonly IDashboardService _dashboardService;
+        private readonly ILogger<AdminDashboardController> _logger;
         private readonly IBookingProcessingService _bookingProcessor;
 
-        // Constructor giờ cũng nên đổi tên cho nhất quán (nhưng không bắt buộc)
-        public AdminDashboardController(IBookingProcessingService bookingProcessor)
+        public AdminDashboardController(IDashboardService dashboardService, ILogger<AdminDashboardController> logger, IBookingProcessingService bookingProcessor)
         {
+            _dashboardService = dashboardService;
+            _logger = logger;
             _bookingProcessor = bookingProcessor;
         }
 
-        // Action Index (Mặc định cho /AdminDashboard)
-        public IActionResult Index()
+        
+        public async Task<IActionResult> Index()
         {
-            // Trả về View trong thư mục Views/AdminDashboard/
             return View();
         }
 
@@ -43,5 +45,11 @@ namespace Tourest.Controllers
         }
 
         // ... Các actions khác của Admin ...
+        public async Task<IActionResult> Dashboard()
+        {
+            _logger.LogInformation("Admin accessing dashboard.");
+            var viewModel = await _dashboardService.GetDashboardDataAsync(TimePeriod.Last30Days);
+            return View(viewModel);
+        }
     }
 }

@@ -1,0 +1,301 @@
+﻿@model Tourest.ViewModels.Tour.TourListViewModel
+
+@{
+    Layout = "/Views/TourManager/_LayoutTourManager.cshtml";
+    ViewData["Title"] = "Create New Tour";
+}
+
+<div class="container-fluid px-4">
+    <div class="container-centered">
+        <h2 class="text-primary">
+            <i class="fas fa-plus me-2"></i>@ViewData["Title"]
+        </h2>
+
+        @* Hiển thị thông báo lỗi (nếu có) *@
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <form method="post" asp-controller="TourManager" asp-action="CreateTour" enctype="multipart/form-data">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        @* Cột bên trái *@
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Name">
+                                    <i class="fas fa-heading me-1 text-primary"></i>Name
+                                </label>
+                                <input asp-for="Name" class="form-control" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Destination">
+                                    <i class="fas fa-map-marker-alt me-1 text-danger"></i>Destination
+                                </label>
+                                <input asp-for="Destination" class="form-control" />
+                                <span asp-validation-for="Destination" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="DurationDays">
+                                    <i class="fas fa-clock me-1 text-primary"></i>Duration Days
+                                </label>
+                                <input asp-for="DurationDays" type="number" class="form-control" />
+                                <span asp-validation-for="DurationDays" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="DurationNights">
+                                    <i class="fas fa-moon me-1 text-primary"></i>Duration Nights
+                                </label>
+                                <input asp-for="DurationNights" type="number" class="form-control" />
+                                <span asp-validation-for="DurationNights" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="ChildPrice">
+                                    <i class="fas fa-child me-1 text-primary"></i>Child Price
+                                </label>
+                                <input asp-for="ChildPrice" type="number" class="form-control" />
+                                <span asp-validation-for="ChildPrice" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="AdultPrice">
+                                    <i class="fas fa-user me-1 text-primary"></i>Adult Price
+                                </label>
+                                <input asp-for="AdultPrice" type="number" class="form-control" />
+                                <span asp-validation-for="AdultPrice" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Status">
+                                    <i class="fas fa-tag me-1 text-primary"></i>Status
+                                </label>
+                                <select asp-for="Status" class="form-select">
+                                    <option value="Draft">Draft</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        @* Cột bên phải *@
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="MinGroupSize">
+                                    <i class="fas fa-users me-1 text-primary"></i>Min Group Size
+                                </label>
+                                <input asp-for="MinGroupSize" type="number" class="form-control" />
+                                <span asp-validation-for="MinGroupSize" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="MaxGroupSize">
+                                    <i class="fas fa-users me-1 text-primary"></i>Max Group Size
+                                </label>
+                                <input asp-for="MaxGroupSize" type="number" class="form-control" />
+                                <span asp-validation-for="MaxGroupSize" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="DeparturePoints">
+                                    <i class="fas fa-plane-departure me-1 text-primary"></i>Departure Points
+                                </label>
+                                <textarea asp-for="DeparturePoints" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="DeparturePoints" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="IncludedServices">
+                                    <i class="fas fa-check-circle me-1 text-success"></i>Included Services
+                                </label>
+                                <textarea asp-for="IncludedServices" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="IncludedServices" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="ExcludedServices">
+                                    <i class="fas fa-times-circle me-1 text-danger"></i>Excluded Services
+                                </label>
+                                <textarea asp-for="ExcludedServices" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="ExcludedServices" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="ImageUrls">
+                                    <i class="fas fa-link me-1 text-primary"></i>Image URL
+                                </label>
+                                <input asp-for="ImageUrls" type="url" class="form-control" />
+                                <span asp-validation-for="ImageUrls" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-file-upload me-1 text-primary"></i>Upload PNG File
+                                </label>
+                                <input type="file" name="imageFile" id="imageFile" accept=".png" class="form-control" />
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="IsCancellable">
+                                    <i class="fas fa-ban me-1 text-primary"></i>Is Cancellable
+                                </label>
+                                <input asp-for="IsCancellable" type="checkbox" />
+                                <span asp-validation-for="IsCancellable" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Nút hành động *@
+                    <div class="actions">
+                        <button type="submit" class="btn btn-primary btn-custom">
+                            <i class="fas fa-save me-1"></i>Create Tour
+                        </button>
+                        <a asp-controller="TourManager" asp-action="ListTour" class="btn btn-outline-secondary btn-custom">
+                            <i class="fas fa-arrow-left me-1"></i>Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* CSS styles - Kế thừa phong cách từ ListTour.cshtml *@
+<style>
+    .container-fluid {
+        padding: 0 2rem;
+    }
+
+    .container-centered {
+        max-width: 1000px; /* Tăng chiều rộng để chứa 2 cột */
+        margin: 2rem auto;
+    }
+
+    .card {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 0.75rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+            outline: none;
+        }
+
+    textarea.form-control {
+        resize: vertical;
+    }
+
+    .btn-custom {
+        padding: 0.5rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin: 0 0.5rem;
+    }
+
+    .btn-primary.btn-custom {
+        background-color: #007bff;
+        border: none;
+    }
+
+        .btn-primary.btn-custom:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+    .btn-outline-secondary.btn-custom {
+        border-color: #6c757d;
+        color: #6c757d;
+    }
+
+        .btn-outline-secondary.btn-custom:hover {
+            background-color: #6c757d;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .actions {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .text-danger {
+        font-size: 0.9rem;
+        margin-top: 0.3rem;
+    }
+
+    @* Đảm bảo khoảng cách giữa các cột *@
+    .row {
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+
+    .col-md-6 {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+</style>
+
+@* Thêm thư viện jQuery và jQuery Validation *@
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Xử lý input số không âm
+            $('input[type="number"]').on('input', function (e) {
+                if (this.value < 0 || isNaN(this.value)) {
+                    this.value = '';
+                }
+            });
+
+            // Client-side validation cho form
+            $('form').validate({
+                errorElement: 'span',
+                errorClass: 'text-danger',
+                highlight: function (element) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        });
+    </script>
+}

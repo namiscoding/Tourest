@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Tourest.Data.Entities;
+using Tourest.ViewModels.Admin.AdminDashboard;
 using Tourest.ViewModels.Tour;
 
 namespace Tourest.Data.Repositories
@@ -7,10 +8,12 @@ namespace Tourest.Data.Repositories
     public class TourRepository : ITourRepository
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<TourRepository> _logger;
 
-        public TourRepository(ApplicationDbContext context)
+        public TourRepository(ApplicationDbContext context, ILogger<TourRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<Tour>> GetActiveToursAsync()
@@ -299,6 +302,119 @@ namespace Tourest.Data.Repositories
                 await _context.TourCategories.AddRangeAsync(newLinks); // Thêm link mới
             }
             // SaveChanges sẽ được gọi bên ngoài trong transaction của Service
+        }
+        public async Task<Dictionary<string, int>> GetTourCountByStatusAsync()
+        {
+            _logger.LogInformation("Getting tour count by status.");
+            try
+            {
+                return await _context.Tours
+                                    .GroupBy(t => t.Status ?? "Unknown") // Group theo Status, xử lý null nếu có
+                                    .Select(g => new { Status = g.Key, Count = g.Count() })
+                                    .ToDictionaryAsync(x => x.Status, x => x.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting tour count by status.");
+                return new Dictionary<string, int>();
+            }
+        }
+
+        // Trả về object hoặc ViewModel tạm chứa TourId, TourName, TotalRevenue
+        public async Task<IEnumerable<TopTourViewModel>> GetTopSellingToursByRevenueAsync(int count, DateTime start, DateTime end)
+        {
+            _logger.LogInformation("Getting top {Count} selling tours by revenue between {StartDate} and {EndDate}", count, start.ToShortDateString(), end.ToShortDateString());
+            DateTime adjustedEndDate = end.Date.AddDays(1);
+
+            try
+            {
+                var topTours = await _context.Payments
+                    .Where(p => p.Status == "Completed" && p.PaymentDate >= start.Date && p.PaymentDate < adjustedEndDate)
+                    .Include(p => p.Booking)
+                        .ThenInclude(b => b.Tour) // Include Tour để lấy thông tin
+                    .Where(p => p.Booking != null && p.Booking.Tour != null)
+                    .GroupBy(p => new {
+                        TourId = p.Booking!.TourID,
+                        TourName = p.Booking!.Tour!.Name,
+                        Destination = p.Booking!.Tour!.Destination, // Lấy thêm Destination
+                        DurationDays = p.Booking!.Tour!.DurationDays, // Lấy thêm DurationDays
+                        ImageUrls = p.Booking!.Tour!.ImageUrls, // Lấy ImageUrls để xử lý thumbnail
+                        AverageRating = p.Booking!.Tour!.AverageRating // Lấy Rating
+                    })
+                    .Select(g => new TopTourViewModel // *** MAP SANG TopTourViewModel ***
+                    {
+                        TourId = g.Key.TourId,
+                        Name = g.Key.TourName,
+                        Destination = g.Key.Destination, // Gán Destination
+                        DurationDays = g.Key.DurationDays, // Gán DurationDays
+                        TotalRevenue = g.Sum(p => p.Amount), // Tính tổng doanh thu
+                        BookingCount = 0, // Không tính booking count ở query này
+                        AverageRating = g.Key.AverageRating,
+                        // Lấy PublicId ảnh đầu tiên làm thumbnail
+                        ThumbnailImagePublicId = g.Key.ImageUrls != null ?
+                            g.Key.ImageUrls.Split(';', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() :
+                            null
+                    })
+                    .OrderByDescending(x => x.TotalRevenue)
+                    .Take(count)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return topTours;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting top selling tours by revenue.");
+                return Enumerable.Empty<TopTourViewModel>();
+            }
+        }
+
+        // *** CẬP NHẬT PHƯƠNG THỨC NÀY ***
+        public async Task<IEnumerable<TopTourViewModel>> GetTopSellingToursByBookingCountAsync(int count, DateTime start, DateTime end)
+        {
+            _logger.LogInformation("Getting top {Count} selling tours by booking count between {StartDate} and {EndDate}", count, start.ToShortDateString(), end.ToShortDateString());
+            DateTime adjustedEndDate = end.Date.AddDays(1);
+            List<string> validBookingStatuses = new List<string> { "Paid", "Confirmed", "Completed" };
+
+            try
+            {
+                var topTours = await _context.Bookings
+                    .Where(b => validBookingStatuses.Contains(b.Status) && b.BookingDate >= start.Date && b.BookingDate < adjustedEndDate)
+                    .Include(b => b.Tour) // Include Tour để lấy thông tin
+                    .Where(b => b.Tour != null)
+                    .GroupBy(b => new {
+                        TourId = b.TourID,
+                        TourName = b.Tour!.Name,
+                        Destination = b.Tour!.Destination, // Lấy thêm Destination
+                        DurationDays = b.Tour!.DurationDays, // Lấy thêm DurationDays
+                        ImageUrls = b.Tour!.ImageUrls, // Lấy ImageUrls
+                        AverageRating = b.Tour!.AverageRating // Lấy Rating
+                    })
+                    .Select(g => new TopTourViewModel // *** MAP SANG TopTourViewModel ***
+                    {
+                        TourId = g.Key.TourId,
+                        Name = g.Key.TourName,
+                        Destination = g.Key.Destination, // Gán Destination
+                        DurationDays = g.Key.DurationDays, // Gán DurationDays
+                        BookingCount = g.Count(), // Đếm số lượng booking
+                        TotalRevenue = 0, // Không tính revenue ở query này
+                        AverageRating = g.Key.AverageRating,
+                        ThumbnailImagePublicId = g.Key.ImageUrls != null ?
+                            g.Key.ImageUrls.Split(';', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() :
+                            null
+                    })
+                    .OrderByDescending(x => x.BookingCount)
+                    .Take(count)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return topTours;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting top selling tours by booking count.");
+                return Enumerable.Empty<TopTourViewModel>();
+            }
         }
     }
 }

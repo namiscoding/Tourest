@@ -1,77 +1,202 @@
 ﻿@model Tourest.ViewModels.Tour.TourGuideDetailViewModel
 
+@{
+    Layout = "/Views/TourManager/_LayoutTourManager.cshtml";
+    ViewData["Title"] = "Tour Guide Detail";
+}
+
+<div class="container-fluid px-4">
+    <div class="container-centered">
+        <h2 class="text-primary">
+            <i class="fas fa-user-circle me-2"></i>@ViewData["Title"]
+        </h2>
+
+        @* Hiển thị thông báo (nếu có) *@
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                @* Profile Picture *@
+                @if (!string.IsNullOrEmpty(Model.ProfilePictureUri))
+                {
+                    <div class="thumbnail">
+                        <img src="@Model.ProfilePictureUri" alt="@Model.FullName" class="thumbnail-image" />
+                    </div>
+                }
+                else
+                {
+                    <div class="thumbnail">
+                        <div class="thumbnail-fallback">
+                            No Profile Picture Available
+                        </div>
+                    </div>
+                }
+
+                @* Detail Fields *@
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="detail-group">
+                            <strong><i class="fas fa-user me-1 text-primary"></i>Full Name:</strong> @Model.FullName
+                        </div>
+                        <div class="detail-group">
+                            <strong><i class="fas fa-envelope me-1 text-primary"></i>Email:</strong> @Model.Email
+                        </div>
+                        <div class="detail-group">
+                            <strong><i class="fas fa-phone me-1 text-primary"></i>Phone Number:</strong> @Model.PhoneNumber
+                        </div>
+                        <div class="detail-group">
+                            <strong><i class="fas fa-map-marker-alt me-1 text-danger"></i>Address:</strong> @(string.IsNullOrEmpty(Model.Address) ? "Not Specified" : Model.Address)
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="detail-group">
+                            <strong><i class="fas fa-briefcase me-1 text-primary"></i>Experience:</strong> @(string.IsNullOrEmpty(Model.Experience) ? "Not Specified" : Model.Experience)
+                        </div>
+                        <div class="detail-group">
+                            <strong><i class="fas fa-language me-1 text-primary"></i>Languages:</strong> @(string.IsNullOrEmpty(Model.Languages) ? "Not Specified" : Model.Languages)
+                        </div>
+                        <div class="detail-group">
+                            <strong><i class="fas fa-tags me-1 text-primary"></i>Specializations:</strong> @(string.IsNullOrEmpty(Model.Specializations) ? "Not Specified" : Model.Specializations)
+                        </div>
+                        <div class="detail-group">
+                            <strong><i class="fas fa-users me-1 text-primary"></i>Max Group Size:</strong> @Model.MaxGroupSizeCapacity
+                        </div>
+                        <div class="detail-group">
+                            <strong><i class="fas fa-star me-1 text-warning"></i>Rating:</strong> @(Model.Rating > 0 ? Model.Rating.ToString("F1") : "Not Rated")
+                        </div>
+                    </div>
+                </div>
+
+                @* Actions *@
+                <div class="actions">
+                    <a asp-controller="TourManager" asp-action="TourGuide" class="btn btn-outline-secondary btn-custom">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Tour Guides List
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Style {
     <style>
+        .container-fluid {
+            padding: 0 2rem;
+        }
+
         .container-centered {
-            max-width: 1000px;
+            max-width: 1000px; /* Tăng chiều rộng để chứa 2 cột */
             margin: 2rem auto;
-            background-color: #fff;
+        }
+
+        .card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-body {
             padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        h2 {
+        .thumbnail {
             text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .thumbnail-image {
+            max-width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+            .thumbnail-image:hover {
+                transform: scale(1.02);
+            }
+
+        .thumbnail-fallback {
+            background-color: #e9ecef;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1.2rem;
+            font-weight: 500;
+            border-radius: 10px;
+        }
+
+        .detail-group {
             margin-bottom: 1.5rem;
-            color: #343a40;
+            display: flex;
+            align-items: flex-start;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: white;
+            .detail-group strong {
+                min-width: 200px;
+                color: #555;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+            }
+
+        .actions {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .btn-custom {
+            padding: 0.5rem 1.5rem;
             border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
-        th, td {
-            padding: 12px 15px;
-            border: 1px solid #dee2e6;
-            text-align: left;
+        .btn-outline-secondary.btn-custom {
+            border-color: #6c757d;
+            color: #6c757d;
         }
 
-        th {
-            background-color: #007bff;
-            color: white;
+            .btn-outline-secondary.btn-custom:hover {
+                background-color: #6c757d;
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        .row {
+            margin-left: -15px;
+            margin-right: -15px;
         }
 
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
+        .col-md-6 {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .text-muted {
+            color: #6c757d;
         }
     </style>
 }
 
-<h2>Tour Guide Detail</h2>
-
-<div class="container-centered">
-    <table>
-        <tr>
-            <th>Experience</th>
-            <td>@Model.Experience</td>
-        </tr>
-        <tr>
-            <th>Languages</th>
-            <td>@Model.Languages</td>
-        </tr>
-        <tr>
-            <th>Specializations</th>
-            <td>@Model.Specializations</td>
-        </tr>
-        <tr>
-            <th>Max Group Size</th>
-            <td>@Model.MaxGroupSizeCapacity</td>
-        </tr>
-        <tr>
-            <th>Rating</th>
-            <td>@Model.Rating</td>
-        </tr>
-        <tr>
-            <th>Profile Picture</th>
-            <td>
-                <img src="@Model.ProfilePictureUri" alt="Profile Picture" />
-            </td>
-        </tr>
-    </table>
-</div>
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+}

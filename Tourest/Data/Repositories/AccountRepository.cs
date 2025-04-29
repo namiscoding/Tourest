@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using Microsoft.EntityFrameworkCore;
 using Tourest.Data.Entities;
 using Tourest.ViewModels.Account;
 
@@ -27,7 +28,19 @@ namespace Tourest.Data.Repositories
             return null;
         }
 
+        public async Task<Account> GetAccountByID(int id)
+        {
+            var account = await _context.Accounts
+                                        .Include(a => a.User) // Nếu muốn lấy kèm User
+                                        .FirstOrDefaultAsync(a => a.AccountID == id);
 
+            if (account == null)
+            {
+                throw new Exception("Không tìm thấy tài khoản!");
+            }
+
+            return account;
+        }
         public Task<User> getUserByEmail(string email)
         {
             throw new NotImplementedException();
@@ -46,5 +59,24 @@ namespace Tourest.Data.Repositories
                 await _context.SaveChangesAsync(); // Lưu vào DB
             return User;
         }
+
+        public async Task<bool> SetToken(string email, string token)
+        {
+            var acccount = await _context.Accounts.FirstOrDefaultAsync(u => u.Username == email);
+            if (acccount == null)
+            {
+                return false;
+            }
+
+            acccount.PasswordResetToken = token;
+            acccount.ResetTokenExpiration = DateTime.UtcNow.AddDays(7); // Token có hiệu lực trong 30 phút
+     
+            await _context.SaveChangesAsync();
+            return true;
+
+
+        }
+
+      
     }
 }
