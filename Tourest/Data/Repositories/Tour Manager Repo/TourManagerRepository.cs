@@ -82,8 +82,7 @@ namespace Tourest.Data.Repositories
                             IsActive = u.IsActive,
                             ProfilePictureUrl = u.ProfilePictureUrl,
                             RegistrationDate = u.RegistrationDate,
-                            Address = u.Address
-                            // Thêm các thuộc tính khác nếu cần
+                            Address = u.Address 
                         };
 
             return await query.ToListAsync();
@@ -91,13 +90,28 @@ namespace Tourest.Data.Repositories
         public IEnumerable<TourListAllViewModel> GetAllTours()
         {
             return _context.Tours
-    .Select(t => new TourListAllViewModel
-    {
-        TourID = t.TourID,
-        Name = t.Name,
-    })
-    .ToList();
-
+                .Select(t => new TourListAllViewModel
+                {
+                    TourID = t.TourID,
+                    Name = t.Name,
+                    Destination = t.Destination,
+                    Description = t.Description,
+                    DurationDays = t.DurationDays,
+                    DurationNights = t.DurationNights,
+                    AdultPrice = t.AdultPrice,
+                    ChildPrice = t.ChildPrice,
+                    MinGroupSize = t.MinGroupSize,
+                    MaxGroupSize = t.MaxGroupSize,
+                    DeparturePoints = t.DeparturePoints,
+                    IncludedServices = t.IncludedServices,
+                    ExcludedServices = t.ExcludedServices,
+                    ImageUrls = t.ImageUrls,
+                    Status = t.Status,
+                    AverageRating = t.AverageRating,
+                    IsCancellable = t.IsCancellable,
+                    CancellationPolicyDescription = t.CancellationPolicyDescription
+                })
+                .ToList();
         }
 
         public async Task<TourListViewModel?> GetTourByIdAsync(int id)
