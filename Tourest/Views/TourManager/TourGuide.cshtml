@@ -5,104 +5,255 @@
     ViewData["Title"] = "Tour Guide List";
 }
 
-<style>
-    .container-centered {
-        max-width: 1000px;
-        margin: 2rem auto;
-        background-color: #fff;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        text-align: center; 
-    }
+<div class="container-fluid px-4">
+    <div class="container-centered">
+        <div class="d-flex justify-content-between align-items-center my-4">
+            <h2 class="text-primary">
+                <i class="fas fa-users me-2"></i>@ViewData["Title"]
+            </h2>
+            <a asp-controller="TourManager" asp-action="ListTour" class="btn btn-primary btn-custom">
+                <i class="fas fa-arrow-left me-1"></i>Back to Tour List
+            </a>
+        </div>
 
-    h2 {
-        text-align: center;
-        margin-bottom: 1.5rem;
-        color: #343a40;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    th, td {
-        padding: 12px 15px;
-        border: 1px solid #dee2e6;
-        text-align: left;
-    }
-
-    th {
-        background-color: #007bff;
-        color: white;
-    }
-
-    tr:nth-child(even) {
-        background-color: #f8f9fa;
-    }
-
-    .btn-back {
-        display: inline-block;
-        background-color: #007bff;  
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
-        font-weight: 500;
-        text-decoration: none;
-        text-align: center;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        margin-top: 1.5rem; 
-    }
-
-        .btn-back:hover {
-            background-color: #0056b3;  
-            transform: translateY(-2px);
+        @* Hiển thị thông báo nếu không có tour guide *@
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>No tour guides found.
+            </div>
         }
-</style>
+        else
+        {
+            @* Hiển thị dạng Card - 3 đối tượng mỗi hàng *@
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+                @foreach (var item in Model)
+                {
+                    <div class="col">
+                        <div class="card tour-guide-card shadow-hover position-relative">
+                            @* Card with actions dropdown *@
+                            <div class="card-img-overlay-top">
+                                <div class="dropdown position-absolute top-0 end-0 m-2" style="z-index: 20;">
+                                    <button class="btn btn-sm btn-light bg-white rounded-circle p-1 shadow-sm action-button"
+                                            type="button" id="dropdownMenuButton-@item.TourGuideUserID"
+                                            data-bs-toggle="dropdown" aria-expanded="false" title="Actions">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuButton-@item.TourGuideUserID">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="TourManager" asp-action="TourGuideDetail" asp-route-id="@item.TourGuideUserID">
+                                                <i class="fas fa-info-circle me-2 fa-fw text-primary"></i>Detail
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="TourManager" asp-action="TourGuideFeedback" asp-route-id="@item.TourGuideUserID">
+                                                <i class="fas fa-comments me-2 fa-fw text-info"></i>Feedback
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="TourManager" asp-action="ViewSchedule" asp-route-id="@item.TourGuideUserID">
+                                                <i class="fas fa-calendar-alt me-2 fa-fw text-success"></i>Schedule
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
 
-<div class="container-centered">
-    <h2>@ViewData["Title"]</h2>
+                                @* Status Badge *@
+                                <div class="position-absolute top-0 start-0 m-2" style="z-index: 10;">
+                                    @if (item.ActiveStatus == "Active")
+                                    {
+                                        <span class="badge bg-success shadow-sm">
+                                            <i class="fas fa-check-circle me-1"></i>Active
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary shadow-sm">
+                                            <i class="fas fa-pause-circle me-1"></i>Inactive
+                                        </span>
+                                    }
+                                </div>
+                            </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>User ID</th>
-                <th>Fullname</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Active</th>
-                <th>Experience</th>
-                <th>Actions</th>
-                <th>Feedback</th>
-                <th>Schedule</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.TourGuideUserID</td>
-                    <td>@item.Fullname</td>
-                    <td>@item.Email</td>
-                    <td>@item.PhoneNumber</td>
-                    <td>@item.ActiveStatus</td>
-                    <td>@item.ExperienceLevel</td>
-                    <td>
-                        <a asp-controller="TourManager" asp-action="TourGuideDetail" asp-route-id="@item.TourGuideUserID">Detail</a>
-                    </td>
-                    <td>
-                        <a asp-controller="TourManager" asp-action="TourGuideFeedback" asp-route-id="@item.TourGuideUserID">Feedback</a>
-                    </td>
-                    <td>
-                        <a asp-controller="TourManager" asp-action="ViewSchedule" asp-route-id="@item.TourGuideUserID">Schedule</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                            @* Full card is clickable with overlay link *@
+                            <a asp-controller="TourManager" asp-action="TourGuideDetail" asp-route-id="@item.TourGuideUserID" class="card-link-overlay"></a>
+
+                            @* Placeholder for image (nếu có ảnh) *@
+                            <div class="guide-image-container">
+                                <div class="guide-image-fallback">
+                                    <i class="fas fa-user-circle fa-3x"></i>
+                                </div>
+                            </div>
+
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-truncate guide-title">@item.Fullname</h5>
+                                <p class="card-text mb-1 text-muted">
+                                    <i class="fas fa-id-badge me-1 text-primary"></i>ID: @item.TourGuideUserID
+                                </p>
+                                <p class="card-text mb-1 text-muted">
+                                    <i class="fas fa-envelope me-1 text-primary"></i>@item.Email
+                                </p>
+                                <p class="card-text mb-2">
+                                    <i class="fas fa-phone me-1 text-primary"></i>@item.PhoneNumber
+                                </p>
+                                <div class="mt-auto pt-2 d-flex justify-content-between align-items-center">
+                                    <span class="card-experience"><i class="fas fa-briefcase me-1 text-primary"></i>@item.ExperienceLevel</span>
+                                    <span class="card-view-details">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>
+
+@section Style {
+    <style>
+        .container-fluid {
+            padding: 0 2rem;
+        }
+
+        .container-centered {
+            max-width: 1200px; /* Tăng chiều rộng để chứa các card */
+            margin: 2rem auto;
+        }
+
+        .tour-guide-card {
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,.1);
+            border-radius: 12px;
+            height: 100%;
+            background-color: #fff;
+        }
+
+        .shadow-hover {
+            transition: all 0.3s ease;
+        }
+
+            .shadow-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+                border-color: rgba(0,123,255,0.5);
+            }
+
+        .guide-image-container {
+            height: 200px;
+            overflow: hidden;
+            background-color: #e9ecef; /* Màu xám mặc định */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .guide-image-fallback {
+            color: #6c757d;
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .guide-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #343a40;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-experience {
+            font-weight: 500;
+            font-size: 1rem;
+            color: #007bff;
+        }
+
+        .card-link-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .action-button {
+            z-index: 20;
+            transition: all 0.2s ease;
+            border: 1px solid #dee2e6;
+        }
+
+            .action-button:hover {
+                background-color: #f8f9fa !important;
+                transform: scale(1.1);
+                border-color: #007bff;
+            }
+
+        .card-view-details {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #f8f9fa;
+            color: #0d6efd;
+            transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
+        }
+
+        .tour-guide-card:hover .card-view-details {
+            background-color: #0d6efd;
+            color: white;
+            transform: translateX(5px);
+            border-color: #0d6efd;
+        }
+
+        .dropdown-menu {
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            z-index: 30;
+        }
+
+        .dropdown-item {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+            .dropdown-item:hover {
+                background-color: #f1f3f5;
+            }
+
+        .btn-custom {
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary.btn-custom {
+            background-color: #007bff;
+            border: none;
+        }
+
+            .btn-primary.btn-custom:hover {
+                background-color: #0056b3;
+                transform: translateY(-2px);
+            }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+}
