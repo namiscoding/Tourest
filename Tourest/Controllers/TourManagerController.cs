@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using Tourest.Data;
 using Tourest.Data.Entities;
@@ -102,7 +104,6 @@ namespace Tourest.Controllers
             return View(tours);
         }
 
-        [HttpPost("ListTour")]
         public IActionResult ListTour(string searchTerm, string statusFilter)
         {
             // Truy vấn dữ liệu từ database
@@ -133,9 +134,9 @@ namespace Tourest.Controllers
             // Áp dụng tìm kiếm nếu có searchTerm
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                searchTerm = searchTerm.ToLower().Trim(); // Xử lý khoảng trắng
-                query = query.Where(t => t.Name.ToLower().Contains(searchTerm) ||
-                                         (t.Destination != null && t.Destination.ToLower().Contains(searchTerm)));
+                searchTerm = RemoveDiacritics(searchTerm.ToLower().Trim());
+                query = query.Where(t => RemoveDiacritics(t.Name.ToLower()).Contains(searchTerm) ||
+                                         (t.Destination != null && RemoveDiacritics(t.Destination.ToLower()).Contains(searchTerm)));
             }
 
             // Áp dụng lọc theo trạng thái nếu có statusFilter
@@ -152,10 +153,30 @@ namespace Tourest.Controllers
             ViewData["CurrentStatus"] = statusFilter;
 
             // Truyền danh sách trạng thái cho dropdown
-            var statuses = new List<string> { "Active", "Inactive", "Draft" }; // Danh sách trạng thái có thể điều chỉnh
+            var statuses = new List<string> { "Active", "Inactive", "Draft" };
             ViewData["Statuses"] = statuses;
 
             return View(tours);
+        }
+
+        private string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
         [HttpGet("GetTourDetails")]
