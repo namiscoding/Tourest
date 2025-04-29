@@ -1,0 +1,556 @@
+﻿@* File: /Views/AdminTours/Details.cshtml *@
+@model AdminTourDetailsViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Chi tiết Tour";
+    var cloudName = Configuration["CloudinarySettings:CloudName"];
+    var defaultTourImage = "assets/images/tour-image.png";
+}
+
+<style>
+    .tour-details-container {
+        padding: 1.5rem 0.5rem;
+    }
+
+    .icon-container {
+        width: 32px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .tour-id {
+        font-size: 12px;
+        opacity: 0.7;
+    }
+
+    .thumbnail-item {
+        border: 2px solid transparent;
+        transition: all 0.2s;
+    }
+
+        .thumbnail-item.active {
+            border-color: var(--bs-primary);
+        }
+
+    .timeline-line {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 15px;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+
+    .day-number {
+        font-size: 14px;
+    }
+
+    .itinerary-content {
+        padding-bottom: 1rem;
+    }
+
+</style>
+
+<!-- Tour Details Container -->
+<div class="tour-details-container">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
+        <div class="d-flex align-items-center mb-3 mb-md-0">
+            <div class="bg-primary text-white rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 46px; height: 46px;">
+                <i class="fas fa-route fa-lg"></i>
+            </div>
+            <div>
+                <h6 class="text-muted text-uppercase fs-xs fw-semibold mb-1">
+                    <span class="tour-id">ID: @Model.TourID</span>
+                </h6>
+                <h1 class="h3 fw-bold mb-0">@Model.Name</h1>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.TourID" class="btn btn-primary">
+                <i class="fas fa-edit me-1"></i> Sửa Tour
+            </a>
+        </div>
+    </div>
+
+    <!-- Tour Status Indicator -->
+    <div class="status-banner mb-4">
+        <div class="row g-0 p-3 bg-@(Model.Status == "Active" ? "success" : (Model.Status == "Draft" ? "warning" : "secondary"))-subtle
+                  border-start border-5 border-@(Model.Status == "Active" ? "success" : (Model.Status == "Draft" ? "warning" : "secondary"))
+                  rounded-3">
+            <div class="col-12 col-sm-6 col-md-3 mb-2 mb-md-0">
+                <div class="d-flex align-items-center">
+                    <div class="icon-container me-2">
+                        <i class="fas fa-tag text-@(Model.Status == "Active" ? "success" : (Model.Status == "Draft" ? "warning" : "secondary"))"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Trạng thái</small>
+                        <span class="fw-semibold">
+                            @if (Model.Status == "Active")
+                            {
+                                <span class="text-success">Hoạt động</span>
+                            }
+                            else if (Model.Status == "Inactive")
+                            {
+                                <span class="text-secondary">Không hoạt động</span>
+                            }
+                            else
+                            {
+                                <span class="text-warning">Bản nháp</span>
+                            }
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3 mb-2 mb-md-0">
+                <div class="d-flex align-items-center">
+                    <div class="icon-container me-2">
+                        <i class="fas fa-calendar-alt text-primary"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Thời lượng</small>
+                        <span class="fw-semibold">@Model.DurationDays ngày / @Model.DurationNights đêm</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3 mb-2 mb-md-0">
+                <div class="d-flex align-items-center">
+                    <div class="icon-container me-2">
+                        <i class="fas fa-dollar-sign text-success"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Giá (từ)</small>
+                        <span class="fw-semibold">@Model.AdultPrice.ToString("N0") ₫</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="d-flex align-items-center">
+                    <div class="icon-container me-2">
+                        <i class="fas fa-star text-warning"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Đánh giá</small>
+                        <span class="fw-semibold d-flex align-items-center">
+                            @if (Model.AverageRating.HasValue)
+                            {
+                                <span>@Model.AverageRating.Value.ToString("0.0")</span>
+                                <div class="ms-1">
+                                    @for (var i = 1; i <= 5; i++)
+                                    {
+                                        <i class="@(i <= Math.Round(Model.AverageRating.Value) ? "fas" : "far") fa-star text-warning small"></i>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa có đánh giá</span>
+                            }
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="row g-4">
+        <!-- Left Column - Main Tour Information -->
+        <div class="col-lg-8">
+            <!-- Tour Images Carousel -->
+            <div class="card border-0 shadow-sm mb-4 overflow-hidden">
+                <div class="card-header bg-transparent border-bottom-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold mb-0">
+                        <i class="fas fa-images me-2 text-primary"></i> Hình ảnh Tour
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.ImageUrls.Any())
+                    {
+                        <div id="tourImagesCarousel" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-indicators">
+                                @for (int i = 0; i < Model.ImageUrls.Count; i++)
+                                {
+                                    <button type="button" data-bs-target="#tourImagesCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")"
+                                            aria-current="@(i == 0 ? "true" : "false")" aria-label="Slide @(i+1)"></button>
+                                }
+                            </div>
+                            <div class="carousel-inner">
+                                @for (int i = 0; i < Model.ImageUrls.Count; i++)
+                                {
+                                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                                        <img src="@Model.ImageUrls[i]" class="d-block w-100" alt="Tour Image"
+                                             style="height: 400px; object-fit: cover;">
+                                    </div>
+                                }
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#tourImagesCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#tourImagesCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                        <div class="image-thumbnails d-flex overflow-auto p-2 bg-light">
+                            @for (int i = 0; i < Model.ImageUrls.Count; i++)
+                            {
+                                <a href="#" data-bs-target="#tourImagesCarousel" data-bs-slide-to="@i"
+                                   class="thumbnail-item @(i == 0 ? "active" : "") me-2" aria-current="@(i == 0 ? "true" : "false")">
+                                    <img src="@Model.ImageUrls[i]" class="img-thumbnail" alt="Thumbnail"
+                                         style="width: 80px; height: 60px; object-fit: cover;">
+                                </a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 bg-light">
+                            <div class="mb-3 text-muted">
+                                <i class="fas fa-image fa-4x"></i>
+                            </div>
+                            <p>Chưa có hình ảnh nào cho tour này.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Tour Description -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold mb-0">
+                        <i class="fas fa-info-circle me-2 text-primary"></i> Mô tả Tour
+                    </h5>
+                    <button class="btn btn-sm btn-link text-decoration-none">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <div class="tour-description">
+                            @Html.Raw(Model.Description)
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-3">
+                            <p class="text-muted mb-0">Chưa có mô tả cho tour này.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Included/Excluded Services -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                            <h5 class="card-title fw-semibold mb-0">
+                                <i class="fas fa-check-circle me-2 text-success"></i> Dịch vụ bao gồm
+                            </h5>
+                            <button class="btn btn-sm btn-link text-decoration-none">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            @if (!string.IsNullOrWhiteSpace(Model.IncludedServices))
+                            {
+                                <div class="included-services">
+                                    @Html.Raw(Model.IncludedServices)
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-3">
+                                    <p class="text-muted mb-0">Chưa cập nhật thông tin.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                            <h5 class="card-title fw-semibold mb-0">
+                                <i class="fas fa-times-circle me-2 text-danger"></i> Dịch vụ không bao gồm
+                            </h5>
+                            <button class="btn btn-sm btn-link text-decoration-none">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            @if (!string.IsNullOrWhiteSpace(Model.ExcludedServices))
+                            {
+                                <div class="excluded-services">
+                                    @Html.Raw(Model.ExcludedServices)
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-3">
+                                    <p class="text-muted mb-0">Chưa cập nhật thông tin.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Itinerary -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold mb-0">
+                        <i class="fas fa-map-marked-alt me-2 text-primary"></i> Lịch trình chi tiết
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.ItineraryDays.Any())
+                    {
+                        <div class="accordion" id="itineraryAccordion">
+                            @foreach (var day in Model.ItineraryDays.OrderBy(d => d.DayNumber).ThenBy(d => d.Order))
+                            {
+                                var collapseId = $"collapse{day.ItineraryDayID}";
+                                var headerId = $"heading{day.ItineraryDayID}";
+                                var isFirst = day == Model.ItineraryDays.OrderBy(d => d.DayNumber).ThenBy(d => d.Order).First();
+
+                                <div class="accordion-item border-0 border-bottom">
+                                    <h2 class="accordion-header border-0" id="@headerId">
+                                        <button class="accordion-button fw-semibold @(isFirst ? "" : "collapsed")" type="button"
+                                                data-bs-toggle="collapse" data-bs-target="#@collapseId"
+                                                aria-expanded="@(isFirst ? "true" : "false")" aria-controls="@collapseId">
+                                            <div class="d-flex align-items-center">
+                                                <div class="day-number rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3"
+                                                     style="width: 30px; height: 30px; flex-shrink: 0;">
+                                                    @day.DayNumber
+                                                </div>
+                                                <span>@day.Title</span>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="@collapseId" class="accordion-collapse collapse @(isFirst ? "show" : "")"
+                                         aria-labelledby="@headerId" data-bs-parent="#itineraryAccordion">
+                                        <div class="accordion-body pt-0">
+                                            <div class="ps-5 position-relative itinerary-content">
+                                                <div class="timeline-line"></div>
+                                                @if (!string.IsNullOrWhiteSpace(day.Description))
+                                                {
+                                                    @Html.Raw(day.Description.Replace("\n", "<br/>"))
+                                                }
+                                                else
+                                                {
+                                                    <p class="text-muted fst-italic">Chưa có mô tả chi tiết cho ngày này.</p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <div class="mb-3 text-muted">
+                                <i class="fas fa-route fa-3x"></i>
+                            </div>
+                            <p>Chưa có lịch trình chi tiết cho tour này.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Tour Details and Additional Info -->
+        <div class="col-lg-4">
+            <!-- Tour Details Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold mb-0">
+                        <i class="fas fa-list me-2 text-primary"></i> Thông tin chi tiết
+                    </h5>
+                    <button class="btn btn-sm btn-link text-decoration-none">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Điểm đến</span>
+                            <span class="fw-semibold text-end">@Model.Destination</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Điểm khởi hành</span>
+                            <span class="fw-semibold text-end">@Model.DeparturePoints</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Giá người lớn</span>
+                            <span class="fw-semibold text-end">@Model.AdultPrice.ToString("N0") ₫</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Giá trẻ em</span>
+                            <span class="fw-semibold text-end">@Model.ChildPrice.ToString("N0") ₫</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Số khách tối thiểu</span>
+                            <span class="fw-semibold text-end">
+                                @(Model.MinGroupSize.HasValue ? Model.MinGroupSize.Value.ToString() : "Không quy định")
+                            </span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Số khách tối đa</span>
+                            <span class="fw-semibold text-end">
+                                @(Model.MaxGroupSize.HasValue ? Model.MaxGroupSize.Value.ToString() : "Không giới hạn")
+                            </span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Cho phép hủy</span>
+                            <span class="fw-semibold text-end">
+                                @if (Model.IsCancellable)
+                                {
+                                    <span class="badge bg-success">Có</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Không</span>
+                                }
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold mb-0">
+                        <i class="fas fa-tags me-2 text-primary"></i> Danh mục
+                    </h5>
+                    <button class="btn btn-sm btn-link text-decoration-none">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    @if (Model.CategoryNames.Any())
+                    {
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var categoryName in Model.CategoryNames)
+                            {
+                                <span class="badge bg-info-subtle text-info p-2 fs-6">
+                                    <i class="fas fa-tag me-1 small"></i> @categoryName
+                                </span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-3">
+                            <p class="text-muted mb-0">Chưa có danh mục.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Cancellation Policy Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold mb-0">
+                        <i class="fas fa-ban me-2 text-primary"></i> Chính sách hủy
+                    </h5>
+                    <button class="btn btn-sm btn-link text-decoration-none">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrWhiteSpace(Model.CancellationPolicyDescription))
+                    {
+                        <div class="cancellation-policy">
+                            @Html.Raw(Model.CancellationPolicyDescription.Replace("\n", "<br/>"))
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-3">
+                            <p class="text-muted mb-0">
+                                @(Model.IsCancellable ? "Chưa có mô tả chính sách hủy." : "Tour này không cho phép hủy.")
+                            </p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Stats Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent">
+                    <h5 class="card-title fw-semibold mb-0">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i> Thống kê nhanh
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Tổng số booking</span>
+                            <span class="badge bg-primary rounded-pill">24</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Doanh thu (30 ngày qua)</span>
+                            <span class="fw-semibold">21,500,000 ₫</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Lượt xem (30 ngày qua)</span>
+                            <span class="fw-semibold">456</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Đánh giá mới nhất</span>
+                            <span class="fw-semibold">14/04/2025</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent text-center">
+                    <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                        <i class="fas fa-chart-line me-1"></i> Xem báo cáo chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="mt-4 d-flex justify-content-between">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+        <div class="d-flex gap-2">
+            
+            <a asp-action="Edit" asp-route-id="@Model.TourID" class="btn btn-primary">
+                <i class="fas fa-edit me-1"></i> Sửa Tour
+            </a>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        // Initialize Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // Handle thumbnail clicks for carousel
+        document.addEventListener('DOMContentLoaded', function() {
+            const thumbnails = document.querySelectorAll('.thumbnail-item');
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    thumbnails.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+}

@@ -1,4 +1,5 @@
 ﻿using Tourest.Data.Entities;
+using Tourest.ViewModels.Admin.AdminDashboard;
 
 namespace Tourest.Data.Repositories
 {
@@ -37,7 +38,8 @@ namespace Tourest.Data.Repositories
         Task<IEnumerable<Rating>> GetRatingsReceivedByGuideAsync(int guideUserId);
         Task<bool> ChangePassword(int uid, string newPassword, string currentPass);
 
+        Task<int> GetUserCountByRoleAsync(string roleName);
+        Task<IEnumerable<TopGuideViewModel>> GetTopRatedGuidesAsync(int count); // Logic phức tạp
     }
-
 }
 

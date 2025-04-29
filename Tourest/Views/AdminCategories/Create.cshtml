@@ -1,35 +1,72 @@
 ﻿@* File: /Views/AdminCategories/Create.cshtml *@
 @model CategoryInputViewModel
-
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Tạo Danh mục Mới";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Create" method="post">
-            @* Hiển thị lỗi validation tổng hợp *@
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <div class="mb-3">
-                <label asp-for="Name" class="form-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span> @* Hiển thị lỗi cho từng trường *@
+<div class="container-fluid px-4 py-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-folder-plus me-2"></i>@ViewData["Title"]</h5>
+                <a asp-action="Index" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i>Quay lại
+                </a>
             </div>
-            <div class="mb-3">
-                <label asp-for="Description" class="form-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <input type="submit" value="Tạo mới" class="btn btn-success" />
-                <a asp-action="Index" class="btn btn-secondary ms-2">Hủy</a>
-            </div>
-        </form>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post">
+                @* Hiển thị lỗi validation tổng hợp *@
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4" role="alert"></div>
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-4">
+                            <label asp-for="Name" class="form-label fw-bold">Tên danh mục</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                <input asp-for="Name" class="form-control" placeholder="Nhập tên danh mục" />
+                            </div>
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-bold">Mô tả</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                                <textarea asp-for="Description" class="form-control" rows="5" placeholder="Nhập mô tả chi tiết về danh mục"></textarea>
+                            </div>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <div class="form-text">Mô tả ngắn gọn giúp người dùng hiểu rõ hơn về danh mục này</div>
+                        </div>
+                        
+                        <div class="d-flex mt-4">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-2"></i>Tạo mới
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary ms-2">
+                                <i class="fas fa-times me-2"></i>Hủy
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6 class="card-title"><i class="fas fa-info-circle me-2"></i>Hướng dẫn</h6>
+                                <hr>
+                                <ul class="mb-0 ps-3">
+                                    <li class="mb-2">Tên danh mục không được để trống</li>
+                                    <li class="mb-2">Mô tả chi tiết giúp người dùng hiểu rõ về danh mục</li>
+                                    <li>Sau khi tạo, danh mục sẽ hiển thị trên trang chủ</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -37,4 +74,12 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        $(document).ready(function() {
+            // Tự động focus vào trường nhập tên
+            $("#Name").focus();
+        });
+    </script>
 }
+
+

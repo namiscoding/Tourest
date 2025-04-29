@@ -1,0 +1,85 @@
+﻿@* File: /Views/AdminPayments/Details.cshtml *@
+@model AdminPaymentDetailsViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Chi tiết Thanh toán";
+}
+
+<h1>@ViewData["Title"] #@Model.PaymentId</h1>
+
+@* Hiển thị thông báo *@
+@if (TempData["SuccessMessage"] != null)
+{
+     <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+     <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+
+<div class="row">
+    <div class="col-md-7">
+        <h4>Thông tin Thanh toán</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-4">Payment ID</dt>
+            <dd class="col-sm-8">@Model.PaymentId</dd>
+
+            <dt class="col-sm-4">Số tiền</dt>
+            <dd class="col-sm-8">@Model.Amount.ToString("N0") VNĐ</dd>
+
+            <dt class="col-sm-4">Ngày Thanh toán</dt>
+            <dd class="col-sm-8">@Model.PaymentDate.ToString("F")</dd> @* Hiển thị đầy đủ ngày giờ *@
+
+            <dt class="col-sm-4">Phương thức</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.PaymentMethod)</dd>
+
+            <dt class="col-sm-4">Mã GD (Cổng TT)</dt>
+            <dd class="col-sm-8">@Html.DisplayFor(model => model.TransactionId)</dd>
+
+            @* Có thể thêm các trường khác như Ghi chú nếu có *@
+        </dl>
+
+    </div>
+
+    <div class="col-md-5">
+        <h4>Thông tin Liên quan</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-5">Booking ID</dt>
+            <dd class="col-sm-7">
+                @Model.BookingId
+            </dd>
+
+            <dt class="col-sm-5">Ngày khởi hành</dt>
+            <dd class="col-sm-7">@(Model.BookingDepartureDate?.ToString("dd/MM/yyyy") ?? "N/A")</dd>
+
+            <dt class="col-sm-5">Số khách</dt>
+            <dd class="col-sm-7">@Model.BookingNumberOfGuests</dd>
+
+            <dt class="col-sm-5">Tên Tour</dt>
+            <dd class="col-sm-7">
+                @* Link đến trang chi tiết Tour *@
+                @* @if(Model.TourId.HasValue) { <a asp-controller="AdminTours" asp-action="Details" asp-route-id="@Model.TourId">@Model.TourName</a> } else { @Model.TourName } *@
+                @Model.TourName
+            </dd>
+
+            <dt class="col-sm-5">Tên Khách hàng</dt>
+            <dd class="col-sm-7">
+                @* Link đến trang chi tiết Customer *@
+                @* @if(Model.CustomerId.HasValue) { <a asp-controller="AdminCustomers" asp-action="Details" asp-route-id="@Model.CustomerId">@Model.CustomerName</a> } else { @Model.CustomerName } *@
+                @Model.CustomerName
+            </dd>
+
+            <dt class="col-sm-5">Email Khách hàng</dt>
+            <dd class="col-sm-7">@Html.DisplayFor(model => model.CustomerEmail)</dd>
+        </dl>
+    </div>
+</div>
+
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">Quay lại Danh sách</a>
+</div>

@@ -13,14 +13,23 @@
 
 <!-- Page Header -->
 <div class="page-header mb-4">
-    <div class="row align-items-center">
-        <div class="col">
-            <h1 class="page-title">
-                <i class="fas fa-users text-primary me-2"></i>@ViewData["Title"]
-            </h1>
-            <p class="text-muted">Quản lý thông tin và trạng thái của khách hàng</p>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 border-start border-success border-4 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-xs fw-bold text-succ text-uppercase mb-1">Tổng Số Khách Hàng</div>
+                            <div class="h3 mb-0 fw-bold">@Model.Count()</div>
+                        </div>
+                        <div class="fa-2x text-primary opacity-25">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-auto">
+        <div class="mt-3 mt-md-0">
             <a asp-action="Create" class="btn btn-primary">
                 <i class="fas fa-plus-circle me-2"></i>Tạo Khách Hàng Mới
             </a>
@@ -145,7 +154,7 @@
                                                     </button>
                                                 }
                                                 else
-                                                {
+                                                    {
                                                     <button type="submit" class="dropdown-item text-success">
                                                         <i class="fas fa-user-check me-2"></i>Kích hoạt
                                                     </button>

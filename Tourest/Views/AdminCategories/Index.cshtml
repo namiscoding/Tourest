@@ -6,84 +6,404 @@
     ViewData["Title"] = "Quản lý Danh mục Tour";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary mb-3">
-        <i class="fas fa-plus me-1"></i> Tạo Danh mục Mới
-    </a>
-</p>
-
-@* Hiển thị thông báo thành công/lỗi (Giữ nguyên) *@
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
-@* Hiển thị dưới dạng Card *@
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-    @* Grid layout, tự điều chỉnh số cột *@
-    @foreach (var item in Model)
-    {
-        <div class="col">
-            <div class="card h-100 shadow-sm">
-                @* h-100 để các card cao bằng nhau *@
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 card-title">
-                        @* Có thể tạo link Details ở đây nếu muốn *@
-                        @* <a asp-action="Details" asp-route-id="@item.CategoryId" class="text-decoration-none text-dark">@item.Name</a> *@
-                        @item.Name
-                    </h5>
-                    @* Nút 3 chấm và Dropdown Actions *@
-                    <div class="dropdown">
-                        <button class="btn btn-link text-secondary p-0" type="button" id="dropdownMenuButton-@item.CategoryId" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton-@item.CategoryId">
-                            <li>
-                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.CategoryId">
-                                    <i class="fas fa-edit me-2"></i>Sửa
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.CategoryId">
-                                    <i class="fas fa-trash-alt me-2"></i>Xóa
-                                </a>
-                                @* Nếu muốn xóa ngay lập tức (ít an toàn hơn): *@
-                                @*
-                                <form asp-action="Delete" asp-route-id="@item.CategoryId" method="post" onsubmit="return confirm('Bạn chắc chắn muốn xóa danh mục này?');">
-                                     @Html.AntiForgeryToken()
-                                     <button type="submit" class="dropdown-item text-danger"><i class="fas fa-trash-alt me-2"></i>Xóa (Confirm)</button>
-                                </form>
-                                *@
-                            </li>
-                        </ul>
+<div class="container-fluid py-2">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 border-start border-success border-4 shadow-sm">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="text-xs fw-bold text-succ text-uppercase mb-1">Tổng danh mục</div>
+                            <div class="h3 mb-0 fw-bold">@Model.Count()</div>
+                        </div>
+                        <div class="fa-2x text-primary opacity-25">
+                            <i class="fas fa-folder"></i>
+                        </div>
                     </div>
                 </div>
-                @* Hiển thị Description nếu có trong ViewModel và không rỗng *@
-                @if (!string.IsNullOrWhiteSpace(item.Description))
-                {
-                    <div class="card-body">
-                        <p class="card-text"><small>@item.Description</small></p>
+            </div>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a asp-action="Create" class="btn btn-primary d-flex align-items-center">
+                <i class="fas fa-plus me-2"></i>Tạo Danh mục Mới
+            </a>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center border-0 shadow-sm" role="alert">
+            <div class="d-flex">
+                <div class="me-3">
+                    <i class="fas fa-check-circle fa-lg text-success"></i>
+                </div>
+                <div>
+                    <strong>Thành công!</strong> @TempData["SuccessMessage"]
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center border-0 shadow-sm" role="alert">
+            <div class="d-flex">
+                <div class="me-3">
+                    <i class="fas fa-exclamation-circle fa-lg text-danger"></i>
+                </div>
+                <div>
+                    <strong>Lỗi!</strong> @TempData["ErrorMessage"]
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Stats Cards -->
+        
+    <!-- Search & Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" id="searchCategory" class="form-control border-start-0" placeholder="Tìm kiếm danh mục...">
                     </div>
-                }
-                @* Có thể thêm footer cho card nếu cần *@
-                @* <div class="card-footer text-muted">
-                    <small>ID: @item.CategoryId</small>
-                </div> *@
+                </div>
+                <div class="col-md-3">
+                    <select id="sortCategories" class="form-select">
+                        <option value="name">Sắp xếp theo tên</option>
+                        <option value="id">Sắp xếp theo ID</option>
+                    </select>
+                </div>
+                <div class="col-md-3 text-md-end">
+                    <div class="btn-group" role="group" aria-label="View options">
+                        <button type="button" class="btn btn-outline-primary active" id="gridView">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="listView">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid View - Main Content -->
+    <div id="categoriesGrid" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col category-item">
+                <div class="card h-100 border-0 shadow-sm hover-card">
+                    <div class="position-relative">
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center py-4">
+                            <i class="fas fa-folder-open fa-3x text-primary opacity-50"></i>
+                        </div>
+                        <div class="position-absolute top-0 end-0 p-2">
+                            <div class="dropdown">
+                                <button class="btn btn-light btn-sm rounded-circle shadow-sm" type="button" id="dropdownMenuButton-@item.CategoryId" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="dropdownMenuButton-@item.CategoryId">
+                                    <li>
+                                        <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.CategoryId">
+                                            <i class="fas fa-edit me-2 text-primary"></i>Chỉnh sửa
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#detailsModal"
+                                           data-category-id="@item.CategoryId"
+                                           data-category-name="@item.Name"
+                                           data-category-desc="@(item.Description ?? "Không có mô tả")">
+                                            <i class="fas fa-eye me-2 text-info"></i>Xem chi tiết
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                           data-category-id="@item.CategoryId"
+                                           data-category-name="@item.Name">
+                                            <i class="fas fa-trash-alt me-2"></i>Xóa
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title mb-0 text-truncate">@item.Name</h5>
+                            <span class="badge bg-primary rounded-pill">ID: @item.CategoryId</span>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(item.Description))
+                        {
+                            <p class="card-text small text-muted mb-0 line-clamp-2">@item.Description</p>
+                        }
+                        else
+                        {
+                            <p class="card-text small text-muted fst-italic mb-0">Không có mô tả</p>
+                        }
+                    </div>
+                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                        <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit me-1"></i>Sửa
+                        </a>
+                        <a href="#" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                           data-category-id="@item.CategoryId"
+                           data-category-name="@item.Name">
+                            <i class="fas fa-trash-alt me-1"></i>Xóa
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- List View (Hidden by default) -->
+    <div id="categoriesList" class="card border-0 shadow-sm d-none">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 60px;">ID</th>
+                        <th>Tên danh mục</th>
+                        <th>Mô tả</th>
+                        <th class="text-end" style="width: 120px;">Tác vụ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="category-item">
+                            <td class="fw-bold">@item.CategoryId</td>
+                            <td class="fw-medium">@item.Name</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.Description))
+                                {
+                                    <span class="text-truncate d-inline-block" style="max-width: 400px;">@item.Description</span>
+                                }
+                                else
+                                {
+                                    <span class="fst-italic text-muted">Không có mô tả</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#detailsModal"
+                                            data-category-id="@item.CategoryId"
+                                            data-category-name="@item.Name"
+                                            data-category-desc="@(item.Description ?? "Không có mô tả")">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                            data-category-id="@item.CategoryId"
+                                            data-category-name="@item.Name">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    @if (!Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <div class="avatar-lg mx-auto bg-light rounded-circle d-flex align-items-center justify-content-center">
+                        <i class="fas fa-folder-open fa-2x text-muted"></i>
+                    </div>
+                </div>
+                <h5 class="fw-bold">Chưa có danh mục nào</h5>
+                <p class="text-muted pb-3">Bạn chưa tạo bất kỳ danh mục tour nào. Hãy tạo danh mục đầu tiên!</p>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Tạo Danh mục Mới
+                </a>
             </div>
         </div>
     }
+</di>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa danh mục <strong id="deleteCategoryName"></strong>?</p>
+                <p class="text-muted mb-0">Hành động này không thể hoàn tác. Các tour thuộc danh mục này có thể bị ảnh hưởng.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="deleteForm" asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deleteCategoryId" name="id" />
+                    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
-@* Không có phân trang trong ví dụ này, nếu danh sách dài cần thêm lại logic phân trang *@
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="detailsModalLabel"><i class="fas fa-info-circle me-2"></i>Chi tiết danh mục</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted small">ID Danh mục</label>
+                    <div class="fw-bold" id="detailsCategoryId"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Tên danh mục</label>
+                    <div class="fw-bold" id="detailsCategoryName"></div>
+                </div>
+                <div>
+                    <label class="form-label text-muted small">Mô tả</label>
+                    <div id="detailsCategoryDesc"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <a id="editCategoryLink" class="btn btn-primary">
+                    <i class="fas fa-edit me-1"></i>Chỉnh sửa
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .hover-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $("#searchCategory").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $(".category-item").filter(function() {
+                    var text = $(this).text().toLowerCase();
+                    $(this).toggle(text.indexOf(value) > -1);
+                });
+
+                // Show empty state if no results
+                checkEmptyResults();
+            });
+
+            // View toggle functionality
+            $("#gridView").click(function() {
+                $(this).addClass("active");
+                $("#listView").removeClass("active");
+                $("#categoriesGrid").removeClass("d-none");
+                $("#categoriesList").addClass("d-none");
+            });
+
+            $("#listView").click(function() {
+                $(this).addClass("active");
+                $("#gridView").removeClass("active");
+                $("#categoriesList").removeClass("d-none");
+                $("#categoriesGrid").addClass("d-none");
+            });
+
+            // Delete modal setup
+            $('#deleteModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var categoryId = button.data('category-id');
+                var categoryName = button.data('category-name');
+
+                $('#deleteCategoryId').val(categoryId);
+                $('#deleteCategoryName').text(categoryName);
+            });
+
+            // Details modal setup
+            $('#detailsModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var categoryId = button.data('category-id');
+                var categoryName = button.data('category-name');
+                var categoryDesc = button.data('category-desc');
+
+                $('#detailsCategoryId').text(categoryId);
+                $('#detailsCategoryName').text(categoryName);
+                $('#detailsCategoryDesc').text(categoryDesc);
+                $('#editCategoryLink').attr("href", `/AdminCategories/Edit/${categoryId}`);
+            });
+
+            // Check for empty results
+            function checkEmptyResults() {
+                var visibleItems = $(".category-item:visible").length;
+
+                if (visibleItems === 0) {
+                    if ($("#noResults").length === 0) {
+                        var noResults = `
+                            <div id="noResults" class="col-12 text-center py-5">
+                                <div class="mb-3">
+                                    <i class="fas fa-search fa-3x text-muted"></i>
+                                </div>
+                                <h5 class="fw-bold">Không tìm thấy kết quả</h5>
+                                <p class="text-muted">Không tìm thấy danh mục phù hợp với từ khóa tìm kiếm.</p>
+                            </div>
+                        `;
+
+                        $("#categoriesGrid").append(noResults);
+
+                        var noResultsTable = `
+                            <tr id="noResultsTable">
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="mb-3">
+                                        <i class="fas fa-search fa-3x text-muted"></i>
+                                    </div>
+                                    <h5 class="fw-bold">Không tìm thấy kết quả</h5>
+                                    <p class="text-muted">Không tìm thấy danh mục phù hợp với từ khóa tìm kiếm.</p>
+                                </td>
+                            </tr>
+                        `;
+
+                        $("#categoriesList tbody").append(noResultsTable);
+                    }
+                } else {
+                    $("#noResults, #noResultsTable").remove();
+                }
+            }
+        });
+    </script>
+}

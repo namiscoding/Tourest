@@ -9,11 +9,13 @@ public static class SeedData
     {
         using (var context = serviceProvider.GetRequiredService<ApplicationDbContext>()) // Thay TourestDbContext bằng DbContext của bạn
         {
-           
+
             // Kiểm tra xem đã có dữ liệu chưa
-            if (context.Users.Any() || context.Accounts.Any())
+            bool adminExists = await context.Users.AnyAsync(u => u.Email == "admin@tourest.com");
+
+            if (adminExists)
             {
-                return; // Cơ sở dữ liệu đã được seed
+                return; // Admin đã được seed, không cần làm gì thêm
             }
 
             // Tạo một User mới
@@ -31,7 +33,7 @@ public static class SeedData
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword("admin123");
             var adminAccount = new Account
             {
-                Username = "admin",
+                Username = adminUser.Email,
                 PasswordHash = hashedPassword, // Lưu trữ mật khẩu đã hash
                 Role = "Admin",
                 LastLoginDate = null, // Giá trị mặc định
@@ -47,4 +49,5 @@ public static class SeedData
             await context.SaveChangesAsync();
         }
     }
+
 }
