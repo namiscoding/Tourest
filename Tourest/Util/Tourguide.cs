@@ -23,22 +23,7 @@
                 <td style=""padding: 8px; border: 1px solid #ddd;""><strong>Tên:</strong></td>
                 <td style=""padding: 8px; border: 1px solid #ddd;"">{{TGName}}</td>
             </tr>
-            <tr>
-                <td style=""padding: 8px; border: 1px solid #ddd;""><strong>Số điện thoại:</strong></td>
-                <td style=""padding: 8px; border: 1px solid #ddd;"">{{PhoneNum}}</td>
-            </tr>
-            <tr>
-                <td style=""padding: 8px; border: 1px solid #ddd;""><strong>Email:</strong></td>
-                <td style=""padding: 8px; border: 1px solid #ddd;"">{{Email}}</td>
-            </tr>
-            <tr>
-                <td style=""padding: 8px; border: 1px solid #ddd;""><strong>Kinh nghiệm:</strong></td>
-                <td style=""padding: 8px; border: 1px solid #ddd;""><strong>{{EXP}}</strong></td>
-            </tr>
-            <tr>
-                <td style=""padding: 8px; border: 1px solid #ddd;""><strong>Ngôn ngữ:</strong></td>
-                <td style=""padding: 8px; border: 1px solid #ddd;""><strong>{{Language}}</strong></td>
-            </tr>
+            
         </table>
 
         <p style=""margin-top: 20px;"">Chúng tôi sẽ liên hệ với bạn để xác nhận chi tiết và hướng dẫn thanh toán nếu cần.</p>

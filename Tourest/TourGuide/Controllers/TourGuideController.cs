@@ -57,8 +57,8 @@ public class TourGuideController : Controller
     public async Task<IActionResult> AcceptAssignment([FromBody] AssignmentRequest request)
     {
         EmailRequest emailRequest = new EmailRequest();
-        var TourGuideId = 3;
-        emailRequest.htmlbody = MailUtil.AssignTourGuide(GetTourGuidebyID(TourGuideId));
+        //var TourGuideId = 3;
+        emailRequest.htmlbody = MailUtil.AssignTourGuide();
         _emailSerivce.SendEmail("trangtran.170204@gmail.com", "TOUREST: Xác nhận đặt tour thành công", emailRequest.htmlbody);
         try
         {

@@ -37,18 +37,18 @@ public class PaymentController : Controller
         _tourGroupRepository = tourGroupRepository;
     }
 
-    
+    // --- CreatePaymentMomo (Giữ nguyên như code bạn cung cấp, đã đúng) ---
     [HttpPost]
     public async Task<IActionResult> CreatePaymentMomo(MomoFormDataModel formData)
     {
         _logger.LogInformation("Received request to create MoMo payment link for existing BookingId (as OrderId): {OrderId}, Amount from form: {Amount}", formData.OrderId, formData.Amount);
 
-        
+        // --- KIỂM TRA DỮ LIỆU ĐẦU VÀO TỪ FORM ---
         if (formData == null || string.IsNullOrEmpty(formData.OrderId) || formData.Amount <= 0)
         {
             _logger.LogWarning("Invalid form data received for MoMo payment creation.");
             TempData["PaymentError"] = "Dữ liệu gửi đi không hợp lệ.";
-            return RedirectToAction("Index", "BookingHistory"); 
+            return RedirectToAction("Index", "BookingHistory"); // <<< THAY THẾ
         }
 
         // --- PARSE BOOKING ID ---
@@ -56,7 +56,7 @@ public class PaymentController : Controller
         {
             _logger.LogWarning("Could not parse OrderId '{MomoOrderId}' from form data to long.", formData.OrderId);
             TempData["PaymentError"] = "Mã đơn hàng không hợp lệ.";
-            return RedirectToAction("Index", "BookingHistory"); 
+            return RedirectToAction("Index", "BookingHistory"); // <<< THAY THẾ
         }
 
         try
@@ -73,29 +73,29 @@ public class PaymentController : Controller
             {
                 _logger.LogWarning("Booking with ID {BookingId} not found.", bookingId);
                 TempData["PaymentError"] = "Không tìm thấy đơn hàng để thanh toán.";
-                return RedirectToAction("Index", "BookingHistory"); 
+                return RedirectToAction("Index", "BookingHistory"); // <<< THAY THẾ
             }
 
             if (booking.Customer == null)
             {
                 _logger.LogError("Customer information not found for Booking {BookingId}.", bookingId);
                 TempData["PaymentError"] = "Thiếu thông tin khách hàng của đơn hàng.";
-                return RedirectToAction("Index", "BookingHistory"); 
+                return RedirectToAction("Index", "BookingHistory"); // <<< THAY THẾ
             }
 
-            
+            // Kiểm tra trạng thái booking
             if (booking.Status != "PendingPayment")
             {
                 _logger.LogWarning("Booking {BookingId} is not in 'PendingPayment' status. Current status: {Status}", bookingId, booking.Status);
                 TempData["PaymentError"] = $"Đơn hàng đang ở trạng thái '{booking.Status}', không thể thanh toán.";
                 if (booking.Status == "Paid")
                 {
-                    return RedirectToAction("Details", "BookingHistory", new { id = booking.BookingID }); 
+                    return RedirectToAction("Details", "BookingHistory", new { id = booking.BookingID }); // <<< THAY THẾ
                 }
-                return RedirectToAction("Index", "BookingHistory"); 
+                return RedirectToAction("Index", "BookingHistory"); // <<< THAY THẾ
             }
 
-           
+            // Kiểm tra giá trị Amount từ form với giá trị trong DB
             if (Math.Abs(booking.TotalPrice - formData.Amount) > 0.01m)
             {
                 _logger.LogWarning("Amount mismatch for Booking {BookingId}. DB TotalPrice: {DbPrice}, Form Amount: {FormAmount}",
@@ -105,12 +105,12 @@ public class PaymentController : Controller
             }
 
             // --- TẠO ĐỊNH DANH DUY NHẤT CHO LẦN THANH TOÁN NÀY ---
-            string uniqueAttemptId = $"{booking.BookingID}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+            string uniqueAttemptId = $"{booking.BookingID}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}"; // Ví dụ: "21_1721986487"
             _logger.LogInformation("Generating unique MoMo attempt ID: {UniqueAttemptId} for BookingID: {BookingId}", uniqueAttemptId, booking.BookingID);
 
             // --- CHUẨN BỊ extraData ---
-            var extraDataObject = new { bookingId = booking.BookingID }; // Chỉ cần bookingId 
-            string extraDataJson = System.Text.Json.JsonSerializer.Serialize(extraDataObject); 
+            var extraDataObject = new { bookingId = booking.BookingID }; // Chỉ cần bookingId là đủ để tìm lại
+            string extraDataJson = System.Text.Json.JsonSerializer.Serialize(extraDataObject); // Hoặc dùng Newtonsoft.Json
             string extraDataBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(extraDataJson));
             _logger.LogInformation("Encoded extraData: {ExtraDataBase64}", extraDataBase64);
 
@@ -336,25 +336,113 @@ public class PaymentController : Controller
                 return View("PaymentFailure");
             }
 
-            // --- XỬ LÝ LOGIC CHÍNH ---
-            // Kiểm tra mã lỗi MoMo trả về SAU KHI đã parse thành công
-            if (callbackData.ResultCode != 0) // Kiểm tra ResultCode đã parse được
-            {
-                _logger.LogWarning("MoMo payment failed via Return URL. ResultCode: {ResultCode}, Message: {Message}", callbackData.ResultCode, callbackData.Message);
-                // Cập nhật trạng thái lỗi vào DB nếu cần
-                // await UpdateBookingStatusOnError(bookingId, "Failed_MoMo_Callback", $"MoMo Error {callbackData.ResultCode}: {callbackData.Message}");
-                ViewBag.Message = "Thanh toán thất bại theo thông báo từ MoMo: " + callbackData.Message;
-                ViewBag.OrderId = callbackData.OrderId; // Hiển thị Attempt ID
-                                                        // ViewBag.BookingId = bookingId; // Hiển thị Booking ID gốc
-                return View("PaymentFailure");
-            }
-
-            // Validate chữ ký (Bây giờ callbackData đã đầy đủ)
             bool isSignatureValid = _momoService.ValidateReturnUrlSignature(callbackData);
             _logger.LogInformation("Return URL Signature validation result: {IsValid} for BookingId: {BookingId}", isSignatureValid, bookingId);
 
             // --- TÌM BOOKING BẰNG bookingId GỐC ---
             var booking = await _dbContext.Bookings
+                                            .Include(b => b.Tour)
+                                            .Include(b => b.Customer)
+                                          .Include(b => b.Payment) // Include Payment để cập nhật
+                                          .FirstOrDefaultAsync(b => b.BookingID == bookingId);
+            // --- XỬ LÝ LOGIC CHÍNH ---
+            // Kiểm tra mã lỗi MoMo trả về SAU KHI đã parse thành công
+            if (callbackData.ResultCode != 0) // Kiểm tra ResultCode đã parse được
+            {
+                 // <<< Dùng bookingId từ extraData
+
+                if (booking == null)
+                {
+                    _logger.LogError("Booking not found for ID {BookingId} from Return URL callback.", bookingId);
+                    ViewBag.Message = "Không tìm thấy đơn hàng trong hệ thống.";
+                    ViewBag.IsSignatureValid = isSignatureValid; // Vẫn báo kết quả check sig
+                    return View("PaymentFailure");
+                }
+
+                if (isSignatureValid)
+                {
+                    EmailRequest request = new EmailRequest();
+                    _logger.LogInformation("Processing successful payment confirmation for BookingId {BookingId}", bookingId);
+
+                    TourGroup? tourGroup = await _tourGroupRepository.FindByTourAndDateAsync(booking.TourID, booking.DepartureDate);
+                    int totalNewGuests = booking.NumberOfAdults + booking.NumberOfChildren;
+                    if (tourGroup != null)
+                    {
+                        tourGroup.TotalGuests += totalNewGuests;
+                    }
+                    await _tourGroupRepository.UpdateAsync(tourGroup);
+                    // Chỉ cập nhật nếu chưa Paid để tránh xử lý lại
+                    if (booking.Status != "Paid")
+                    {
+                        request.htmlbody = MailUtil.CreateBooking(booking);
+                        _emailSerivce.SendEmail("trangtran.170204@gmail.com", "TOUREST: Xác nhận đặt tour thành công", request.htmlbody);
+
+                        booking.Status = "Paid";
+                        booking.TourGroupID = tourGroup.TourGroupID;
+                        var paymentTime = callbackData.ResponseTimeConvertedUtc ?? DateTime.UtcNow; // Lấy thời gian chuẩn
+
+                        // Tạo hoặc cập nhật Payment record
+                        if (booking.Payment == null)
+                        {
+                            var payment = new Payment
+                            {
+                                BookingID = booking.BookingID,
+                                Amount = (int)callbackData.Amount, // Hoặc decimal tùy kiểu DB
+                                PaymentDate = paymentTime,
+                                PaymentMethod = "MoMo",
+                                TransactionID = callbackData.TransId, // Lưu mã giao dịch MoMo
+                                Status = "Completed",
+                                // PaymentNotes = $"Paid via MoMo Return URL. AttemptID: {callbackData.OrderId}" // Ghi chú thêm
+                            };
+                            _dbContext.Payments.Add(payment);
+                            await _dbContext.SaveChangesAsync(); // Lưu Payment trước
+                            booking.PaymentID = payment.PaymentID; // Gán FK
+                            await _dbContext.SaveChangesAsync(); // Lưu lại Booking với PaymentID
+                            _logger.LogInformation("Created new Payment record for BookingId {BookingId}", bookingId);
+                        }
+                        else
+                        {
+                            booking.Payment.Amount = (int)callbackData.Amount; // Hoặc decimal
+                            booking.Payment.PaymentDate = paymentTime;
+                            booking.Payment.PaymentMethod = "MoMo";
+                            booking.Payment.TransactionID = callbackData.TransId;
+                            booking.Payment.Status = "Completed";
+                            // booking.Payment.PaymentNotes = $"Payment updated via MoMo Return URL. AttemptID: {callbackData.OrderId}";
+                            await _dbContext.SaveChangesAsync(); // Lưu thay đổi Payment và Booking Status
+                            _logger.LogInformation("Updated existing Payment record for BookingId {BookingId}", bookingId);
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Booking {BookingId} was already Paid when Return URL callback received.", booking.BookingID);
+                    }
+
+                    ViewBag.Message = "Thanh toán thành công!";
+                    ViewBag.OrderId = callbackData.OrderId; // Hiển thị Attempt ID (uniqueOrderId)
+                                                            // ViewBag.BookingId = bookingId; // Hiển thị Booking ID gốc nếu muốn
+                    ViewBag.Amount = callbackData.Amount;
+                    ViewBag.TransactionId = callbackData.TransId;
+                    ViewBag.IsSignatureValid = true;
+                    return View("PaymentSuccess");
+                }
+                else // Chữ ký không hợp lệ
+                {
+                    _logger.LogWarning("Invalid signature for Return URL payment. BookingId: {BookingId}", bookingId);
+                    // Cập nhật trạng thái lỗi vào DB nếu cần
+                    // await UpdateBookingStatusOnError(bookingId, "Failed_Signature_Callback", "Invalid MoMo signature on Return URL.");
+                    ViewBag.Message = "Chữ ký giao dịch không hợp lệ.";
+                    ViewBag.OrderId = callbackData.OrderId; // Hiển thị Attempt ID
+                    ViewBag.IsSignatureValid = false;
+                    return View("PaymentFailure");
+                }
+            }
+
+            // Validate chữ ký (Bây giờ callbackData đã đầy đủ)
+             isSignatureValid = _momoService.ValidateReturnUrlSignature(callbackData);
+            _logger.LogInformation("Return URL Signature validation result: {IsValid} for BookingId: {BookingId}", isSignatureValid, bookingId);
+
+            // --- TÌM BOOKING BẰNG bookingId GỐC ---
+             booking = await _dbContext.Bookings
                                             .Include(b => b.Tour)
                                             .Include(b => b.Customer)
                                           .Include(b => b.Payment) // Include Payment để cập nhật
