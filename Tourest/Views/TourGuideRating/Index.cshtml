@@ -269,19 +269,19 @@
             <a href="/TourGuide/Index#assignments"><i class="fas fa-tasks me-2"></i>View Assignments</a>
             <a href="/TourGuide/CompletedTours" class="active"><i class="fas fa-clipboard-check me-2"></i>Completed Tours</a>
             <a href="#profile"><i class="fas fa-user me-2"></i>Profile</a>
-            <a href="#logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+            <form id="logout-form" asp-controller="Authentication" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <a href="javascript:void(0)" onclick="document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+            </form>
         </div>
     </div>
 
     <!-- Main Content -->
     <main class="main-content">
         <!-- Dashboard Header -->
-        <header class="dashboard-header">
-            <div class="container">
-                <h1><i class="fas fa-clipboard-check me-2"></i>My Completed Tours</h1>
-                <p>View all tours you've guided</p>
-            </div>
-        </header>
+      
 
         <!-- Tours Section -->
         <section class="tours-section">

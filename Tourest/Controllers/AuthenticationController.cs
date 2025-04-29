@@ -72,6 +72,11 @@ namespace Tourest.Controllers
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+                if (CurrentAccount.Account.Role == "TourGuide")
+                {
+                    return Redirect("https://localhost:7227/TourGuide/Index");
+                }
+                return RedirectToAction("Index", "Tours");
             }
             return RedirectToAction("Index", "Tours"); }
     
@@ -113,8 +118,22 @@ namespace Tourest.Controllers
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             }
             return RedirectToAction("Index","Tours"); }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+           
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+          
+            HttpContext.Session.Remove("CurrentAccount");
+
+           
+            return RedirectToAction("Login", "Authentication");
+        }
 
 
 
     }
+
 }

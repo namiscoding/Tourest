@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using Tourest.Data;
 using Tourest.Services;
 using Tourest.TourGuide.Services;
@@ -25,16 +26,27 @@ public class TourGuideController : Controller
     [HttpGet("Index")]
     public async Task<IActionResult> Index(int tourGuideId)
     {
+         tourGuideId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+        if (tourGuideId == 0)
+        {
+            return Unauthorized("Tour guide not authenticated.");
+        }
+
         await UpdateExpiredAssignmentsAsync();
-        var assignments = await _assignmentService.GetTourAssignmentsAsync(3);
+        var assignments = await _assignmentService.GetTourAssignmentsAsync(tourGuideId);
         return View(assignments);
     }
     [HttpGet("TourGuideScheduleWork")]
     public async Task<IActionResult> TourGuideScheduleWork(int tourGuideId, int tourGroupId)
     {
 
-        var schedule = await _assignmentService.GetTourAssignmentsAsync(3);
+        tourGuideId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+        if (tourGuideId == 0)
+        {
+            return Unauthorized("Tour guide not authenticated.");
+        }
 
+        var schedule = await _assignmentService.GetTourAssignmentsAsync(tourGuideId);
         return View("TourGuideScheduleWork", schedule);
     }
 

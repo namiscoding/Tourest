@@ -303,8 +303,14 @@
             <a href="/TourGuide/Index"><i class="fas fa-tachometer-alt me-2"></i>Overview</a>
             <a href="#schedule" class="active"><i class="fas fa-calendar-alt me-2"></i>View Schedule</a>
             <a href="#assignments"><i class="fas fa-tasks me-2"></i>View Assignments</a>
+            <a href="/TourGuideRating"><i class="fas fa-clipboard-check me-2"></i>Completed Tours</a>
             <a href="#profile"><i class="fas fa-user me-2"></i>Profile</a>
-            <a href="#logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
+            <form id="logout-form" asp-controller="Authentication" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <a href="javascript:void(0)" onclick="document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+            </form>
         </div>
     </div>
 
