@@ -310,6 +310,7 @@ namespace Tourest.Data.Repositories
             // Có thể log warning nếu không tìm thấy TourGuide
         }
 
+
         public async Task<int> GetUserCountByRoleAsync(string roleName)
         {
             _logger.LogInformation("Getting user count for role: {RoleName}", roleName);
@@ -365,6 +366,39 @@ namespace Tourest.Data.Repositories
                 return Enumerable.Empty<TopGuideViewModel>(); // Trả về danh sách rỗng nếu lỗi
             }
         }
+
+
+        public async Task<bool> ChangePassword(int uid, string newPassword, string currentPass)
+        {
+            // 1. Lấy tài khoản theo UserID
+            var account = await _context.Accounts
+                                        .FirstOrDefaultAsync(a => a. UserID == uid);
+
+            if (account == null)
+            {
+                return false;
+            }
+
+            // 2. Verify mật khẩu hiện tại
+            bool isCurrentPasswordValid = BCrypt.Net.BCrypt.Verify(currentPass, account.PasswordHash);
+            if (!isCurrentPasswordValid)
+            {
+                return false;
+            }
+
+            // 3. Hash mật khẩu mới bằng BCrypt
+            string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            // 4. Cập nhật lại PasswordHash
+            account.PasswordHash = newPasswordHash;
+
+            // 5. Save thay đổi vào database
+            _context.Accounts.Update(account);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
 
     }
 }

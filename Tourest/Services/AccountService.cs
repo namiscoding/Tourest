@@ -8,10 +8,14 @@ namespace Tourest.Services
     public class AccountService : IAccountService
     {
         public readonly IAccountRepository _accountRepository;
+        private readonly IUserRepository _userRepository;
 
-        public AccountService(IAccountRepository accountRepository)
+        
+
+        public AccountService(IAccountRepository accountRepository, IUserRepository userRepository)
         {
             _accountRepository = accountRepository;
+            _userRepository = userRepository;
         }
 
         public Task<IEnumerable<UserViewModel>> AuthenticationAsync()
@@ -53,6 +57,20 @@ namespace Tourest.Services
         public Task<UserViewModel> UpdateProfile(UserViewModel userViewModel)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<bool> UpdatePassword(int uid ,string newP,string currenPass)
+        {
+            Console.Write(uid + " " + newP);
+            bool status = await _userRepository.ChangePassword(uid, newP, currenPass);
+            // Băm mật khẩu mới
+            return status;
+        }
+
+        public async Task<bool> AddtokenForgot(string token, string email)
+        {
+            bool status = await _accountRepository.SetToken(email, token);
+            return status;
         }
     }
 }

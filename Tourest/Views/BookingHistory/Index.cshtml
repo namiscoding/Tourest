@@ -185,10 +185,11 @@
                                                             }
                                                             else if (booking.Status != null && booking.Status.Equals("Paid", StringComparison.OrdinalIgnoreCase))
                                                             {
-
-                                                                <a asp-controller="TourGuides" asp-action="Details" asp-route-tourId="" asp-route-bookingId="" class="btn btn-sm btn-outline-primary" title="Đánh giá tour guide này">
-                                                                    <i class="fa-regular fa-star me-1"></i> View Tour Guide Infor 
-                                                                </a>
+                                                                
+                                                                    <a asp-controller="TourGuides" asp-action="Details" asp-route-tourId="" asp-route-bookingId="" class="btn btn-sm btn-outline-primary" title="Đánh giá tour guide này">
+                                                                        <i class="fa-regular fa-star me-1"></i> View Tour Guide Infor 
+                                                                    </a>
+                                                                
                                                             }
                                                     @* Thêm nút xem chi tiết booking nếu bạn có trang chi tiết booking *@
                                                     @*

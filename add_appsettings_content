@@ -19,4 +19,10 @@
   "RequestType": "captureWallet"
 }
 
+@tnam
+"CloudinarySettings": {
+    "CloudName": "dmz5js5hh",
+    "ApiKey": "586771756471872",
+    "ApiSecret": "tGxRi9MOZ7hlu_QSne15ppCedBo"
+  }
 

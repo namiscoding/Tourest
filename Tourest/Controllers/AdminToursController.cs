@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Tourest.Services;
 using Tourest.ViewModels.Admin.AdminTour;
 
 namespace Tourest.Controllers
 {
+    [Authorize]
     public class AdminToursController : Controller
     {
         private readonly ITourService _tourService;
@@ -18,6 +20,7 @@ namespace Tourest.Controllers
         }
 
         // GET: AdminTours
+        [Authorize(Roles ="Admin")]
         public async Task<IActionResult> Index(string? searchTerm = null, string? statusFilter = null, int pageIndex = 1, int pageSize = 10)
         {
             _logger.LogInformation("Admin accessing Tours list. Search: {Search}, Status: {Status}, Page: {Page}", searchTerm, statusFilter, pageIndex);

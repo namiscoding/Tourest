@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<Tourest.ViewModels.RejectedAssignedTourViewModel>
 @{
     ViewData["Title"] = "Rejected Assigned Tours";
+    Layout = "/Views/TourManager/_LayoutTourManager.cshtml";
 }
 
 <!DOCTYPE html>
@@ -49,29 +50,83 @@
             color: #721c24;
             font-style: italic;
         }
+
+        .guide-card {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .guide-card:hover {
+                background-color: #f8f9fa;
+            }
+
+            .guide-card.selected {
+                border: 2px solid var(--primary-color);
+                background-color: #e8f5e9;
+            }
+
+        .guide-rating {
+            color: #ffc107;
+        }
+
+        .specialization-badge {
+            font-size: 0.7rem;
+            margin-right: 0.3rem;
+        }
+
+        .difficulty-badge {
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .difficulty-1 {
+            background-color: #28a745;
+        }
+
+        .difficulty-2 {
+            background-color: #5bc0de;
+        }
+
+        .difficulty-3 {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .difficulty-4 {
+            background-color: #fd7e14;
+        }
+
+        .difficulty-5 {
+            background-color: #dc3545;
+        }
+
+        .modal-content {
+            border-radius: 0.5rem;
+        }
+
+        .modal-header {
+            background-color: var(--warning-color);
+            color: #000;
+        }
+
+        #tourDetails p {
+            margin-bottom: 0.5rem;
+        }
+
+        .badge.bg-info, .badge.bg-primary, .badge.bg-secondary {
+            color: white;
+        }
     </style>
 </head>
 <body>
+    @Html.AntiForgeryToken()
+
     <div class="container-fluid px-0">
-        <!-- Header
-        <header class="bg-white text-dark py-4 mb-4 shadow">
-            <div class="container">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1 class="h3 mb-0">
-                            <img src="https://via.placeholder.com/30x30.png?text=T" alt="Tourest Logo" class="me-2" style="vertical-align: middle;" />
-                            Rejected Assigned Tours
-                        </h1>
-                        <p class="mb-0">View tours that were assigned but rejected</p>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <img src="https://via.placeholder.com/40" alt="Profile" class="rounded-circle me-2" width="40" height="40">
-                        <span>Tour Manager</span>
-                    </div>
-                </div>
-            </div>
-        </header>
-         -->
+
+        <!-- Header -->
+      
+
+
         <!-- Main Content -->
         <main class="container">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -88,7 +143,7 @@
                     {
                         @foreach (var tour in Model)
                         {
-                            <div class="card tour-card mb-3" id="tour-@tour.TourGroupId">
+                            <div class="card tour-card mb-3" id="tour-@tour.TourGroupId" data-tour-group-id="@tour.TourGroupId">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
@@ -119,6 +174,14 @@
                                                 </small>
                                             </div>
                                         </div>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-primary assign-different-guide-btn"
+                                                    data-tour-group-id="@tour.TourGroupId"
+                                                    data-tour-name="@tour.TourName"
+                                                    data-departure-date="@tour.DepartureDate.ToString("MMM dd, yyyy")">
+                                                <i class="fas fa-user-plus me-1"></i> Assign Different Guide
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -140,8 +203,251 @@
         </main>
     </div>
 
+    <!-- Assign Guide Modal -->
+    <div class="modal fade" id="assignGuideModal" tabindex="-1" aria-labelledby="assignGuideModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignGuideModalLabel"><i class="fas fa-user-plus me-2"></i> Reassign Tour Guide</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="tourGroupId" />
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Tour Details</h6>
+                            <div id="tourDetails" class="border p-3 rounded bg-light"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>TOUR DIFFICULTY: <span id="tourDifficultyBadge" class="badge difficulty-badge"></span></h6>
+                            <h6>GROUP SIZE: <span id="groupSizeBadge" class="badge bg-info"></span></h6>
+                            <h6>REQUIRED EXPERIENCE: <span id="requiredExpBadge" class="badge bg-primary"></span></h6>
+                        </div>
+                    </div>
+                    <h5 class="mb-3">Recommended Guides</h5>
+                    <div id="recommendedGuides" class="row mb-4"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmReassignBtn" disabled>Reassign Guide</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('.assign-different-guide-btn').on('click', function () {
+                const tourGroupId = $(this).data('tour-group-id');
+                const tourName = $(this).data('tour-name');
+                const departureDate = $(this).data('departure-date');
+
+                $('#tourGroupId').val(tourGroupId);
+                $('#tourDetails').html(`
+                    <p><strong>TOUR:</strong> ${tourName || 'N/A'}</p>
+                    <p><strong>DEPARTURE:</strong> ${departureDate || 'N/A'}</p>
+                `);
+                $('#tourDifficultyBadge').text('Loading...').removeClass().addClass('badge difficulty-badge bg-secondary');
+                $('#requiredExpBadge').text('Loading...').removeClass().addClass('badge bg-secondary');
+                $('#groupSizeBadge').text('N/A').removeClass().addClass('badge bg-info');
+
+                $('#assignGuideModal').modal('show');
+                loadRecommendedGuides(tourGroupId);
+            });
+
+            function loadRecommendedGuides(tourGroupId) {
+                console.log(`Loading guides for tourGroupId: ${tourGroupId}`);
+                $('#recommendedGuides').html(`
+                    <div class="col-12 text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p>Loading recommended guides...</p>
+                    </div>
+                `);
+
+                $.ajax({
+                    url: `/TourManager/GetRecommendedGuides/${tourGroupId}`,
+                    type: 'GET',
+                    success: function (data) {
+                        console.log('Recommended guides response:', data);
+                        if (data && Array.isArray(data) && data.length > 0) {
+                            let html = '';
+                            data.forEach((guide, index) => {
+                                if (index === 0) {
+                                    $('#tourDifficultyBadge')
+                                        .text(guide.tourDifficulty ? `Level ${guide.tourDifficulty}` : 'Unknown')
+                                        .removeClass()
+                                        .addClass(`badge difficulty-badge ${guide.tourDifficulty ? 'difficulty-' + guide.tourDifficulty : 'bg-secondary'}`);
+                                    $('#requiredExpBadge')
+                                        .text(guide.requiredExperience ? `${guide.requiredExperience} years` : 'Unknown')
+                                        .removeClass()
+                                        .addClass(`badge ${guide.requiredExperience ? 'bg-primary' : 'bg-secondary'}`);
+                                    $('#groupSizeBadge')
+                                        .text(guide.maxCapacity ? `${guide.maxCapacity} pax` : 'Unknown')
+                                        .removeClass()
+                                        .addClass(`badge ${guide.maxCapacity ? 'bg-info' : 'bg-secondary'}`);
+                                }
+
+                                html += `
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card guide-card" data-guide-id="${guide.id}" onclick="selectGuide(this)">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h5 class="card-title mb-1 text-uppercase">${guide.name || 'Unknown'}</h5>
+                                                        <div class="mb-2">
+                                                            ${renderStars(guide.rating || 0)}
+                                                            <span class="small ms-1">${(guide.rating || 0).toFixed(1)}</span>
+                                                        </div>
+                                                        <p class="small mb-1 text-uppercase"><i class="fas fa-language me-1"></i> ${guide.languages || 'N/A'}</p>
+                                                        <p class="small mb-1 text-uppercase"><i class="fas fa-briefcase me-1"></i> ${guide.experience || 0} years</p>
+                                                        <p class="small mb-1 text-uppercase"><i class="fas fa-users me-1"></i> Max: ${guide.maxCapacity || 0}</p>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <span class="badge bg-success">Suitability: ${(guide.suitabilityScore || 0).toFixed(0)}%</span>
+                                                        ${index < 3 ? '<span class="badge bg-warning text-dark ms-1">Top Pick</span>' : ''}
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2">
+                                                    ${renderSpecializations(guide.specializations)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            $('#recommendedGuides').html(html);
+                        } else {
+                            $('#recommendedGuides').html(`
+                                <div class="col-12 text-center py-3">
+                                    <p>No recommended guides available.</p>
+                                    <button class="btn btn-primary retry-btn" onclick="loadRecommendedGuides(${tourGroupId})">Retry</button>
+                                </div>
+                            `);
+                            $('#tourDifficultyBadge').text('Unknown').removeClass().addClass('badge difficulty-badge bg-secondary');
+                            $('#requiredExpBadge').text('Unknown').removeClass().addClass('badge bg-secondary');
+                            $('#groupSizeBadge').text('Unknown').removeClass().addClass('badge bg-secondary');
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error(`Failed to load guides: ${textStatus} - ${errorThrown}`);
+                        console.log('Error response:', jqXHR.responseText);
+                        $('#recommendedGuides').html(`
+                            <div class="col-12 text-center py-3">
+                                <p class="text-danger">Error loading guides. Please try again.</p>
+                                <button class="btn btn-primary retry-btn" onclick="loadRecommendedGuides(${tourGroupId})">Retry</button>
+                            </div>
+                        `);
+                        $('#tourDifficultyBadge').text('Unknown').removeClass().addClass('badge difficulty-badge bg-secondary');
+                        $('#requiredExpBadge').text('Unknown').removeClass().addClass('badge bg-secondary');
+                        $('#groupSizeBadge').text('Unknown').removeClass().addClass('badge bg-secondary');
+                        showToast('Failed to load recommended guides.', 'error');
+                    }
+                });
+            }
+
+            function renderStars(rating) {
+                let stars = '';
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = rating % 1 >= 0.5;
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= fullStars) {
+                        stars += '<i class="fas fa-star guide-rating"></i>';
+                    } else if (i === fullStars + 1 && hasHalfStar) {
+                        stars += '<i class="fas fa-star-half-alt guide-rating"></i>';
+                    } else {
+                        stars += '<i class="far fa-star guide-rating"></i>';
+                    }
+                }
+                return stars;
+            }
+
+            function renderSpecializations(specializations) {
+                if (!specializations) return '';
+                const specs = specializations.split(';').filter(spec => spec.trim());
+                return specs.map(spec => `<span class="badge specialization-badge bg-info text-uppercase">${spec.trim()}</span>`).join('');
+            }
+
+            window.selectGuide = function (element) {
+                $('.guide-card').removeClass('selected');
+                $(element).addClass('selected');
+                $('#confirmReassignBtn').prop('disabled', false);
+            };
+
+            $('#confirmReassignBtn').on('click', function () {
+                const tourGroupId = $('#tourGroupId').val();
+                const selectedGuideId = $('.guide-card.selected').data('guide-id');
+
+                if (!tourGroupId || !selectedGuideId) {
+                    showToast('Please select a tour guide to reassign.', 'error');
+                    return;
+                }
+
+                console.log('Reassigning:', { tourGroupId, selectedGuideId });
+
+                $.ajax({
+                    url: '/TourManager/ReassignGuide',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                    },
+                    data: JSON.stringify({ tourGroupId: parseInt(tourGroupId), guideId: parseInt(selectedGuideId) }),
+                    success: function (response) {
+                        console.log('ReassignGuide response:', response);
+                        if (response.success) {
+                            $('#assignGuideModal').modal('hide');
+                            $(`#tour-${tourGroupId}`).fadeOut(300, function () {
+                                $(this).remove();
+                                if (!$('.tour-card').length) {
+                                    $('.col-12').html(`
+                                        <div class="text-center py-5 bg-light rounded">
+                                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                            <h3 class="h4 text-muted">No Rejected Assigned Tours</h3>
+                                            <p class="text-muted">There are no tours that were assigned and rejected.</p>
+                                            <button class="btn btn-primary" onclick="location.reload()">
+                                                <i class="fas fa-sync-alt me-2"></i> Check for Updates
+                                            </button>
+                                        </div>
+                                    `);
+                                }
+                            });
+                            showToast('Guide reassigned successfully!', 'success');
+                        } else {
+                            showToast(response.message || 'Failed to reassign guide.', 'error');
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error(`Reassign guide failed: ${textStatus} - ${errorThrown}`);
+                        console.log('Error response:', jqXHR.responseText);
+                        let errorMessage = 'Error reassigning guide. Please try again.';
+                        if (jqXHR.status === 404) {
+                            errorMessage = 'ReassignGuide endpoint not found. Please contact support.';
+                        } else if (jqXHR.status === 400) {
+                            errorMessage = 'Invalid request. Please ensure all required fields are provided.';
+                        }
+                        showToast(errorMessage, 'error');
+                    }
+                });
+            });
+
+            function showToast(message, type) {
+                const toastClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const toastHtml = `
+                    <div class="alert ${toastClass} alert-dismissible fade show position-fixed bottom-0 end-0 m-3" role="alert">
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                $('body').append(toastHtml);
+                setTimeout(() => $('.alert').alert('close'), 5000);
+            }
+        });
+    </script>
 </body>
 </html>

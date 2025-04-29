@@ -170,7 +170,8 @@ namespace Tourest
             app.UseAuthorization();
             app.MapIdentityApi<IdentityUser>();
             app.UseHttpsRedirection();
-			      app.UseStaticFiles();
+      
+            app.UseStaticFiles();
             app.UseSession();
             //app.MapHub<NotificationHub>("/notificationHub");
             app.MapHub<RatingHub>("/ratingHub");
