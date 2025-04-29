@@ -1,4 +1,5 @@
 ﻿using Tourest.Data.Entities;
+using Tourest.ViewModels.Admin.AdminDashboard;
 
 namespace Tourest.Data.Repositories
 {
@@ -6,5 +7,6 @@ namespace Tourest.Data.Repositories
     {
         Task<Rating> AddAsync(Rating rating);
         Task<int> GetTotalTourRatingCountAsync();
+
     }
 }

@@ -124,7 +124,7 @@ namespace Tourest.Services
                 DeparturePointsList = tour.DeparturePoints?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList() ?? new List<string>(),
                 IncludedServicesList = tour.IncludedServices?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList() ?? new List<string>(),
                 ExcludedServicesList = tour.ExcludedServices?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList() ?? new List<string>(),
-                ImageUrlList = tour.ImageUrls?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList() ?? new List<string>(),
+                ImageUrlList = tour.ImageUrls?.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList() ?? new List<string>(),
 
                 // Map các collection liên quan
                 ItineraryDays = tour.ItineraryDays?.Select(it => new ItineraryDayViewModel

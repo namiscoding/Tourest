@@ -1,91 +1,192 @@
-﻿@* File: /Views/AdminTourGuides/Create.cshtml *@
-@model AdminCreateTourGuideViewModel
+﻿@model AdminCreateTourGuideViewModel
 
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Tạo Hướng dẫn viên Mới";
 }
 
-<h1>@ViewData["Title"]</h1>
-<hr />
-<div class="row">
-    <div class="col-md-8">
-        @* Form có thể dài hơn *@
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="m-0 fw-bold text-primary">@ViewData["Title"]</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Quay lại
+        </a>
+    </div>
 
-            <h4>Thông tin Tài khoản</h4>
-            <div class="row g-3">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="FullName" class="form-label"></label>
-                    <input asp-for="FullName" class="form-control" />
-                    <span asp-validation-for="FullName" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Email" class="form-label"></label>
-                    <input asp-for="Email" class="form-control" type="email" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Password" class="form-label"></label>
-                    <input asp-for="Password" class="form-control" type="password" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="ConfirmPassword" class="form-label"></label>
-                    <input asp-for="ConfirmPassword" class="form-control" type="password" />
-                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="PhoneNumber" class="form-label"></label>
-                    <input asp-for="PhoneNumber" class="form-control" />
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                </div>
-                <div class="col-md-12 mb-3">
-                    <label asp-for="Address" class="form-label"></label>
-                    <textarea asp-for="Address" class="form-control" rows="2"></textarea>
-                    <span asp-validation-for="Address" class="text-danger"></span>
-                </div>
-                <div class="col-md-12 mb-3">
-                    <label asp-for="ProfilePictureFile" class="form-label"></label>
-                    <input asp-for="ProfilePictureFile" type="file" class="form-control" accept="image/*" />
-                    <span asp-validation-for="ProfilePictureFile" class="text-danger"></span>
-                </div>
-                <div class="col-md-12 mb-3 form-check">
-                    <input asp-for="IsActive" type="checkbox" class="form-check-input" />
-                    <label asp-for="IsActive" class="form-check-label"></label>
-                </div>
-            </div>
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4" role="alert"></div>
 
-            <h4 class="mt-4">Thông tin Hồ sơ Hướng dẫn viên</h4>
-            <div class="row g-3">
-                <div class="col-md-6 mb-3">
-                    <label asp-for="ExperienceLevel" class="form-label"></label>
-                    <input asp-for="ExperienceLevel" class="form-control" />
-                    <span asp-validation-for="ExperienceLevel" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="MaxGroupSizeCapacity" class="form-label"></label>
-                    <input asp-for="MaxGroupSizeCapacity" class="form-control" type="number" />
-                    <span asp-validation-for="MaxGroupSizeCapacity" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="LanguagesSpoken" class="form-label"></label>
-                    <input asp-for="LanguagesSpoken" class="form-control" placeholder="Ví dụ: Tiếng Việt;Tiếng Anh" />
-                    <span asp-validation-for="LanguagesSpoken" class="text-danger"></span>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label asp-for="Specializations" class="form-label"></label>
-                    <input asp-for="Specializations" class="form-control" placeholder="Ví dụ: Lịch sử;Văn hóa;Leo núi" />
-                    <span asp-validation-for="Specializations" class="text-danger"></span>
-                </div>
-            </div>
+                <div class="row">
+                    <!-- Cột thông tin cá nhân -->
+                    <div class="col-lg-5">
+                        <div class="card h-100 bg-light border-0">
+                            <div class="card-body">
+                                <h4 class="card-title border-bottom pb-3 mb-4">
+                                    <i class="bi bi-person-circle me-2"></i>Thông tin Tài khoản
+                                </h4>
 
-            <div class="mt-4 mb-3">
-                <input type="submit" value="Tạo mới" class="btn btn-success" />
-                <a asp-action="Index" class="btn btn-secondary ms-2">Hủy</a>
-            </div>
-        </form>
+                                <div class="mb-4 text-center">
+                                    <div class="position-relative d-inline-block mb-3">
+                                        <div class="profile-placeholder rounded-circle bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; overflow: hidden;">
+                                            <i class="bi bi-person-fill" style="font-size: 4rem;"></i>
+                                        </div>
+                                        <label for="ProfilePictureFile" class="position-absolute bottom-0 end-0 btn btn-sm btn-primary rounded-circle">
+                                            <i class="bi bi-camera-fill"></i>
+                                        </label>
+                                    </div>
+                                    <input id="ProfilePictureFile" asp-for="ProfilePictureFile" type="file" class="form-control d-none" accept="image/*" onchange="displayImagePreview(this)" />
+                                    <small class="text-muted d-block">Chọn ảnh đại diện</small>
+                                    <span asp-validation-for="ProfilePictureFile" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="FullName" class="form-label fw-medium"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent"><i class="bi bi-person"></i></span>
+                                        <input asp-for="FullName" class="form-control" placeholder="Nhập họ tên đầy đủ" />
+                                    </div>
+                                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Email" class="form-label fw-medium"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent"><i class="bi bi-envelope"></i></span>
+                                        <input asp-for="Email" class="form-control" type="email" placeholder="email@example.com" />
+                                    </div>
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="Password" class="form-label fw-medium"></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-transparent"><i class="bi bi-lock"></i></span>
+                                            <input asp-for="Password" class="form-control" type="password" />
+                                        </div>
+                                        <span asp-validation-for="Password" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label asp-for="ConfirmPassword" class="form-label fw-medium"></label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-transparent"><i class="bi bi-lock-fill"></i></span>
+                                            <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                                        </div>
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="PhoneNumber" class="form-label fw-medium"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent"><i class="bi bi-telephone"></i></span>
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="0912345678" />
+                                    </div>
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label asp-for="Address" class="form-label fw-medium"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent"><i class="bi bi-geo-alt"></i></span>
+                                        <textarea asp-for="Address" class="form-control" rows="2" placeholder="Nhập địa chỉ đầy đủ"></textarea>
+                                    </div>
+                                    <span asp-validation-for="Address" class="text-danger small"></span>
+                                </div>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
+                                    <label asp-for="IsActive" class="form-check-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cột thông tin hướng dẫn viên -->
+                    <div class="col-lg-7">
+                        <div class="card h-100 border-0">
+                            <div class="card-body">
+                                <h4 class="card-title border-bottom pb-3 mb-4">
+                                    <i class="bi bi-briefcase me-2"></i>Thông tin Hồ sơ Hướng dẫn viên
+                                </h4>
+
+                                <div class="mb-4">
+                                    <label asp-for="ExperienceLevel" class="form-label fw-medium"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent"><i class="bi bi-star"></i></span>
+                                        <select asp-for="ExperienceLevel" class="form-select">
+                                            <option value="">-- Chọn cấp độ kinh nghiệm --</option>
+                                            <option value="1 năm">Mới vào nghề (< 1 năm)</option>
+                                            <option value="2 năm">Có kinh nghiệm (1-3 năm)</option>
+                                            <option value="4 năm">Chuyên nghiệp (3-5 năm)</option>
+                                            <option value="6 năm">Cao cấp (5+ năm)</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="ExperienceLevel" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="MaxGroupSizeCapacity" class="form-label fw-medium"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent"><i class="bi bi-people"></i></span>
+                                        <input asp-for="MaxGroupSizeCapacity" class="form-control" type="number" min="1" placeholder="Nhập số lượng khách tối đa" />
+                                    </div>
+                                    <span asp-validation-for="MaxGroupSizeCapacity" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="LanguagesSpoken" class="form-label fw-medium"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent"><i class="bi bi-translate"></i></span>
+                                        <input asp-for="LanguagesSpoken" class="form-control" placeholder="Ví dụ: Tiếng Việt;Tiếng Anh;Tiếng Trung" />
+                                    </div>
+                                    <small class="text-muted">Phân cách các ngôn ngữ bằng dấu chấm phẩy (;)</small>
+                                    <span asp-validation-for="LanguagesSpoken" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label asp-for="Specializations" class="form-label fw-medium"></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent"><i class="bi bi-bookmark-star"></i></span>
+                                        <input asp-for="Specializations" class="form-control" placeholder="Ví dụ: Lịch sử;Văn hóa;Leo núi;Ẩm thực" />
+                                    </div>
+                                    <small class="text-muted">Phân cách các chuyên môn bằng dấu chấm phẩy (;)</small>
+                                    <span asp-validation-for="Specializations" class="text-danger small"></span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-medium">Mô tả kinh nghiệm</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent"><i class="bi bi-file-text"></i></span>
+                                        <textarea class="form-control" name="ExperienceDescription" rows="4" placeholder="Mô tả kinh nghiệm và thành tựu nổi bật"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-medium">Khu vực hoạt động</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-transparent"><i class="bi bi-geo-fill"></i></span>
+                                        <input class="form-control" name="OperatingAreas" placeholder="Ví dụ: Hà Nội;Hạ Long;Ninh Bình" />
+                                    </div>
+                                    <small class="text-muted">Phân cách các khu vực bằng dấu chấm phẩy (;)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i> Hủy
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-1"></i> Tạo mới
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -93,4 +194,28 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
+    <script>
+        function displayImagePreview(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                
+                reader.onload = function (e) {
+                    var placeholder = document.querySelector('.profile-placeholder');
+                    
+                    // Remove any existing image or icon
+                    placeholder.innerHTML = '';
+                    
+                    // Create and add the image
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    placeholder.appendChild(img);
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}   

@@ -136,6 +136,9 @@ namespace Tourest
             builder.Services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
             builder.Services.AddScoped<ISupportRequestService, SupportRequestService>();
 
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+
             builder.Services.AddScoped<ITourGroupRepository, TourGroupRepository>();
 
             builder.Services.AddScoped<IRatingRepository, RatingRepository>();
@@ -147,6 +150,7 @@ namespace Tourest
             builder.Services.AddScoped<IBookingProcessingService, BookingProcessingService>();
             builder.Services.AddHostedService<BookingStatusUpdaterService>();
 
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
 
             builder.Services.AddControllersWithViews();
 
@@ -179,13 +183,15 @@ namespace Tourest
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
+                var logger = services.GetRequiredService<ILogger<Program>>();
                 try
                 {
                     await SeedData.Initialize(services);
+                    logger.LogInformation("Seed admin data success: ");
                 }
                 catch (Exception ex)
                 {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    
                     logger.LogError(ex, "An error occurred while seeding the database.");
                 }
             }

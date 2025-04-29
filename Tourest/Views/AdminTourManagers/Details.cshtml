@@ -10,81 +10,168 @@
 }
 
 <div class="container-fluid py-4">
-    <div class="d-sm-flex justify-content-between align-items-center mb-4">
-        <h2 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-user-tie me-2"></i>@Model.FullName
-        </h2>
+    <!-- Header with Breadcrumb -->
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center mb-4">
         <div>
-            <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary">
-                <i class="fas fa-edit me-1"></i>Sửa thông tin
+            <nav aria-label="breadcrumb" class="d-none d-md-block">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="/Admin/Dashboard"><i class="fas fa-home"></i></a></li>
+                    <li class="breadcrumb-item"><a asp-action="Index">Quản lý Tour</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">@Model.FullName</li>
+                </ol>
+            </nav>
+            <h2 class="h3 mb-0 text-primary">
+                <i class="fas fa-user-tie me-2"></i>Thông tin Quản lý Tour
+            </h2>
+            <p class="text-muted">ID: @Model.UserId</p>
+        </div>
+        <div class="d-flex gap-2 mt-3 mt-lg-0">
+            <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary d-flex align-items-center">
+                <i class="fas fa-edit me-2"></i>Sửa thông tin
             </a>
-            <a asp-action="Index" class="btn btn-outline-secondary ms-2">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-cog me-1"></i> Tùy chọn
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow">
+                    <li><h6 class="dropdown-header">Tác vụ nhanh</h6></li>
+                    <li><a class="dropdown-item" href="mailto:@Model.Email"><i class="fas fa-envelope me-2 text-primary"></i>Gửi email</a></li>
+                    <li><a class="dropdown-item" href="tel:@Model.PhoneNumber"><i class="fas fa-phone me-2 text-success"></i>Gọi điện</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    @if (Model.IsActive)
+                    {
+                        <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#disableAccountModal"><i class="fas fa-user-slash me-2"></i>Vô hiệu hóa tài khoản</a></li>
+                    }
+                    else
+                    {
+                        <li><a class="dropdown-item text-success" href="#"><i class="fas fa-user-check me-2"></i>Kích hoạt tài khoản</a></li>
+                    }
+                </ul>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-1"></i>Quay lại
             </a>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div class="row">
+    <div class="row g-4">
         <!-- Profile Card -->
         <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-light">
-                    <h6 class="m-0 font-weight-bold text-primary">Thông tin cá nhân</h6>
-                    <div class="dropdown no-arrow">
-                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end shadow animated--fade-in"
-                             aria-labelledby="dropdownMenuLink">
-                            <a class="dropdown-item" href="#"><i class="fas fa-envelope me-2"></i>Gửi email</a>
-                            <a class="dropdown-item" href="#"><i class="fas fa-phone me-2"></i>Gọi điện</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-danger" href="#"><i class="fas fa-user-slash me-2"></i>Vô hiệu hóa tài khoản</a>
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="card-header py-3 bg-gradient-primary text-white">
+                    <h5 class="m-0 fw-bold"><i class="fas fa-id-card me-2"></i>Hồ sơ cá nhân</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="position-relative">
+                        <div class="bg-light" style="height: 80px;"></div>
+                        <div class="text-center" style="margin-top: -50px;">
+                            <div class="position-relative d-inline-block">
+                                <img src="@CloudinaryHelper.GetThumbnailUrl(Model.ProfilePictureUrl, 200, 200, cloudName, defaultAvatar)"
+                                     alt="Ảnh đại diện của @Model.FullName"
+                                     class="img-profile rounded-circle img-thumbnail border-3 shadow"
+                                     style="width: 120px; height: 120px; object-fit: cover;" />
+                                @if (Model.IsActive)
+                                {
+                                    <span class="position-absolute bottom-0 end-0 badge border border-white border-2 bg-success rounded-circle p-2" data-bs-toggle="tooltip" title="Đang hoạt động">
+                                        <i class="fas fa-check"></i>
+                                        <span class="visually-hidden">Đang hoạt động</span>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="position-absolute bottom-0 end-0 badge border border-white border-2 bg-danger rounded-circle p-2" data-bs-toggle="tooltip" title="Đã vô hiệu hóa">
+                                        <i class="fas fa-ban"></i>
+                                        <span class="visually-hidden">Đã vô hiệu hóa</span>
+                                    </span>
+                                }
+                            </div>
+                            <h4 class="mt-3 mb-1 fw-bold">@Model.FullName</h4>
+                            <p class="text-muted mb-3">
+                                <span class="badge bg-primary">Quản lý Tour</span>
+                                <span class="ms-2 small">Thành viên từ @Model.RegistrationDate.ToString("MM/yyyy")</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr class="my-0">
+
+                    <div class="p-4">
+                        <h6 class="text-primary mb-3"><i class="fas fa-address-card me-2"></i>Thông tin liên hệ</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <span class="bg-primary bg-opacity-10 text-primary p-2 rounded-circle">
+                                            <i class="fas fa-envelope"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="small text-muted">Email</div>
+                                        <div class="fw-medium">
+                                            <a href="mailto:@Model.Email" class="text-decoration-none">@Model.Email</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <span class="bg-success bg-opacity-10 text-success p-2 rounded-circle">
+                                            <i class="fas fa-phone"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="small text-muted">Số điện thoại</div>
+                                        <div class="fw-medium">
+                                            <a href="tel:@Model.PhoneNumber" class="text-decoration-none">@Model.PhoneNumber</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0">
+                                        <span class="bg-info bg-opacity-10 text-info p-2 rounded-circle">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </span>
+                                    </div>
+                                    <div class="flex-grow-1 ms-3">
+                                        <div class="small text-muted">Địa chỉ</div>
+                                        <div class="fw-medium">
+                                            @(string.IsNullOrEmpty(Model.Address) ? "Chưa cập nhật" : Model.Address)
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <hr class="my-0">
+
+                    <div class="card-footer bg-white py-3">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h5 class="mb-0 fw-bold">@Model.AssignmentsMade.Count</h5>
+                                <small class="text-muted">Phân công</small>
+                            </div>
+                            <div class="col-6">
+                                <h5 class="mb-0 fw-bold">@Model.RegistrationDate.ToString("dd/MM/yyyy")</h5>
+                                <small class="text-muted">Ngày đăng ký</small>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="card-body text-center">
-                    <div class="position-relative mb-3">
-                        <img src="@CloudinaryHelper.GetThumbnailUrl(Model.ProfilePictureUrl, 200, 200, cloudName, defaultAvatar)"
-                             alt="Ảnh đại diện của @Model.FullName"
-                             class="img-profile rounded-circle img-fluid mx-auto border shadow"
-                             style="width: 180px; height: 180px; object-fit: cover;" />
-                        @if (Model.IsActive)
-                        {
-                            <div class="position-absolute bottom-0 end-0 p-1">
-                                <span class="badge bg-success rounded-pill"><i class="fas fa-check me-1"></i>Hoạt động</span>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="position-absolute bottom-0 end-0 p-1">
-                                <span class="badge bg-danger rounded-pill"><i class="fas fa-ban me-1"></i>Vô hiệu hóa</span>
-                            </div>
-                        }
-                    </div>
-                    <h4 class="mb-1">@Model.FullName</h4>
-                    <p class="text-muted mb-3">Quản lý Tour</p>
-                    <div class="d-flex justify-content-center mb-2">
-                        <a href="mailto:@Model.Email" class="btn btn-outline-primary btn-sm me-2">
-                            <i class="fas fa-envelope me-1"></i>Email
-                        </a>
-                        <a href="tel:@Model.PhoneNumber" class="btn btn-outline-success btn-sm">
-                            <i class="fas fa-phone me-1"></i>Gọi
-                        </a>
-                    </div>
+            </div>
+
+            <!-- Activity Chart Card - Thêm mới -->
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden mt-4">
+                <div class="card-header py-3 bg-gradient-info text-white">
+                    <h5 class="m-0 fw-bold"><i class="fas fa-chart-line me-2"></i>Hoạt động</h5>
                 </div>
-                <div class="card-footer bg-light">
-                    <div class="row text-center">
-                        <div class="col">
-                            <h5 class="mb-0">@Model.AssignmentsMade.Count</h5>
-                            <small class="text-muted">Phân công</small>
-                        </div>
-                        <div class="col">
-                            <h5 class="mb-0">@Model.RegistrationDate.ToString("MM/yyyy")</h5>
-                            <small class="text-muted">Ngày đăng ký</small>
-                        </div>
+                <div class="card-body">
+                    <div class="text-center py-4">
+                        <canvas id="activityChart" style="max-height: 250px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -92,38 +179,49 @@
 
         <!-- Information Column -->
         <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 bg-light">
-                    <h6 class="m-0 font-weight-bold text-primary">Thông tin chi tiết</h6>
-                </div>
-                <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-6 mb-3 mb-md-0">
-                            <div class="border-start border-primary border-3 ps-3 mb-3">
-                                <label class="text-muted mb-1 small">ID Quản lý</label>
-                                <p class="mb-0 fw-bold">@Model.UserId</p>
-                            </div>
-                            <div class="border-start border-primary border-3 ps-3 mb-3">
-                                <label class="text-muted mb-1 small">Họ Tên</label>
-                                <p class="mb-0 fw-bold">@Model.FullName</p>
-                            </div>
-                            <div class="border-start border-primary border-3 ps-3">
-                                <label class="text-muted mb-1 small">Email</label>
-                                <p class="mb-0 fw-bold">@Model.Email</p>
+            <!-- Status Cards -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 border-start border-primary border-4 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="text-xs fw-bold text-primary text-uppercase mb-1">Tổng phân công</div>
+                                    <div class="h3 mb-0 fw-bold">@Model.AssignmentsMade.Count</div>
+                                </div>
+                                <div class="fa-2x text-primary opacity-25">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="border-start border-primary border-3 ps-3 mb-3">
-                                <label class="text-muted mb-1 small">Số điện thoại</label>
-                                <p class="mb-0 fw-bold">@Model.PhoneNumber</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 border-start border-success border-4 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="text-xs fw-bold text-success text-uppercase mb-1">Phân công hoàn thành</div>
+                                    <div class="h3 mb-0 fw-bold">@Model.AssignmentsMade.Count(a => a.AssignmentStatus == "Hoàn thành")</div>
+                                </div>
+                                <div class="fa-2x text-success opacity-25">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
                             </div>
-                            <div class="border-start border-primary border-3 ps-3 mb-3">
-                                <label class="text-muted mb-1 small">Địa chỉ</label>
-                                <p class="mb-0 fw-bold">@(string.IsNullOrEmpty(Model.Address) ? "Chưa cập nhật" : Model.Address)</p>
-                            </div>
-                            <div class="border-start border-primary border-3 ps-3">
-                                <label class="text-muted mb-1 small">Ngày đăng ký</label>
-                                <p class="mb-0 fw-bold">@Model.RegistrationDate.ToString("dd/MM/yyyy HH:mm")</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 border-start border-warning border-4 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div class="text-xs fw-bold text-warning text-uppercase mb-1">Đang thực hiện</div>
+                                    <div class="h3 mb-0 fw-bold">@Model.AssignmentsMade.Count(a => a.AssignmentStatus == "Đang thực hiện")</div>
+                                </div>
+                                <div class="fa-2x text-warning opacity-25">
+                                    <i class="fas fa-spinner"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -131,40 +229,50 @@
             </div>
 
             <!-- Assignments Card -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-light">
-                    <h6 class="m-0 font-weight-bold text-primary">
-                        <i class="fas fa-tasks me-2"></i>Phân công Hướng dẫn viên
-                    </h6>
-                    <button class="btn btn-sm btn-outline-primary">
-                        <i class="fas fa-download me-1"></i>Xuất Excel
-                    </button>
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="card-header py-3 d-flex flex-column flex-sm-row align-items-sm-center justify-content-between bg-white border-bottom">
+                    <h5 class="m-0 fw-bold text-primary">
+                        <i class="fas fa-tasks me-2"></i>Lịch sử Phân công Hướng dẫn viên
+                    </h5>
+                    <div class="d-flex gap-2 mt-2 mt-sm-0">
+                        <button type="button" class="btn btn-sm btn-success">
+                            <i class="fas fa-plus me-1"></i>Tạo phân công
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download me-1"></i>Xuất Excel
+                        </button>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     @if (Model.AssignmentsMade.Any())
                     {
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle" id="assignmentsTable">
+                            <table class="table table-hover align-middle mb-0" id="assignmentsTable">
                                 <thead class="table-light">
                                     <tr>
-                                        <th scope="col">ID</th>
-                                        <th scope="col">Tour</th>
+                                        <th scope="col" style="width: 60px;">ID</th>
+                                        <th scope="col" style="min-width: 150px;">Tour</th>
                                         <th scope="col">Ngày khởi hành</th>
                                         <th scope="col">Hướng dẫn viên</th>
                                         <th scope="col">Trạng thái</th>
                                         <th scope="col">Ngày phân công</th>
-                                        <th scope="col"></th>
+                                        <th scope="col" class="text-end" style="width: 60px;"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var assignment in Model.AssignmentsMade)
                                     {
                                         <tr>
-                                            <td>@assignment.AssignmentId</td>
-                                            <td class="fw-bold">@assignment.TourName</td>
+                                            <td class="text-center">@assignment.AssignmentId</td>
+                                            <td class="fw-medium text-primary">@assignment.TourName</td>
                                             <td>@(assignment.DepartureDate?.ToString("dd/MM/yyyy") ?? "N/A")</td>
                                             <td>
-                                                @assignment.TourGuideName
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm me-2 bg-light rounded-circle d-flex align-items-center justify-content-center">
+                                                        <i class="fas fa-user text-muted"></i>
+                                                    </div>
+                                                    <span>@assignment.TourGuideName</span>
+                                                </div>
                                             </td>
                                             <td>
                                                 @{
@@ -190,14 +298,14 @@
                                                 <span class="badge @badgeClass"><i class="@icon me-1"></i>@assignment.AssignmentStatus</span>
                                             </td>
                                             <td>@assignment.AssignmentDate.ToString("dd/MM/yyyy")</td>
-                                            <td class="text-end">
+                                            <td>
                                                 <div class="dropdown">
-                                                    <button class="btn btn-sm btn-light border-0" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <button class="btn btn-sm btn-light border-0 rounded-circle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                         <i class="fas fa-ellipsis-v"></i>
                                                     </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
-                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2"></i>Xem chi tiết</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Chỉnh sửa</a></li>
+                                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-eye me-2 text-primary"></i>Xem chi tiết</a></li>
+                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2 text-info"></i>Chỉnh sửa</a></li>
                                                         <li><hr class="dropdown-divider"></li>
                                                         <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash-alt me-2"></i>Xóa phân công</a></li>
                                                     </ul>
@@ -212,9 +320,13 @@
                     else
                     {
                         <div class="text-center py-5">
-                            <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
-                            <h5>Chưa có phân công nào</h5>
-                            <p class="text-muted">Quản lý tour này chưa thực hiện phân công hướng dẫn viên nào.</p>
+                            <div class="mb-4">
+                                <div class="avatar-lg mx-auto bg-light rounded-circle d-flex align-items-center justify-content-center">
+                                    <i class="fas fa-tasks fa-2x text-muted"></i>
+                                </div>
+                            </div>
+                            <h5 class="fw-bold">Chưa có phân công nào</h5>
+                            <p class="text-muted pb-3">Quản lý tour này chưa thực hiện phân công hướng dẫn viên nào.</p>
                             <button class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Tạo phân công mới
                             </button>
@@ -222,20 +334,130 @@
                     }
                 </div>
             </div>
+
+            <!-- Recent Activities Card -->
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden mt-4">
+                <div class="card-header py-3 bg-white border-bottom">
+                    <h5 class="m-0 fw-bold text-primary">
+                        <i class="fas fa-history me-2"></i>Hoạt động gần đây
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="timeline p-4">
+                        <div class="timeline-item">
+                            <div class="timeline-item-marker">
+                                <div class="timeline-item-marker-indicator bg-primary">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                            </div>
+                            <div class="timeline-item-content">
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-bold">Tài khoản được tạo</span>
+                                    <span class="text-muted small">@Model.RegistrationDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                                <p class="mt-2 mb-0 text-muted">Tài khoản quản lý tour đã được tạo bởi Admin.</p>
+                            </div>
+                        </div>
+                        @if (Model.AssignmentsMade.Any())
+                        {
+                            <div class="timeline-item">
+                                <div class="timeline-item-marker">
+                                    <div class="timeline-item-marker-indicator bg-success">
+                                        <i class="fas fa-tasks"></i>
+                                    </div>
+                                </div>
+                                <div class="timeline-item-content">
+                                    <div class="d-flex justify-content-between">
+                                        <span class="fw-bold">Phân công tour gần nhất</span>
+                                        <span class="text-muted small">@Model.AssignmentsMade.OrderByDescending(a => a.AssignmentDate).First().AssignmentDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                    </div>
+                                    <p class="mt-2 mb-0 text-muted">Đã phân công hướng dẫn viên @Model.AssignmentsMade.OrderByDescending(a => a.AssignmentDate).First().TourGuideName cho tour @Model.AssignmentsMade.OrderByDescending(a => a.AssignmentDate).First().TourName.</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Disable Account Modal -->
+<div class="modal fade" id="disableAccountModal" tabindex="-1" aria-labelledby="disableAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="disableAccountModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Vô hiệu hóa tài khoản</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn vô hiệu hóa tài khoản của <strong>@Model.FullName</strong>?</p>
+                <p class="text-muted mb-0">Quản lý tour sẽ không thể đăng nhập và thực hiện các chức năng trên hệ thống sau khi bị vô hiệu hóa.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger">Xác nhận vô hiệu hóa</button>
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         $(document).ready(function() {
+            // Tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+            // DataTable
             $('#assignmentsTable').DataTable({
                 language: {
                     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/vi.json'
                 },
                 pageLength: 5,
-                lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "Tất cả"]]
+                lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "Tất cả"]],
+                order: [[0, 'desc']]
+            });
+
+            // Activity Chart
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            const activityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'],
+                    datasets: [{
+                        label: 'Phân công',
+                        data: [3, 5, 2, 7, 4, @Model.AssignmentsMade.Count],
+                        backgroundColor: 'rgba(78, 115, 223, 0.2)',
+                        borderColor: 'rgba(78, 115, 223, 1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointBackgroundColor: 'rgba(78, 115, 223, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
             });
         });
     </script>

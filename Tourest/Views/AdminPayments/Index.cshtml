@@ -1,0 +1,472 @@
+﻿@model PaginatedList<AdminPaymentListViewModel>
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Quản lý Thanh toán";
+
+    // Lấy lại các giá trị filter/sort/search để hiển thị và dùng trong link
+    string? currentMethod = ViewData["CurrentMethod"] as string;
+    string? currentStartDate = ViewData["CurrentStartDate"] as string;
+    string? currentEndDate = ViewData["CurrentEndDate"] as string;
+    string currentSearch = ViewData["CurrentSearch"] as string ?? "";
+    string currentSort = ViewData["CurrentSort"] as string ?? "date";
+    bool currentAscending = ViewData["Ascending"] as bool? ?? false;
+
+    // Helper để tạo route data cho sorting links
+    Func<string, object> GetSortRouteData = (newSortBy) =>
+    {
+        return new
+        {
+            methodFilter = currentMethod,
+            startDate = currentStartDate,
+            endDate = currentEndDate,
+            searchTerm = currentSearch,
+            pageIndex = Model.PageIndex,
+            sortBy = newSortBy,
+            ascending = (newSortBy == currentSort ? !currentAscending : true)
+        };
+    };
+
+    // Helper để tạo route data cho paging links
+    Func<int, object> GetPagingRouteData = (newPageIndex) =>
+    {
+        return new
+        {
+            methodFilter = currentMethod,
+            startDate = currentStartDate,
+            endDate = currentEndDate,
+            searchTerm = currentSearch,
+            sortBy = currentSort,
+            ascending = currentAscending,
+            pageIndex = newPageIndex
+        };
+    };
+
+    // Helper để hiển thị mũi tên sort
+    Func<string, string> GetSortIcon = (columnName) =>
+    {
+        if (currentSort != columnName) return "<i class=\"bi bi-filter text-muted\"></i>";
+        return currentAscending ? "<i class=\"bi bi-sort-up-alt text-primary\"></i>" : "<i class=\"bi bi-sort-down text-primary\"></i>";
+    };
+
+    // Tính tổng số tiền trang hiện tại
+    decimal currentPageTotal = Model.Sum(p => p.Amount);
+}
+
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1 fw-bold text-primary">@ViewData["Title"]</h2>
+            <p class="text-muted mb-0">Quản lý và theo dõi tất cả các giao dịch thanh toán</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exportModal">
+                <i class="bi bi-file-earmark-excel me-2"></i> Xuất Excel
+            </button>
+            <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i> In báo cáo
+            </button>
+        </div>
+    </div>
+
+    <!-- Dashboard Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-1">Tổng số giao dịch</h6>
+                            <h3 class="mb-0 fw-bold">@Model.TotalCount</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-3">
+                            <i class="bi bi-credit-card fs-4 text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-1">Tổng tiền (trang hiện tại)</h6>
+                            <h3 class="mb-0 fw-bold">@currentPageTotal.ToString("N0") đ</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-3">
+                            <i class="bi bi-cash-stack fs-4 text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-1">Số trang</h6>
+                            <h3 class="mb-0 fw-bold">@Model.PageIndex / @Model.TotalPages</h3>
+                        </div>
+                        <div class="bg-light rounded-circle p-3">
+                            <i class="bi bi-file-earmark-text fs-4 text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-1">Khoảng thời gian</h6>
+                            <p class="mb-0 fw-medium">
+                                @(string.IsNullOrEmpty(currentStartDate) ? "Tất cả" : $"{currentStartDate} - {(string.IsNullOrEmpty(currentEndDate) ? "nay" : currentEndDate)}")
+                            </p>
+                        </div>
+                        <div class="bg-light rounded-circle p-3">
+                            <i class="bi bi-calendar-range fs-4 text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="card-title mb-0 fw-bold">
+                <i class="bi bi-funnel me-2 text-primary"></i>Bộ lọc tìm kiếm
+            </h5>
+            <button class="btn btn-sm btn-link text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true">
+                <i class="bi bi-chevron-up"></i>
+            </button>
+        </div>
+        <div class="collapse show" id="filterCollapse">
+            <div class="card-body">
+                <form asp-action="Index" method="get" id="filterForm">
+                    <div class="row g-3">
+                        <div class="col-lg-4">
+                            <div class="form-floating">
+                                <input type="text" name="searchTerm" id="searchTerm" class="form-control" placeholder="Tìm kiếm..." value="@currentSearch">
+                                <label for="searchTerm">Tìm kiếm giao dịch</label>
+                                <small class="text-muted d-block mt-1">Booking ID, Mã GD, Tên KH, Tên Tour...</small>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="form-floating">
+                                <select name="methodFilter" id="methodFilter" class="form-select" asp-items="@(new SelectList(ViewData["PaymentMethods"] as List<string> ?? new List<string>()))">
+                                    <option value="">-- Tất cả --</option>
+                                </select>
+                                <label for="methodFilter">Phương thức</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="form-floating">
+                                <input type="date" name="startDate" id="startDate" class="form-control" value="@currentStartDate">
+                                <label for="startDate">Từ ngày</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-4">
+                            <div class="form-floating">
+                                <input type="date" name="endDate" id="endDate" class="form-control" value="@currentEndDate">
+                                <label for="endDate">Đến ngày</label>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1 d-flex align-items-center justify-content-center">
+                                <i class="bi bi-search me-2"></i> Tìm kiếm
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary d-flex align-items-center justify-content-center" title="Xóa bộ lọc">
+                                <i class="bi bi-x-circle"></i>
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-check-circle-fill me-2 flex-shrink-0"></i>
+            <div>@TempData["SuccessMessage"]</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2 flex-shrink-0"></i>
+            <div>@TempData["ErrorMessage"]</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Table Card -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 fw-bold">
+                <i class="bi bi-list-ul me-2 text-primary"></i>Danh sách thanh toán
+                @if (!string.IsNullOrEmpty(currentSearch) || !string.IsNullOrEmpty(currentMethod) || !string.IsNullOrEmpty(currentStartDate))
+                {
+                    <span class="badge bg-primary ms-2">Đã lọc</span>
+                }
+            </h5>
+            <span class="text-muted">Hiển thị @Model.Count() / @Model.TotalCount bản ghi</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="py-3">Pay ID</th>
+                            <th class="py-3">Booking ID</th>
+                            <th class="py-3">Khách hàng</th>
+                            <th class="py-3">Tour</th>
+                            <th class="py-3">
+                                <a href="#" class="text-decoration-none text-dark d-flex align-items-center"
+                                   onclick="event.preventDefault(); document.querySelector('#sortBy').value='amount'; document.querySelector('#ascending').value='@((currentSort == "amount" ? !currentAscending : true).ToString().ToLower())'; document.querySelector('#filterForm').submit();">
+                                    Số tiền
+                                    <span class="ms-1">@Html.Raw(GetSortIcon("amount"))</span>
+                                </a>
+                            </th>
+                            <th class="py-3">Phương thức</th>
+                            <th class="py-3">Mã GD</th>
+                            <th class="py-3">
+                                <a href="#" class="text-decoration-none text-dark d-flex align-items-center"
+                                   onclick="event.preventDefault(); document.querySelector('#sortBy').value='date'; document.querySelector('#ascending').value='@((currentSort == "date" ? !currentAscending : true).ToString().ToLower())'; document.querySelector('#filterForm').submit();">
+                                    Ngày TT
+                                    <span class="ms-1">@Html.Raw(GetSortIcon("date"))</span>
+                                </a>
+                            </th>
+                            <th class="py-3 text-end">Chi tiết</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="9" class="text-center py-4">
+                                    <div class="py-5">
+                                        <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+                                        <p class="text-muted mb-0 fw-medium">Không có dữ liệu thanh toán phù hợp.</p>
+                                        @if (!string.IsNullOrEmpty(currentSearch) || !string.IsNullOrEmpty(currentMethod) || !string.IsNullOrEmpty(currentStartDate))
+                                        {
+                                            <p class="text-muted">Hãy thử thay đổi điều kiện lọc.</p>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="fw-medium">#@item.PaymentId</span>
+                                    </td>
+                                    <td>
+                                            #@item.BookingId
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary rounded-circle p-2 me-2">
+                                                <i class="bi bi-person"></i>
+                                            </div>
+                                            <span>@item.CustomerName</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="text-truncate d-inline-block" style="max-width: 180px;" title="@item.TourName">
+                                            @item.TourName
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-success">@item.Amount.ToString("N0") đ</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-purple" style="color: purple;">
+                                            <i class="bi bi-wallet2 me-1"></i> @item.PaymentMethod
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <code class="bg-light p-1 rounded small">@(string.IsNullOrEmpty(item.TransactionId) ? "--" : item.TransactionId)</code>
+                                    </td>
+                                    <td>
+                                        <span class="text-nowrap">
+                                            <i class="bi bi-calendar-event me-1 text-muted"></i>
+                                            @item.PaymentDate.ToString("dd/MM/yyyy")
+                                        </span>
+                                        <br />
+                                        <small class="text-muted">@item.PaymentDate.ToString("HH:mm:ss")</small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <a asp-action="Details" asp-route-id="@item.PaymentId" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="text-muted">
+                    <span>Tổng số: <strong>@Model.TotalCount</strong> giao dịch</span>
+                </div>
+
+                <!-- Phân trang -->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                            <a class="page-link" href="#" onclick="event.preventDefault(); document.querySelector('#pageIndex').value='@(Model.PageIndex - 1)'; document.querySelector('#filterForm').submit();" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        @{
+                            int startPage = Math.Max(1, Model.PageIndex - 2);
+                            int endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
+                            if (startPage > 1)
+                            {
+                                <li class="page-item"><a class="page-link" href="#" onclick="event.preventDefault(); document.querySelector('#pageIndex').value='1'; document.querySelector('#filterForm').submit();">1</a></li>
+                                if (startPage > 2)
+                                {
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                }
+                            }
+                            for (int i = startPage; i <= endPage; i++)
+                            {
+                                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                    <a class="page-link" href="#" onclick="event.preventDefault(); document.querySelector('#pageIndex').value='@i'; document.querySelector('#filterForm').submit();">@i</a>
+                                </li>
+                            }
+                            if (endPage < Model.TotalPages)
+                            {
+                                if (endPage < Model.TotalPages - 1)
+                                {
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                }
+                                <li class="page-item"><a class="page-link" href="#" onclick="event.preventDefault(); document.querySelector('#pageIndex').value='@Model.TotalPages'; document.querySelector('#filterForm').submit();">@Model.TotalPages</a></li>
+                            }
+                        }
+                        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                            <a class="page-link" href="#" onclick="event.preventDefault(); document.querySelector('#pageIndex').value='@(Model.PageIndex + 1)'; document.querySelector('#filterForm').submit();" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden inputs for sorting and paging -->
+<input type="hidden" id="sortBy" name="sortBy" value="@currentSort">
+<input type="hidden" id="ascending" name="ascending" value="@currentAscending.ToString().ToLower()">
+<input type="hidden" id="pageIndex" name="pageIndex" value="@Model.PageIndex">
+
+<!-- Export Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="exportModalLabel">
+                    <i class="bi bi-file-earmark-arrow-down me-2 text-primary"></i>Xuất Báo Cáo Thanh Toán
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Phạm vi xuất</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="exportScope" id="exportAll" checked>
+                            <label class="form-check-label" for="exportAll">
+                                Tất cả giao dịch phù hợp bộ lọc
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="exportScope" id="exportCurrent">
+                            <label class="form-check-label" for="exportCurrent">
+                                Chỉ trang hiện tại (@Model.PageIndex)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exportFormat" class="form-label fw-medium">Định dạng file</label>
+                        <select id="exportFormat" class="form-select">
+                            <option value="excel">Excel (.xlsx)</option>
+                            <option value="csv">CSV (.csv)</option>
+                            <option value="pdf">PDF (.pdf)</option>
+                        </select>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="includeHeaders" checked>
+                        <label class="form-check-label" for="includeHeaders">
+                            Bao gồm tiêu đề cột
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i>Đóng
+                </button>
+                <button type="button" class="btn btn-primary">
+                    <i class="bi bi-download me-2"></i>Xuất Báo Cáo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Set current method value in select
+        if ('@currentMethod') document.getElementById('methodFilter').value = '@currentMethod';
+
+        // Print receipt function
+        function printReceipt(paymentId) {
+            // Implement print functionality
+            console.log("Printing receipt for payment: " + paymentId);
+            // In thực tế sẽ mở popup hoặc tab mới để in biên lai
+            alert("Đang in biên lai cho giao dịch #" + paymentId);
+        }
+
+        // Initialize form submission - move hidden inputs into form on submit
+        document.getElementById('filterForm').addEventListener('submit', function(e) {
+            // Add hidden inputs if they don't exist in the form already
+            const sortByInput = document.getElementById('sortBy');
+            const ascendingInput = document.getElementById('ascending');
+            const pageIndexInput = document.getElementById('pageIndex');
+
+            if (!this.contains(sortByInput)) {
+                this.appendChild(sortByInput);
+            }
+            if (!this.contains(ascendingInput)) {
+                this.appendChild(ascendingInput);
+            }
+            if (!this.contains(pageIndexInput)) {
+                this.appendChild(pageIndexInput);
+            }
+        });
+
+        // Add tooltip initialization
+        const tooltipTriggerList = document.querySelectorAll('[title]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    </script>
+}

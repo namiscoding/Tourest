@@ -1,4 +1,5 @@
 ﻿using Tourest.Data.Entities;
+using Tourest.ViewModels.Admin.AdminDashboard;
 using Tourest.ViewModels.Tour;
 
 namespace Tourest.Data.Repositories
@@ -34,5 +35,9 @@ namespace Tourest.Data.Repositories
         Task<int> GetActiveTourCountAsync();
         Task<int> GetDistinctDestinationCountAsync();
         Task<IEnumerable<Tour>> GetFeaturedToursAsync(int count);
+        Task<Dictionary<string, int>> GetTourCountByStatusAsync(); // Trả về Dictionary<StatusName, Count>
+        Task<IEnumerable<TopTourViewModel>> GetTopSellingToursByRevenueAsync(int count, DateTime start, DateTime end); // Trả về anonymous object hoặc ViewModel tạm
+        Task<IEnumerable<TopTourViewModel>> GetTopSellingToursByBookingCountAsync(int count, DateTime start, DateTime end);
+
     }
 }

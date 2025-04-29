@@ -1,0 +1,577 @@
+﻿@model AdminDashboardViewModel
+
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Admin Dashboard";
+    var cloudName = Configuration["CloudinarySettings:CloudName"];
+    var defaultAvatar = "assets/images/tour-image.png";
+}
+
+<!-- Main Dashboard Container -->
+<div class="dashboard-container">
+    <!-- Page Header with Action Buttons -->
+    <div class="dashboard-header mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between">
+            <div>
+                <h1 class="h3 fw-bold text-primary mb-0">@ViewData["Title"]</h1>
+                <p class="text-muted fs-6">Tổng quan hoạt động kinh doanh</p>
+            </div>
+            <div class="d-flex">
+                <div class="dropdown me-2">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" id="timeRangeDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-calendar-alt me-1"></i> 30 ngày gần nhất
+                    </button>
+                    <ul class="dropdown-menu shadow-sm" aria-labelledby="timeRangeDropdown">
+                        <li><a class="dropdown-item active" href="#">30 ngày gần nhất</a></li>
+                        <li><a class="dropdown-item" href="#">Quý hiện tại</a></li>
+                        <li><a class="dropdown-item" href="#">Năm hiện tại</a></li>
+                    </ul>
+                </div>
+                <button class="btn btn-primary">
+                    <i class="fas fa-download me-1"></i> Xuất Báo Cáo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Cards Row -->
+    <div class="row g-3 mb-4">
+        <!-- Revenue Card -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 position-relative overflow-hidden">
+                <div class="card-indicator bg-primary"></div>
+                <div class="card-body py-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="flex-shrink-0 stat-icon bg-primary-subtle text-primary rounded-circle p-3 me-3">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted text-uppercase fs-xs fw-semibold mb-1">Doanh Thu (30 ngày)</h6>
+                            <h3 class="fw-bold mb-0">@Model.TotalRevenueLast30Days.ToString("N0") ₫</h3>
+                        </div>
+                    </div>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: 87%" aria-valuenow="87" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mt-2">
+                        <small class="text-success fw-semibold">
+                            <i class="fas fa-arrow-up me-1"></i> 12.4%
+                        </small>
+                        <small class="text-muted">so với tháng trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Card -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 position-relative overflow-hidden">
+                <div class="card-indicator bg-success"></div>
+                <div class="card-body py-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="flex-shrink-0 stat-icon bg-success-subtle text-success rounded-circle p-3 me-3">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted text-uppercase fs-xs fw-semibold mb-1">Bookings (30 ngày)</h6>
+                            <h3 class="fw-bold mb-0">@Model.TotalBookingsLast30Days</h3>
+                        </div>
+                    </div>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 66%" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mt-2">
+                        <small class="text-success fw-semibold">
+                            <i class="fas fa-arrow-up me-1"></i> 5.7%
+                        </small>
+                        <small class="text-muted">so với tháng trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customers Card -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 position-relative overflow-hidden">
+                <div class="card-indicator bg-info"></div>
+                <div class="card-body py-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="flex-shrink-0 stat-icon bg-info-subtle text-info rounded-circle p-3 me-3">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted text-uppercase fs-xs fw-semibold mb-1">Khách Hàng</h6>
+                            <h3 class="fw-bold mb-0">@Model.TotalCustomers</h3>
+                        </div>
+                    </div>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mt-2">
+                        <small class="text-success fw-semibold">
+                            <i class="fas fa-arrow-up me-1"></i> 8.1%
+                        </small>
+                        <small class="text-muted">so với tháng trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tour Guides Card -->
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100 position-relative overflow-hidden">
+                <div class="card-indicator bg-warning"></div>
+                <div class="card-body py-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="flex-shrink-0 stat-icon bg-warning-subtle text-warning rounded-circle p-3 me-3">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted text-uppercase fs-xs fw-semibold mb-1">Hướng Dẫn Viên</h6>
+                            <h3 class="fw-bold mb-0">@Model.TotalTourGuides</h3>
+                        </div>
+                    </div>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between mt-2">
+                        <small class="text-success fw-semibold">
+                            <i class="fas fa-arrow-up me-1"></i> 2.3%
+                        </small>
+                        <small class="text-muted">so với tháng trước</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-3 mb-4">
+        <!-- Revenue Chart -->
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold text-primary mb-0">Doanh Thu (6 tháng gần nhất)</h5>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-link text-muted" type="button" id="revenueFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="revenueFilterDropdown">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sync-alt me-2"></i>Làm mới</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-download me-2"></i>Tải xuống</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-chart-line me-2"></i>Xem chi tiết</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="revenueChartWrapper" style="height: 360px">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Chart -->
+        <div class="col-xl-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold text-primary mb-0">Bookings (7 ngày gần nhất)</h5>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-link text-muted" type="button" id="bookingFilterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="bookingFilterDropdown">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-sync-alt me-2"></i>Làm mới</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-download me-2"></i>Tải xuống</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="bookingChartWrapper" style="height: 360px">
+                        <canvas id="bookingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Third Row with guide stats and top tours -->
+    <div class="row g-3">
+        <!-- Top Rated Tour Guides -->
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold text-primary mb-0">Top Hướng Dẫn Viên (Rating)</h5>
+                    <a asp-controller="AdminTourGuides" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                        Xem tất cả <i class="fas fa-angle-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.TopRatedGuides.Any())
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var guide in Model.TopRatedGuides)
+                            {
+                                <div class="list-group-item border-0 border-bottom px-4 py-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-wrapper me-3 position-relative">
+                                                <img src="@CloudinaryHelper.GetThumbnailUrl(null, 48, 48, cloudName, defaultAvatar)"
+                                                     class="rounded-circle border" alt="@guide.FullName"
+                                                     style="width:48px; height:48px; object-fit: cover;" />
+                                                <span class="position-absolute bottom-0 end-0 bg-success rounded-circle p-1 border border-white"
+                                                      data-bs-toggle="tooltip" title="Online"></span>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-semibold">
+                                                    <a asp-controller="AdminTourGuides" asp-action="Details" asp-route-id="@guide.UserId"
+                                                       class="text-decoration-none">@guide.FullName</a>
+                                                </h6>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <div class="text-warning me-1">
+                                                @for (var i = 1; i <= 5; i++)
+                                                {
+                                                    <i class="@(i <= Math.Round(guide.AverageRating ?? 0) ? "fas" : "far") fa-star"></i>
+                                                }
+                                            </div>
+                                            <span class="badge bg-warning text-dark fw-semibold ms-2">
+                                                @((guide.AverageRating ?? 0).ToString("0.0"))
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center">
+                            <div class="py-4">
+                                <div class="mb-3 text-muted">
+                                    <i class="fas fa-user-slash fa-3x"></i>
+                                </div>
+                                <p class="mb-0">Chưa có dữ liệu đánh giá hướng dẫn viên.</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Selling Tours -->
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold text-primary mb-0">Top Tour Bán Chạy (30 ngày)</h5>
+                    <a asp-controller="AdminTours" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                        Xem tất cả <i class="fas fa-angle-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.TopSellingToursByRevenue.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">Tour</th>
+                                        <th class="text-center">Bookings</th>
+                                        <th class="text-end pe-4">Doanh Thu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var tour in Model.TopSellingToursByRevenue)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="tour-thumb me-3 rounded bg-light" style="width:36px; height:36px; overflow:hidden">
+                                                        <img src="@CloudinaryHelper.GetThumbnailUrl(tour.ThumbnailImagePublicId, 36, 36, cloudName, defaultAvatar)"
+                                                             alt="@tour.Name" class="img-fluid" style="object-fit: cover; width:100%; height:100%;" />
+                                                    </div>
+                                                    <div>
+                                                        <a asp-controller="AdminTours" asp-action="Details" asp-route-id="@tour.TourId"
+                                                           class="text-decoration-none fw-semibold">@tour.Name</a>
+                                                        <div class="text-muted small">@tour.DurationDays ngày • @tour.Destination</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-info">@tour.BookingCount</span>
+                                            </td>
+                                            <td class="text-end fw-semibold pe-4">@tour.TotalRevenue.ToString("N0") ₫</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center">
+                            <div class="py-4">
+                                <div class="mb-3 text-muted">
+                                    <i class="fas fa-map-marked-alt fa-3x"></i>
+                                </div>
+                                <p class="mb-0">Chưa có dữ liệu doanh thu tour.</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <style>
+        .dashboard-container {
+            padding: 1.5rem 0.5rem;
+        }
+
+        .card-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .stat-icon i {
+                font-size: 1.25rem;
+            }
+
+        .progress-sm {
+            height: 6px;
+        }
+
+        .fs-xs {
+            font-size: 0.75rem;
+        }
+
+    </style>
+
+
+@section Scripts {
+    <!-- Required Chart.js and ApexCharts libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Register ChartJS plugins
+            Chart.register(ChartDataLabels);
+
+            // Set chart defaults
+            Chart.defaults.font.family = "'Inter', 'Segoe UI', 'Arial', sans-serif";
+            Chart.defaults.color = '#6c757d';
+            Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(33, 37, 41, 0.9)';
+            Chart.defaults.plugins.tooltip.titleFont = { weight: 'bold' };
+            Chart.defaults.plugins.tooltip.padding = 12;
+            Chart.defaults.plugins.tooltip.cornerRadius = 8;
+            Chart.defaults.plugins.tooltip.displayColors = false;
+
+            // Common chart options
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            };
+
+            // --- Revenue Chart ---
+            const createRevenueChart = () => {
+                const revenueCtx = document.getElementById('revenueChart');
+                if (!revenueCtx) return;
+
+                try {
+                    // Parse JSON safely
+                    const revenueJson = '@Html.Raw(Json.Serialize(Model.RevenueLast6Months ?? new ChartDataViewModel()))';
+                    const revenueData = JSON.parse(revenueJson);
+
+                    if (revenueData && revenueData.labels && revenueData.data) {
+                        const gradient = revenueCtx.getContext('2d').createLinearGradient(0, 0, 0, 350);
+                        gradient.addColorStop(0, 'rgba(78, 115, 223, 0.2)');
+                        gradient.addColorStop(1, 'rgba(78, 115, 223, 0.0)');
+
+                        new Chart(revenueCtx, {
+                            type: 'line',
+                            data: {
+                                labels: revenueData.labels,
+                                datasets: [{
+                                    label: revenueData.labelName || 'Doanh thu',
+                                    data: revenueData.data,
+                                    borderColor: '#4e73df',
+                                    backgroundColor: gradient,
+                                    borderWidth: 3,
+                                    fill: true,
+                                    tension: 0.4,
+                                    pointBackgroundColor: '#fff',
+                                    pointBorderColor: '#4e73df',
+                                    pointBorderWidth: 2,
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6,
+                                    pointHoverBackgroundColor: '#fff',
+                                    pointHoverBorderColor: '#4e73df',
+                                    pointHoverBorderWidth: 2
+                                }]
+                            },
+                            options: {
+                                ...commonOptions,
+                                scales: {
+                                    x: {
+                                        grid: {
+                                            display: false,
+                                            drawBorder: false
+                                        }
+                                    },
+                                    y: {
+                                        grid: {
+                                            color: 'rgba(0, 0, 0, 0.05)',
+                                            drawBorder: false
+                                        },
+                                        ticks: {
+                                            callback: function(value) {
+                                                return new Intl.NumberFormat('vi-VN', {
+                                                    style: 'currency',
+                                                    currency: 'VND',
+                                                    notation: 'compact',
+                                                    compactDisplay: 'short'
+                                                }).format(value);
+                                            },
+                                            padding: 10
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    ...commonOptions.plugins,
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return new Intl.NumberFormat('vi-VN', {
+                                                    style: 'currency',
+                                                    currency: 'VND'
+                                                }).format(context.parsed.y);
+                                            }
+                                        }
+                                    },
+                                    datalabels: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        console.error("Revenue chart data is invalid:", revenueData);
+                    }
+                } catch (e) {
+                    console.error("Error parsing or rendering revenue chart:", e);
+                }
+            };
+
+            // --- Booking Chart ---
+            const createBookingChart = () => {
+                const bookingCtx = document.getElementById('bookingChart');
+                if (!bookingCtx) return;
+
+                try {
+                    const bookingJson = '@Html.Raw(Json.Serialize(Model.BookingsLast7Days ?? new ChartDataViewModel()))';
+                    const bookingData = JSON.parse(bookingJson);
+
+                    if (bookingData && bookingData.labels && bookingData.data) {
+                        new Chart(bookingCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: bookingData.labels,
+                                datasets: [{
+                                    label: bookingData.labelName || 'Số Bookings',
+                                    data: bookingData.data,
+                                    backgroundColor: '#36b9cc',
+                                    borderRadius: 6,
+                                    maxBarThickness: 30
+                                }]
+                            },
+                            options: {
+                                ...commonOptions,
+                                scales: {
+                                    x: {
+                                        grid: {
+                                            display: false,
+                                            drawBorder: false
+                                        }
+                                    },
+                                    y: {
+                                        grid: {
+                                            color: 'rgba(0, 0, 0, 0.05)',
+                                            drawBorder: false
+                                        },
+                                        beginAtZero: true,
+                                        ticks: {
+                                            stepSize: 1,
+                                            padding: 10
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    ...commonOptions.plugins,
+                                    datalabels: {
+                                        color: '#fff',
+                                        anchor: 'end',
+                                        align: 'top',
+                                        offset: 0,
+                                        font: {
+                                            weight: 'bold'
+                                        },
+                                        formatter: function(value) {
+                                            if (value > 0) return value;
+                                            return '';
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        console.error("Booking chart data is invalid:", bookingData);
+                    }
+                } catch (e) {
+                    console.error("Error parsing or rendering booking chart:", e);
+                }
+            };
+
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+
+            // Initialize all charts
+            createRevenueChart();
+            createBookingChart();
+
+            // Handle window resize to redraw charts
+            window.addEventListener('resize', function() {
+                // Add debounce if needed
+            });
+        });
+    </script>
+}

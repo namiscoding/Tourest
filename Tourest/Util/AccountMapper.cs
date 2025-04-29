@@ -1,6 +1,7 @@
 ﻿using Tourest.Data.Entities;
 using Tourest.ViewModels.Account;
 using Tourest.ViewModels.Admin;
+using Tourest.ViewModels.Admin.AdminDashboard;
 
 namespace Tourest.Util
 {
