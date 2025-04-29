@@ -1,6 +1,7 @@
 ﻿@model List<Tourest.ViewModels.Tour.TourGuideListViewModel>
 
 @{
+    Layout = "/Views/TourManager/_LayoutTourManager.cshtml";
     ViewData["Title"] = "Tour Guide List";
 }
 
@@ -12,6 +13,7 @@
         padding: 2rem;
         border-radius: 12px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        text-align: center; /* Căn giữa nội dung */
     }
 
     h2 {
@@ -43,6 +45,24 @@
     tr:nth-child(even) {
         background-color: #f8f9fa;
     }
+
+    .btn-back {
+        display: inline-block;
+        background-color: #007bff; /* Đổi màu thành xanh giống th */
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        text-align: center;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        margin-top: 1.5rem; /* Thêm khoảng cách phía trên nút */
+    }
+
+        .btn-back:hover {
+            background-color: #0056b3; /* Màu xanh đậm hơn khi hover */
+            transform: translateY(-2px);
+        }
 </style>
 
 <div class="container-centered">
@@ -59,6 +79,7 @@
                 <th>Experience</th>
                 <th>Actions</th>
                 <th>Feedback</th>
+                <th>Schedule</th>
             </tr>
         </thead>
         <tbody>
@@ -77,8 +98,12 @@
                     <td>
                         <a asp-controller="TourManager" asp-action="TourGuideFeedback" asp-route-id="@item.TourGuideUserID">Feedback</a>
                     </td>
+                    <td>
+                        <a asp-controller="TourManager" asp-action="ViewSchedule" asp-route-id="@item.TourGuideUserID">Schedule</a>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
+    <a asp-controller="TourManager" asp-action="Index" class="btn-back">Back to Tour Manager</a>
 </div>

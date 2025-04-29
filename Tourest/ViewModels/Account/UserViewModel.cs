@@ -1,4 +1,5 @@
-﻿using Tourest.Data.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using Tourest.Data.Entities;
 
 namespace Tourest.ViewModels.Account
 {
@@ -6,13 +7,24 @@ namespace Tourest.ViewModels.Account
     {
 
         public int UserID { get; set; }
+        [Required(ErrorMessage = "FullName cannot be empty.")]
         public string FullName { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Email cannot be empty.")]
+        [RegularExpression(@"^[^@\s]+@[^@\s]+\.(com|net|org|vn)$", ErrorMessage = "Invalid email format.")]
         public string Email { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Phone number cannot be empty.")]
+        [Display(Name = "Phone Number")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits (0-9).")]
         public string? PhoneNumber { get; set; }
         public string? Address { get; set; }
-        public string? ProfilePictureUrl { get; set; }
+   
         public DateTime RegistrationDate { get; set; }
+        [Display(Name = "Is Active?")]
         public bool IsActive { get; set; }
+        public string? ProfilePictureUrl { get; set; }
+
+        [Display(Name = "Ảnh đại diện mới (Chọn file nếu muốn thay đổi)")]
+        public IFormFile? ProfilePictureFile { get; set; } // Nhận file upload mới
 
         // Navigation Properties
         public virtual AccountViewModel? Account { get; set; }

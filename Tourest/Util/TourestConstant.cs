@@ -4,6 +4,156 @@
     {
         public const string CompanyName = "Tourest";
 
+        public const string templateforgotP = @"<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Password Reset Request</title>
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Container */
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header */
+        .header {
+            background-color: #2196F3;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        .header img {
+            max-height: 60px;
+        }
+        
+        /* Content */
+        .content {
+            padding: 30px 40px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        /* Button */
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .button {
+            display: inline-block;
+            background-color: #FF5722;
+            color: #ffffff !important;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .button:hover {
+            background-color: #E64A19;
+        }
+        
+        /* Security note */
+        .security-note {
+            background-color: #f3f3f3;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-top: 20px;
+            border-left: 4px solid #FFC107;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: #f3f3f3;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .footer a {
+            color: #2196F3;
+            text-decoration: none;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 600px) {
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=""email-container"">
+        <!-- Header with Logo -->
+        <div class=""header"">
+            <img src=""https://example.com/logo.png"" alt=""Tourest Logo"" style=""max-height: 60px;"">
+        </div>
+        
+        <!-- Main Content -->
+        <div class=""content"">
+            <h1>Password Reset Request</h1>
+            
+            <p>Xin chào,</p>
+            
+            <p>Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản Tourest của bạn. Nếu bạn muốn đổi mật khẩu, vui lòng nhấp vào nút bên dưới.</p>
+            
+            <div class=""button-container"">
+                <a href=""{{YOUR_RESET_TOKEN}}"" class=""button"">Đặt lại mật khẩu</a>
+            </div>
+            
+            <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này hoặc liên hệ với bộ phận hỗ trợ nếu bạn có thắc mắc.</p>
+            
+            <div class=""security-note"">
+                <strong>Lưu ý bảo mật:</strong> Liên kết đặt lại mật khẩu này sẽ hết hạn sau 24 giờ. Chúng tôi không bao giờ yêu cầu mật khẩu qua email.
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class=""footer"">
+            <p>© 2025 Tourest. Tất cả các quyền được bảo lưu.</p>
+            <p>
+                <a href=""https://tourest.com/terms"">Điều khoản sử dụng</a> | 
+                <a href=""https://tourest.com/privacy"">Chính sách bảo mật</a> | 
+                <a href=""https://tourest.com/contact"">Liên hệ</a>
+            </p>
+            <p>Tourest Inc., 123 Đường Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh, Việt Nam</p>
+        </div>
+    </div>
+</body>
+</html>";
+
+
         public const string TemplateBooking = @"
 <!DOCTYPE html>
 <html lang=""vi"">

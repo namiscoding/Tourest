@@ -5,6 +5,9 @@
 @{
     ViewData["Title"] = "Tourest -đăng nhập cho tao";
 }
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -228,6 +231,7 @@
                                                         <input asp-for="Register.Fullname" type="text"
                                                                class="form-control"
                                                                id="signupFullName" placeholder="Enter your Fullname" />
+                                                        <span asp-validation-for="Register.Fullname" class="text-danger"></span>
                                                     </div>
                                                 </div>
                                                 <div class="row mb-3 align-items-center">
@@ -237,6 +241,7 @@
                                                                class="form-control"
                                                                id="signupEmail"
                                                                placeholder="Enter your email" />
+                                                        <span asp-validation-for="Register.Email" class="text-danger"></span>
                                                     </div>
                                                 </div>
 
@@ -246,6 +251,7 @@
                                                         <input asp-for="Register.PhoneNumber" type="tel"
                                                                class="form-control"
                                                                id="signupPhone" placeholder="Enter your phone number" />
+                                                        <span asp-validation-for="Register.PhoneNumber" class="text-danger"></span>
                                                     </div>
                                                 </div>
                                                 <div class="row mb-3 align-items-center">
@@ -255,6 +261,7 @@
                                                                class="form-control"
                                                                id="signupPassword"
                                                                placeholder="Enter your password" />
+                                                        <span asp-validation-for="Register.PasswordHash" class="text-danger"></span>
                                                     </div>
                                                 </div>
                                                 <div class="row mb-3 align-items-center">
@@ -264,6 +271,7 @@
                                                                class="form-control"
                                                                id="signupConfirmPassword"
                                                                placeholder="Confirm your password" />
+                                                        <span asp-validation-for="Register.PasswordHashConfirm" class="text-danger"></span>
                                                     </div>
                                                 </div>
                                         <button type="submit" class="common-btn color-two w-100">
@@ -331,7 +339,12 @@
                                         <button type="submit" class="common-btn color-two w-100">
                                             Sign In
                                         </button>
+                                                <a asp-controller="Authentication" asp-action="EnterEmail" >
+                                                   Forgot Password à 
+                                                </a>
+
                                     </form>
+
                                     <div class="social-login text-center">
                                         <p>Or sign in with:</p>
                                         <div class="btn-group justify-content-center flex-wrap gap-2">
@@ -348,6 +361,8 @@
                                     </div>
                                 </div>
                             </div>
+
+
                         </div>
                     </div>
                 </div>
