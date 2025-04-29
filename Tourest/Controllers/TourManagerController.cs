@@ -96,69 +96,48 @@ namespace Tourest.Controllers
             var customers = await _tourManagerService.GetCustomersForTourAsync(tourId);
             return View(customers);
         }
-
-        // GET: /TourManager/ListTour
         [HttpGet("ListTour")]
-        public IActionResult ListTour()
-        {
-            var tours = _tourManagerService.GetAllTours();
-            return View(tours);
-        }
-
         public IActionResult ListTour(string searchTerm, string statusFilter)
         {
-            // Truy vấn dữ liệu từ database
-            var query = _context.Tours
+            var tours = _context.Tours.AsQueryable();
+
+            // Nếu có keyword thì filter theo Name hoặc Destination
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                tours = tours.Where(t => t.Name.Contains(searchTerm) || t.Destination.Contains(searchTerm));
+            }
+
+            // Nếu có status filter thì lọc theo Status
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                tours = tours.Where(t => t.Status == statusFilter);
+            }
+
+            var model = tours
                 .Select(t => new TourListAllViewModel
                 {
                     TourID = t.TourID,
                     Name = t.Name,
                     Destination = t.Destination,
-                    Description = t.Description,
-                    DurationDays = t.DurationDays,
-                    DurationNights = t.DurationNights,
-                    AdultPrice = t.AdultPrice,
-                    ChildPrice = t.ChildPrice,
-                    MinGroupSize = t.MinGroupSize,
-                    MaxGroupSize = t.MaxGroupSize,
-                    DeparturePoints = t.DeparturePoints,
-                    IncludedServices = t.IncludedServices,
-                    ExcludedServices = t.ExcludedServices,
-                    ImageUrls = t.ImageUrls,
                     Status = t.Status,
-                    AverageRating = t.AverageRating,
-                    IsCancellable = t.IsCancellable,
-                    CancellationPolicyDescription = t.CancellationPolicyDescription
+                    // các thuộc tính khác cần thiết
                 })
-                .AsQueryable();
+                .ToList();
 
-            // Áp dụng tìm kiếm nếu có searchTerm
-            if (!string.IsNullOrEmpty(searchTerm))
-            {
-                searchTerm = RemoveDiacritics(searchTerm.ToLower().Trim());
-                query = query.Where(t => RemoveDiacritics(t.Name.ToLower()).Contains(searchTerm) ||
-                                         (t.Destination != null && RemoveDiacritics(t.Destination.ToLower()).Contains(searchTerm)));
-            }
-
-            // Áp dụng lọc theo trạng thái nếu có statusFilter
-            if (!string.IsNullOrEmpty(statusFilter))
-            {
-                query = query.Where(t => t.Status == statusFilter);
-            }
-
-            // Lấy tất cả dữ liệu đã lọc
-            var tours = query.ToList();
-
-            // Lưu các giá trị tìm kiếm và lọc để hiển thị lại trong form
+            // Pass lại search term và status hiện tại để giữ trạng thái View
             ViewData["CurrentFilter"] = searchTerm;
             ViewData["CurrentStatus"] = statusFilter;
 
-            // Truyền danh sách trạng thái cho dropdown
-            var statuses = new List<string> { "Active", "Inactive", "Draft" };
+            // Pass lại danh sách Status
+            var statuses = _context.Tours
+                .Select(t => t.Status)
+                .Distinct()
+                .ToList();
             ViewData["Statuses"] = statuses;
 
-            return View(tours);
+            return View(model);
         }
+
 
         private string RemoveDiacritics(string text)
         {

@@ -59,7 +59,7 @@ public class TourGuideController : Controller
         EmailRequest emailRequest = new EmailRequest();
         var TourGuideId = 3;
         emailRequest.htmlbody = MailUtil.AssignTourGuide(GetTourGuidebyID(TourGuideId));
-        _emailSerivce.SendEmail("trangtran.170204@gmail.com", "TOUREST: Xác nhận đặt tour thành công", emailRequest.htmlbody);
+        //_emailSerivce.SendEmail("trangtran.170204@gmail.com", "TOUREST: Xác nhận đặt tour thành công", emailRequest.htmlbody);
         try
         {
             Console.WriteLine($"Accepting assignment ID: {request?.AssignmentId}");
@@ -137,20 +137,20 @@ public class TourGuideController : Controller
                 }
 
                 // Prepare notification
-                var notificationView = new NotificationViewModel
-                {
-                    SenderUserID = 3, // Assuming tour guide ID is 3; adjust as needed
-                    RecipientUserID = booking.CustomerID,
-                    Type = "AssignmentAccepted",
-                    Title = "Tour Guide Assignment Accepted",
-                    Content = $"The tour guide has accepted your tour assignment (ID: {request.AssignmentId}).",
-                    RelatedEntityID = "TourAssignment",
-                    RelatedEntityType = "TourAssignment",
-                    ActionUrl = $"/Tour/Details/{assignment.TourGroupID}" // Adjust URL as needed
-                };
+                //var notificationView = new NotificationViewModel
+                //{
+                //    SenderUserID = 3, // Assuming tour guide ID is 3; adjust as needed
+                //    RecipientUserID = booking.CustomerID,
+                //    Type = "AssignmentAccepted",
+                //    Title = "Tour Guide Assignment Accepted",
+                //    Content = $"The tour guide has accepted your tour assignment (ID: {request.AssignmentId}).",
+                //    RelatedEntityID = "TourAssignment",
+                //    RelatedEntityType = "TourAssignment",
+                //    ActionUrl = $"/Tour/Details/{assignment.TourGroupID}" // Adjust URL as needed
+                //};
 
                 // Send SignalR notification
-                await _notificationService.SendingMessage(booking.CustomerID, notificationView);
+                //await _notificationService.SendingMessage(booking.CustomerID, notificationView);
 
                 // Prepare and send email
                 string subject = "Tour Guide Assignment Accepted";
