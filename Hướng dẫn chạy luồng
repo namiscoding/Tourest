@@ -1,0 +1,3 @@
+Do project chưa hoàn thiện, dưới đây là cách hướng dẫn chạy luồng với TourManager, dưới đây là đường link để test chức năng:
+https://localhost:7227/TourManager/GetUnassignedBookings: TourManager xem nhưng tour chưa được gán tourguide và dựa vào độ phù hợp được tính toán để assign tourguide phù hợp.
+https://localhost:7227/TourManager/GetRejectedAssignedTours: TourManager xem những rejected assignment và gán tourguide khác cho tour đó
